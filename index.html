@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Braden Blackburn Photography</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { margin: 0; padding: 0; }
+        .page { display: none; }
+        .page.active { display: block; }
+        .parallax { transform: translateY(0); transition: transform 0.1s ease-out; }
+    </style>
+</head>
+<body class="bg-white">
+    <!-- Navigation -->
+    <nav class="fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-md shadow-sm py-4">
+        <div class="max-w-7xl mx-auto px-6 flex items-center justify-between">
+            <a href="#" onclick="showPage('home')" class="text-2xl font-light tracking-wider">
+                <span class="text-gray-900">BRADEN</span>
+                <span class="ml-1 font-normal text-gray-900">BLACKBURN</span>
+            </a>
+            
+            <div class="hidden md:flex items-center gap-8">
+                <a href="#" onclick="showPage('home')" class="nav-link text-sm tracking-wide transition-all duration-300 relative group text-gray-700 font-light">
+                    Home
+                    <span class="absolute -bottom-1 left-0 h-px bg-current transition-all duration-300 w-0 group-hover:w-full"></span>
+                </a>
+                <a href="#" onclick="showPage('portfolio')" class="nav-link text-sm tracking-wide transition-all duration-300 relative group text-gray-700 font-light">
+                    Portfolio
+                    <span class="absolute -bottom-1 left-0 h-px bg-current transition-all duration-300 w-0 group-hover:w-full"></span>
+                </a>
+                <a href="#" onclick="showPage('about')" class="nav-link text-sm tracking-wide transition-all duration-300 relative group text-gray-700 font-light">
+                    About
+                    <span class="absolute -bottom-1 left-0 h-px bg-current transition-all duration-300 w-0 group-hover:w-full"></span>
+                </a>
+                <a href="#" onclick="showPage('services')" class="nav-link text-sm tracking-wide transition-all duration-300 relative group text-gray-700 font-light">
+                    Services
+                    <span class="absolute -bottom-1 left-0 h-px bg-current transition-all duration-300 w-0 group-hover:w-full"></span>
+                </a>
+                <a href="#" onclick="showPage('contact')" class="nav-link text-sm tracking-wide transition-all duration-300 relative group text-gray-700 font-light">
+                    Contact
+                    <span class="absolute -bottom-1 left-0 h-px bg-current transition-all duration-300 w-0 group-hover:w-full"></span>
+                </a>
+            </div>
+            
+            <button onclick="toggleMobileMenu()" class="md:hidden text-gray-900" id="menuBtn">
+                <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="3" y1="12" x2="21" y2="12"></line>
+                    <line x1="3" y1="6" x2="21" y2="6"></line>
+                    <line x1="3" y1="18" x2="21" y2="18"></line>
+                </svg>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Mobile Menu -->
+    <div id="mobileMenu" class="fixed inset-0 z-40 bg-white transform translate-x-full transition-transform duration-300 md:hidden">
+        <div class="flex flex-col items-center justify-center h-full gap-8">
+            <a href="#" onclick="showPage('home'); toggleMobileMenu();" class="text-2xl tracking-wide text-gray-600 font-light">Home</a>
+            <a href="#" onclick="showPage('portfolio'); toggleMobileMenu();" class="text-2xl tracking-wide text-gray-600 font-light">Portfolio</a>
+            <a href="#" onclick="showPage('about'); toggleMobileMenu();" class="text-2xl tracking-wide text-gray-600 font-light">About</a>
+            <a href="#" onclick="showPage('services'); toggleMobileMenu();" class="text-2xl tracking-wide text-gray-600 font-light">Services</a>
+            <a href="#" onclick="showPage('contact'); toggleMobileMenu();" class="text-2xl tracking-wide text-gray-600 font-light">Contact</a>
+        </div>
+    </div>
+
+    <!-- HOME PAGE -->
+    <div id="home" class="page active">
+        <section class="relative h-screen overflow-hidden">
+            <div class="absolute inset-0">
+                <img src="https://images.unsplash.com/photo-1606216794074-735e91aa2c92?w=2000&h=1200&fit=crop" alt="Hero" class="parallax w-full h-full object-cover">
+                <div class="absolute inset-0 bg-gradient-to-b from-black/40 via-black/20 to-black/60"></div>
+            </div>
+            
+            <div class="relative h-full flex items-center justify-center text-center px-6">
+                <div>
+                    <h1 class="text-5xl md:text-7xl lg:text-8xl font-light text-white mb-6 tracking-wide">
+                        Capturing<br>
+                        <span class="font-normal italic">Moments</span>
+                    </h1>
+                    <p class="text-lg md:text-xl text-gray-200 mb-8 font-light tracking-wide">
+                        Through the lens of Braden Blackburn
+                    </p>
+                    <button onclick="showPage('portfolio')" class="bg-white text-gray-900 hover:bg-gray-100 rounded-full px-8 py-4 text-base tracking-wide transition-colors">
+                        View Portfolio →
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <section class="py-24 px-6 bg-gray-50">
+            <div class="max-w-7xl mx-auto">
+                <div class="text-center mb-16">
+                    <h2 class="text-4xl md:text-5xl font-light mb-4 tracking-wide">Featured Work</h2>
+                    <p class="text-gray-600 text-lg font-light">A glimpse into recent sessions</p>
+                </div>
+                
+                <div class="grid md:grid-cols-2 gap-6">
+                    <div class="group relative overflow-hidden aspect-[4/5] cursor-pointer">
+                        <img src="https://images.unsplash.com/photo-1606216794074-735e91aa2c92?w=1200&h=1600&fit=crop" alt="Featured 1" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110">
+                    </div>
+                    <div class="group relative overflow-hidden aspect-[4/5] cursor-pointer">
+                        <img src="https://images.unsplash.com/photo-1519741497674-611481863552?w=1200&h=800&fit=crop" alt="Featured 2" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110">
+                    </div>
+                    <div class="group relative overflow-hidden aspect-[4/5] cursor-pointer">
+                        <img src="https://images.unsplash.com/photo-1523438885200-e635ba2c371e?w=1200&h=1600&fit=crop" alt="Featured 3" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110">
+                    </div>
+                    <div class="group relative overflow-hidden aspect-[4/5] cursor-pointer">
+                        <img src="https://images.unsplash.com/photo-1511285560929-80b456fea0bc?w=1200&h=800&fit=crop" alt="Featured 4" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110">
+                    </div>
+                </div>
+                
+                <div class="text-center mt-12">
+                    <button onclick="showPage('portfolio')" class="rounded-full px-8 py-3 border border-gray-300 hover:bg-gray-900 hover:text-white hover:border-gray-900 transition-all duration-300">
+                        Explore Full Portfolio
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <section class="py-24 px-6">
+            <div class="max-w-6xl mx-auto">
+                <div class="grid md:grid-cols-2 gap-16 items-center">
+                    <div>
+                        <div class="relative">
+                            <img src="https://images.unsplash.com/photo-1554048612-b6a482bc67e5?w=800&h=1000&fit=crop" alt="Braden Blackburn" class="w-full h-[600px] object-cover">
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <h2 class="text-4xl md:text-5xl font-light mb-6 tracking-wide">Meet Braden</h2>
+                        <div class="space-y-4 text-gray-600 leading-relaxed">
+                            <p>With a passion for storytelling through imagery, I specialize in capturing authentic moments that you'll treasure forever.</p>
+                            <p>Whether it's a wedding, portrait session, or special event, my goal is to create timeless photographs that reflect your unique story.</p>
+                        </div>
+                        <button onclick="showPage('about')" class="mt-6 text-gray-900 hover:underline">
+                            Learn More About Me →
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="py-24 px-6 bg-gray-900 text-white">
+            <div class="max-w-7xl mx-auto">
+                <div class="text-center mb-16">
+                    <h2 class="text-4xl md:text-5xl font-light mb-4 tracking-wide">Services</h2>
+                    <p class="text-gray-400 text-lg font-light">Tailored photography experiences for every occasion</p>
+                </div>
+                
+                <div class="grid md:grid-cols-3 gap-8">
+                    <div class="border border-gray-800 p-8 hover:border-gray-600 transition-colors duration-300">
+                        <h3 class="text-2xl font-light mb-3 tracking-wide">Weddings</h3>
+                        <p class="text-gray-400 mb-6">Complete coverage of your special day</p>
+                        <button onclick="showPage('services')" class="text-white hover:underline">View Details →</button>
+                    </div>
+                    <div class="border border-gray-800 p-8 hover:border-gray-600 transition-colors duration-300">
+                        <h3 class="text-2xl font-light mb-3 tracking-wide">Portraits</h3>
+                        <p class="text-gray-400 mb-6">Individual, couple, and family sessions</p>
+                        <button onclick="showPage('services')" class="text-white hover:underline">View Details →</button>
+                    </div>
+                    <div class="border border-gray-800 p-8 hover:border-gray-600 transition-colors duration-300">
+                        <h3 class="text-2xl font-light mb-3 tracking-wide">Events</h3>
+                        <p class="text-gray-400 mb-6">Corporate and private event photography</p>
+                        <button onclick="showPage('services')" class="text-white hover:underline">View Details →</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="py-24 px-6">
+            <div class="max-w-4xl mx-auto text-center">
+                <h2 class="text-4xl md:text-5xl font-light mb-6 tracking-wide">Let's Create Something Beautiful</h2>
+                <p class="text-gray-600 text-lg mb-8 font-light">Ready to capture your story? Get in touch to discuss your photography needs.</p>
+                <button onclick="showPage('contact')" class="bg-gray-900 hover:bg-gray-800 rounded-full px-12 py-4 text-white text-base tracking-wide">
+                    Get In Touch
+                </button>
+            </div>
+        </section>
+    </div>
+
+    <!-- PORTFOLIO PAGE -->
+    <div id="portfolio" class="page pt-24 pb-16 bg-white">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="text-center mb-16">
+                <h1 class="text-5xl md:text-6xl font-light mb-4 tracking-wide">Portfolio</h1>
+                <p class="text-gray-600 text-lg font-light">A collection of my favorite moments</p>
+            </div>
+            
+            <div class="flex flex-wrap justify-center gap-4 mb-12">
+                <button onclick="filterPortfolio('all')" class="filter-btn px-6 py-2 rounded-full text-sm tracking-wide bg-gray-900 text-white">All Work</button>
+                <button onclick="filterPortfolio('weddings')" class="filter-btn px-6 py-2 rounded-full text-sm tracking-wide bg-gray-100 text-gray-700">Weddings</button>
+                <button onclick="filterPortfolio('portraits')" class="filter-btn px-6 py-2 rounded-full text-sm tracking-wide bg-gray-100 text-gray-700">Portraits</button>
+                <button onclick="filterPortfolio('events')" class="filter-btn px-6 py-2 rounded-full text-sm tracking-wide bg-gray-100 text-gray-700">Events</button>
+            </div>
+            
+            <div class="grid md:grid-cols-3 gap-6" id="portfolioGrid">
+                <div class="portfolio-item group cursor-pointer" data-category="weddings">
+                    <img src="https://images.unsplash.com/photo-1606216794074-735e91aa2c92?w=800&h=1000&fit=crop" alt="Portfolio 1" class="w-full h-auto transition-transform duration-700 group-hover:scale-110">
+                </div>
+                <div class="portfolio-item group cursor-pointer" data-category="portraits">
+                    <img src="https://images.unsplash.com/photo-1519741497674-611481863552?w=800&h=600&fit=crop" alt="Portfolio 2" class="w-full h-auto transition-transform duration-700 group-hover:scale-110">
+                </div>
+                <div class="portfolio-item group cursor-pointer" data-category="weddings">
+                    <img src="https://images.unsplash.com/photo-1523438885200-e635ba2c371e?w=800&h=1000&fit=crop" alt="Portfolio 3" class="w-full h-auto transition-transform duration-700 group-hover:scale-110">
+                </div>
+                <div class="portfolio-item group cursor-pointer" data-category="events">
+                    <img src="https://images.unsplash.com/photo-1511285560929-80b456fea0bc?w=800&h=600&fit=crop" alt="Portfolio 4" class="w-full h-auto transition-transform duration-700 group-hover:scale-110">
+                </div>
+                <div class="portfolio-item group cursor-pointer" data-category="portraits">
+                    <img src="https://images.unsplash.com/photo-1529635731460-8504839715b6?w=800&h=1000&fit=crop" alt="Portfolio 5" class="w-full h-auto transition-transform duration-700 group-hover:scale-110">
+                </div>
+                <div class="portfolio-item group cursor-pointer" data-category="weddings">
+                    <img src="https://images.unsplash.com/photo-1583939003579-730e3918a45a?w=800&h=600&fit=crop" alt="Portfolio 6" class="w-full h-auto transition-transform duration-700 group-hover:scale-110">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ABOUT PAGE -->
+    <div id="about" class="page pt-24 pb-16 bg-white">
+        <section class="relative h-[60vh] overflow-hidden mb-24">
+            <img src="https://images.unsplash.com/photo-1554048612-b6a482bc67e5?w=2000&h=1200&fit=crop" alt="Braden Blackburn" class="w-full h-full object-cover">
+            <div class="absolute inset-0 bg-gradient-to-b from-black/40 to-black/60"></div>
+            <div class="absolute inset-0 flex items-center justify-center">
+                <h1 class="text-5xl md:text-7xl font-light text-white tracking-wide">About Me</h1>
+            </div>
+        </section>
+        
+        <section class="max-w-4xl mx-auto px-6 mb-24">
+            <div class="space-y-6 text-gray-700 leading-relaxed text-lg">
+                <p class="text-2xl font-light text-gray-900 mb-8">
+                    Hi, I'm Braden Blackburn — a photographer passionate about capturing the beauty in everyday moments.
+                </p>
+                
+                <p>Photography has always been more than just a profession for me; it's a way to freeze time and preserve the emotions, connections, and stories that make life meaningful. From intimate portraits to grand celebrations, I believe every moment deserves to be remembered.</p>
+                
+                <p>My journey into photography began when I picked up my first camera. Since then, I've had the privilege of working with amazing clients, capturing everything from weddings and engagements to family portraits and special events.</p>
+                
+                <p>What sets my work apart is my commitment to authenticity. I don't believe in overly posed or artificial shots. Instead, I focus on creating a comfortable environment where genuine emotions and connections can shine through. The result? Images that feel timeless, natural, and uniquely yours.</p>
+            </div>
+        </section>
+        
+        <section class="bg-gray-50 py-20 mb-24">
+            <div class="max-w-6xl mx-auto px-6">
+                <div class="grid md:grid-cols-4 gap-8">
+                    <div class="text-center">
+                        <div class="text-4xl font-light mb-2">500+</div>
+                        <div class="text-gray-600 text-sm tracking-wide">Sessions Completed</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-4xl font-light mb-2">100+</div>
+                        <div class="text-gray-600 text-sm tracking-wide">Happy Couples</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-4xl font-light mb-2">5+</div>
+                        <div class="text-gray-600 text-sm tracking-wide">Years Experience</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-4xl font-light mb-2">1000+</div>
+                        <div class="text-gray-600 text-sm tracking-wide">Satisfied Clients</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <section class="max-w-6xl mx-auto px-6 mb-24">
+            <div class="text-center mb-12">
+                <h2 class="text-4xl md:text-5xl font-light mb-4 tracking-wide">My Philosophy</h2>
+                <p class="text-gray-600 text-lg font-light">What guides my approach to photography</p>
+            </div>
+            
+            <div class="grid md:grid-cols-3 gap-8">
+                <div class="text-center p-8">
+                    <h3 class="text-2xl font-light mb-4 tracking-wide">Authenticity</h3>
+                    <p class="text-gray-600 leading-relaxed">I capture real emotions and genuine moments, not forced poses. Your photos should reflect who you truly are.</p>
+                </div>
+                <div class="text-center p-8">
+                    <h3 class="text-2xl font-light mb-4 tracking-wide">Connection</h3>
+                    <p class="text-gray-600 leading-relaxed">Building trust with my clients is essential. When you're comfortable, the best moments naturally unfold.</p>
+                </div>
+                <div class="text-center p-8">
+                    <h3 class="text-2xl font-light mb-4 tracking-wide">Timelessness</h3>
+                    <p class="text-gray-600 leading-relaxed">Trends come and go, but great photography endures. I focus on creating images you'll cherish forever.</p>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- SERVICES PAGE -->
+    <div id="services" class="page pt-24 pb-16 bg-white">
+        <section class="max-w-5xl mx-auto px-6 mb-20 text-center">
+            <h1 class="text-5xl md:text-6xl font-light mb-6 tracking-wide">Services & Investment</h1>
+            <p class="text-gray-600 text-lg font-light max-w-2xl mx-auto leading-relaxed">
+                Quality photography is an investment in memories that last a lifetime. I offer flexible packages to suit your needs and budget.
+            </p>
+        </section>
+        
+        <section class="max-w-7xl mx-auto px-6 mb-20">
+            <div class="space-y-20">
+                <div class="grid md:grid-cols-2 gap-12 items-center">
+                    <div>
+                        <img src="https://images.unsplash.com/photo-1606216794074-735e91aa2c92?w=800&h=600&fit=crop" alt="Wedding Photography" class="w-full h-auto">
+                    </div>
+                    <div>
+                        <h2 class="text-3xl md:text-4xl font-light mb-4 tracking-wide">Wedding Photography</h2>
+                        <p class="text-gray-600 mb-6 leading-relaxed">Comprehensive coverage of your special day from preparation to reception</p>
+                        <ul class="space-y-3 mb-6">
+                            <li class="flex items-start gap-3 text-gray-600">✓ Full day coverage (8-12 hours)</li>
+                            <li class="flex items-start gap-3 text-gray-600">✓ Second photographer included</li>
+                            <li class="flex items-start gap-3 text-gray-600">✓ Engagement session</li>
+                            <li class="flex items-start gap-3 text-gray-600">✓ High-resolution edited images</li>
+                        </ul>
+                        <div class="text-2xl font-light text-gray-900 mb-6">Starting at $2,500</div>
+                        <button onclick="showPage('contact')" class="bg-gray-900 hover:bg-gray-800 rounded-full px-8 py-3 text-white">Book This Service</button>
+                    </div>
+                </div>
+                
+                <div class="grid md:grid-cols-2 gap-12 items-center">
+                    <div class="md:order-2">
+                        <img src="https://images.unsplash.com/photo-1554048612-b6a482bc67e5?w=800&h=600&fit=crop" alt="Portrait Sessions" class="w-full h-auto">
+                    </div>
+                    <div class="md:order-1">
+                        <h2 class="text-3xl md:text-4xl font-light mb-4 tracking-wide">Portrait Sessions</h2>
+                        <p class="text-gray-600 mb-6 leading-relaxed">Individual, couple, family, and senior portraits in studio or on location</p>
+                        <ul class="space-y-3 mb-6">
+                            <li class="flex items-start gap-3 text-gray-600">✓ 1-2 hour session</li>
+                            <li class="flex items-start gap-3 text-gray-600">✓ Multiple outfit changes</li>
+                            <li class="flex items-start gap-3 text-gray-600">✓ Location of your choice</li>
+                            <li class="flex items-start gap-3 text-gray-600">✓ 25+ edited high-resolution images</li>
+                        </ul>
+                        <div class="text-2xl font-light text-gray-900 mb-6">Starting at $350</div>
+                        <button onclick="showPage('contact')" class="bg-gray-900 hover:bg-gray-800 rounded-full px-8 py-3 text-white">Book This Service</button>
+                    </div>
+                </div>
+                
+                <div class="grid md:grid-cols-2 gap-12 items-center">
+                    <div>
+                        <img src="https://images.unsplash.com/photo-1511285560929-80b456fea0bc?w=800&h=600&fit=crop" alt="Event Photography" class="w-full h-auto">
+                    </div>
+                    <div>
+                        <h2 class="text-3xl md:text-4xl font-light mb-4 tracking-wide">Event Photography</h2>
+                        <p class="text-gray-600 mb-6 leading-relaxed">Corporate events, parties, and special celebrations captured professionally</p>
+                        <ul class="space-y-3 mb-6">
+                            <li class="flex items-start gap-3 text-gray-600">✓ Flexible hourly packages</li>
+                            <li class="flex items-start gap-3 text-gray-600">✓ Candid and formal shots</li>
+                            <li class="flex items-start gap-3 text-gray-600">✓ Fast turnaround time</li>
+                            <li class="flex items-start gap-3 text-gray-600">✓ High-resolution edited images</li>
+                        </ul>
+                        <div class="text-2xl font-light text-gray-900 mb-6">Starting at $200/hour</div>
+                        <button onclick="showPage('contact')" class="bg-gray-900 hover:bg-gray-800 rounded-full px-8 py-3 text-white">Book This Service</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- CONTACT PAGE -->
+    <div id="contact" class="page pt-24 pb-16 bg-white">
+        <section class="max-w-5xl mx-auto px-6 mb-20 text-center">
+            <h1 class="text-5xl md:text-6xl font-light mb-6 tracking-wide">Let's Connect</h1>
+            <p class="text-gray-600 text-lg font-light max-w-2xl mx-auto leading-relaxed">
+                Ready to capture your story? Fill out the form below or reach out directly. I typically respond within 24 hours.
+            </p>
+        </section>
+        
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="grid lg:grid-cols-5 gap-16">
+                <div class="lg:col-span-3">
+                    <form onsubmit="handleContactSubmit(event)" class="space-y-6">
+                        <div class="grid md:grid-cols-2 gap-6">
+                            <div class="space-y-2">
+                                <label class="text-gray-700 block">Full Name *</label>
+                                <input required class="border border-gray-300 p-3 w-full rounded" placeholder="John Doe">
+                            </div>
+                            <div class="space-y-2">
+                                <label class="text-gray-700 block">Email Address *</label>
+                                <input type="email" required class="border border-gray-300 p-3 w-full rounded" placeholder="john@example.com">
+                            </div>
+                        </div>
+                        
+                        <div class="grid md:grid-cols-2 gap-6">
+                            <div class="space-y-2">
+                                <label class="text-gray-700 block">Phone Number</label>
+                                <input type="tel" class="border border-gray-300 p-3 w-full rounded" placeholder="(555) 123-4567">
+                            </div>
+                            <div class="space-y-2">
+                                <label class="text-gray-700 block">Service Type *</label>
+                                <select required class="border border-gray-300 p-3 w-full rounded">
+                                    <option value="">Select a service</option>
+                                    <option value="wedding">Wedding Photography</option>
+                                    <option value="portrait">Portrait Session</option>
+                                    <option value="event">Event Photography</option>
+                                    <option value="other">Other / Not Sure</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="space-y-2">
+                            <label class="text-gray-700 block">Tell Me About Your Vision *</label>
+                            <textarea required class="border border-gray-300 p-3 w-full rounded min-h-[150px]" placeholder="Share details about your event, location preferences, style inspiration, or any questions you have..."></textarea>
+                        </div>
+                        
+                        <button type="submit" class="w-full md:w-auto bg-gray-900 hover:bg-gray-800 rounded-full px-12 py-4 text-white text-base tracking-wide">
+                            Send Message
+                        </button>
+                    </form>
+                </div>
+                
+                <div class="lg:col-span-2">
+                    <div class="bg-gray-50 p-8 rounded-lg mb-8">
+                        <h3 class="text-2xl font-light mb-6 tracking-wide">Get In Touch</h3>
+                        <div class="space-y-6">
+                            <div class="flex items-start gap-4">
+                                <div class="text-gray-900">📍 Fort Mitchell, Kentucky</div>
+                            </div>
+                            <div class="flex items-start gap-4">
+                                <div class="text-gray-900">📞 (555) 123-4567</div>
+                            </div>
+                            <div class="flex items-start gap-4">
+                                <div class="text-gray-900">✉️ braden@photography.com</div>
+                            </div>
+                            <div class="flex items-start gap-4">
+                                <div class="text-gray-900">📷 @bradenblackburn</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-gray-900 p-8 rounded-lg text-white mb-8">
+                        <h3 class="text-xl font-light mb-4 tracking-wide">Response Time</h3>
+                        <p class="text-gray-400 text-sm leading-relaxed">
+                            I typically respond to all inquiries within 24 hours. If you haven't heard back, please check your spam folder or reach out directly via phone.
+                        </p>
+                    </div>
+                    
+                    <div class="border border-gray-200 p-8 rounded-lg">
+                        <h3 class="text-xl font-light mb-4 tracking-wide">Booking Notice</h3>
+                        <p class="text-gray-600 text-sm leading-relaxed">
+                            For weddings and large events, I recommend booking 6-12 months in advance. Portrait sessions can typically be scheduled within 2-4 weeks.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white py-12">
+        <div class="max-w-7xl mx-auto px-6 text-center">
+            <div class="text-2xl font-light tracking-wider mb-4">
+                <span>BRADEN</span> <span class="font-normal">BLACKBURN</span>
+            </div>
+            <p class="text-gray-400 mb-6">Capturing life's most precious moments</p>
+            <div class="flex justify-center gap-6 mb-6">
+                <a href="#" class="text-gray-400 hover:text-white transition-colors">Instagram</a>
+                <a href="#" class="text-gray-400 hover:text-white transition-colors">Facebook</a>
+                <a href="mailto:braden@photography.com" class="text-gray-400 hover:text-white transition-colors">Email</a>
+            </div>
+            <p class="text-gray-500 text-sm">© 2024 Braden Blackburn Photography. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        // Page navigation
+        function showPage(pageName) {
+            document.querySelectorAll('.page').forEach(page => {
+                page.classList.remove('active');
+            });
+            document.getElementById(pageName).classList.add('active');
+            
+            // Update nav active state
+            document.querySelectorAll('.nav-link').forEach(link => {
+                link.classList.remove('font-medium');
+                link.classList.add('font-light');
+                const underline = link.querySelector('span');
+                if (underline) underline.classList.remove('w-full');
+            });
+            
+            window.scrollTo(0, 0);
+        }
+
+        // Mobile menu toggle
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobileMenu');
+            menu.classList.toggle('translate-x-full');
+        }
+
+        // Portfolio filter
+        function filterPortfolio(category) {
+            const items = document.querySelectorAll('.portfolio-item');
+            const buttons = document.querySelectorAll('.filter-btn');
+            
+            buttons.forEach(btn => {
+                btn.classList.remove('bg-gray-900', 'text-white');
+                btn.classList.add('bg-gray-100', 'text-gray-700');
+            });
+            event.target.classList.remove('bg-gray-100', 'text-gray-700');
+            event.target.classList.add('bg-gray-900', 'text-white');
+            
+            items.forEach(item => {
+                if (category === 'all' || item.dataset.category === category) {
+                    item.style.display = 'block';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        }
+
+        // Contact form submission
+        function handleContactSubmit(e) {
+            e.preventDefault();
+            alert('Thank you for your inquiry! I\'ll get back to you within 24 hours.');
+            e.target.reset();
+        }
+
+        // Parallax effect on home page
+        window.addEventListener('scroll', () => {
+            const parallax = document.querySelector('.parallax');
+            if (parallax && document.getElementById('home').classList.contains('active')) {
+                const scrolled = window.pageYOffset;
+                parallax.style.transform = `translateY(${scrolled * 0.5}px)`;
+            }
+        });
+    </script>
+</body>
+</html>
