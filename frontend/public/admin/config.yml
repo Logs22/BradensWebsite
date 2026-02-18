@@ -6,7 +6,6 @@ backend:
   auth_endpoint: github
   client_id: Ov23li1bIuX6xlBqkojs
 
-local_backend: true
 media_folder: "frontend/public/images"
 public_folder: "/images"
 
