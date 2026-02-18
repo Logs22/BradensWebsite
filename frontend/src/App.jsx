@@ -10,20 +10,22 @@ function App() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
   useEffect(() => {
+    const baseUrl = import.meta.env.BASE_URL
+
     // Load hero content
-    fetch('/content/hero.json')
+    fetch(`${baseUrl}content/hero.json`)
       .then(res => res.json())
       .then(data => setHero(data))
       .catch(err => console.error('Error loading hero:', err))
 
     // Load about content
-    fetch('/content/about.json')
+    fetch(`${baseUrl}content/about.json`)
       .then(res => res.json())
       .then(data => setAbout(data))
       .catch(err => console.error('Error loading about:', err))
 
     // Load portfolio items
-    fetch('/content/portfolio.json')
+    fetch(`${baseUrl}content/portfolio.json`)
       .then(res => res.json())
       .then(data => {
         const items = data.items || data
