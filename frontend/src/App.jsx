@@ -23,16 +23,14 @@ function App() {
       .catch(err => console.error('Error loading about:', err))
 
     // Load portfolio items
-    const portfolioData = [
-      { image: 'https://images.unsplash.com/photo-1606216794074-735e91aa2c92?w=800&h=1000&fit=crop', category: 'weddings', title: 'Wedding 1' },
-      { image: 'https://images.unsplash.com/photo-1519741497674-611481863552?w=800&h=600&fit=crop', category: 'portraits', title: 'Portrait 1' },
-      { image: 'https://images.unsplash.com/photo-1523438885200-e635ba2c371e?w=800&h=1000&fit=crop', category: 'weddings', title: 'Wedding 2' },
-      { image: 'https://images.unsplash.com/photo-1511285560929-80b456fea0bc?w=800&h=600&fit=crop', category: 'events', title: 'Event 1' },
-      { image: 'https://images.unsplash.com/photo-1529635731460-8504839715b6?w=800&h=1000&fit=crop', category: 'portraits', title: 'Portrait 2' },
-      { image: 'https://images.unsplash.com/photo-1583939003579-730e3918a45a?w=800&h=600&fit=crop', category: 'weddings', title: 'Wedding 3' },
-    ]
-    setPortfolio(portfolioData)
-    setFilteredPortfolio(portfolioData)
+    fetch('/content/portfolio.json')
+      .then(res => res.json())
+      .then(data => {
+        const items = data.items || data
+        setPortfolio(items)
+        setFilteredPortfolio(items)
+      })
+      .catch(err => console.error('Error loading portfolio:', err))
   }, [])
 
   const showPage = (page) => {
@@ -326,7 +324,7 @@ function App() {
       <footer className="bg-gray-900 text-white py-12 px-6">
         <div className="max-w-7xl mx-auto text-center">
           <p className="text-gray-400 font-light">© 2024 Braden Blackburn Photography. All rights reserved.</p>
-          <p className="text-gray-500 text-sm mt-2">Edited via <a href="/#/admin" className="hover:text-white underline">Admin Panel</a></p>
+          <p className="text-gray-500 text-sm mt-2">Edited via <a href="/BradensWebsite/admin/" className="hover:text-white underline">Admin Panel</a></p>
         </div>
       </footer>
     </div>

@@ -31,9 +31,12 @@ collections:
   
   - name: "portfolio"
     label: "Portfolio"
-    folder: "frontend/src/content/portfolio"
-    create: true
+    file: "frontend/src/content/portfolio.json"
     fields:
-      - { label: "Image", name: "image", widget: "image" }
-      - { label: "Category", name: "category", widget: "select", options: ["Weddings", "Portraits", "Events"] }
-      - { label: "Title", name: "title", widget: "string" }
+      - label: "Portfolio Items"
+        name: "items"
+        widget: "list"
+        fields:
+          - { label: "Image", name: "image", widget: "image" }
+          - { label: "Category", name: "category", widget: "select", options: ["weddings", "portraits", "events"] }
+          - { label: "Title", name: "title", widget: "string" }
