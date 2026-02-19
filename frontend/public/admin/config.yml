@@ -5,7 +5,7 @@ backend:
   base_url: https://sveltia-cms-auth.l22bitt1.workers.dev
 
 media_folder: "frontend/public/images"
-public_folder: "/BradensWebsite/images"
+public_folder: "/images"
 
 collections:
   - name: "pages"
