@@ -11,21 +11,22 @@ function App() {
 
   useEffect(() => {
     const baseUrl = import.meta.env.BASE_URL
+    const cacheBuster = `?t=${Date.now()}`
 
     // Load hero content
-    fetch(`${baseUrl}content/hero.json`)
+    fetch(`${baseUrl}content/hero.json${cacheBuster}`)
       .then(res => res.json())
       .then(data => setHero(data))
       .catch(err => console.error('Error loading hero:', err))
 
     // Load about content
-    fetch(`${baseUrl}content/about.json`)
+    fetch(`${baseUrl}content/about.json${cacheBuster}`)
       .then(res => res.json())
       .then(data => setAbout(data))
       .catch(err => console.error('Error loading about:', err))
 
     // Load portfolio items
-    fetch(`${baseUrl}content/portfolio.json`)
+    fetch(`${baseUrl}content/portfolio.json${cacheBuster}`)
       .then(res => res.json())
       .then(data => {
         const items = data.items || data
