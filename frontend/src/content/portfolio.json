@@ -29,6 +29,16 @@
       "image": "https://images.unsplash.com/photo-1583939003579-730e3918a45a?w=800&h=600&fit=crop",
       "category": "weddings",
       "title": "Wedding 3"
+    },
+    {
+      "image": "/BradensWebsite/images/alex-albon-williams-mercedes-fw44-2022-saudi-arabian-gp-1920×1080.jpg",
+      "category": "events",
+      "title": "Test Photo"
+    },
+    {
+      "image": "/BradensWebsite/images/2021-qatar-grand-prix-valtteri-bottas-mercedes-1920×1200.jpg",
+      "category": "portraits",
+      "title": "another test"
     }
   ]
 }
