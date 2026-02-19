@@ -2,7 +2,7 @@ backend:
   name: github
   repo: logs22/BradensWebsite
   branch: main
-  base_url: https://sveltia-cms-auth.<your-subdomain>.workers.dev
+  base_url: https://sveltia-cms-auth.l22bitt1.workers.dev
 
 media_folder: "frontend/public/images"
 public_folder: "/BradensWebsite/images"
