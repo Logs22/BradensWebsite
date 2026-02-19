@@ -2,8 +2,6 @@ backend:
   name: github
   repo: logs22/BradensWebsite
   branch: main
-  base_url: https://auth.decapcms.com
-  auth_endpoint: github
   client_id: Ov23li1bIuX6xlBqkojs
 
 media_folder: "frontend/public/images"
