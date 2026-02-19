@@ -8,6 +8,7 @@ function App() {
   const [portfolio, setPortfolio] = useState([])
   const [filteredPortfolio, setFilteredPortfolio] = useState([])
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const [services, setServices] = useState([])
 
   useEffect(() => {
     const baseUrl = import.meta.env.BASE_URL
@@ -34,6 +35,12 @@ function App() {
         setFilteredPortfolio(items)
       })
       .catch(err => console.error('Error loading portfolio:', err))
+
+    // Load services content
+    fetch(`${baseUrl}content/services.json${cacheBuster}`)
+      .then(res => res.json())
+      .then(data => setServices(data.services || []))
+      .catch(err => console.error('Error loading services:', err))
   }, [])
 
   const showPage = (page) => {
@@ -332,60 +339,28 @@ function App() {
           </section>
           <section className="max-w-7xl mx-auto px-6 mb-20">
             <div className="space-y-20">
-              {/* Wedding Photography */}
-              <div className="grid md:grid-cols-2 gap-12 items-center">
-                <div>
-                  <img src="https://images.unsplash.com/photo-1606216794074-735e91aa2c92?w=800&h=600&fit=crop" alt="Wedding Photography" className="w-full h-auto" />
+              {services.map((service, idx) => (
+                <div key={idx} className="grid md:grid-cols-2 gap-12 items-center">
+                  <div className={idx % 2 === 1 ? 'md:order-2' : ''}>
+                    {service.image && (
+                      <img src={service.image} alt={service.title} className="w-full h-auto" />
+                    )}
+                  </div>
+                  <div className={idx % 2 === 1 ? 'md:order-1' : ''}>
+                    <h2 className="text-3xl md:text-4xl font-light mb-4 tracking-wide">{service.title}</h2>
+                    <p className="text-gray-600 mb-6 leading-relaxed">{service.desc}</p>
+                    {service.features && (
+                      <ul className="space-y-3 mb-6">
+                        {service.features.map((feature, fidx) => (
+                          <li key={fidx} className="flex items-start gap-3 text-gray-600">✓ {feature}</li>
+                        ))}
+                      </ul>
+                    )}
+                    <div className="text-2xl font-light text-gray-900 mb-6">{service.price}</div>
+                    <button onClick={() => showPage('contact')} className="bg-gray-900 hover:bg-gray-800 rounded-full px-8 py-3 text-white">Book This Service</button>
+                  </div>
                 </div>
-                <div>
-                  <h2 className="text-3xl md:text-4xl font-light mb-4 tracking-wide">Wedding Photography</h2>
-                  <p className="text-gray-600 mb-6 leading-relaxed">Comprehensive coverage of your special day from preparation to reception</p>
-                  <ul className="space-y-3 mb-6">
-                    <li className="flex items-start gap-3 text-gray-600">✓ Full day coverage (8-12 hours)</li>
-                    <li className="flex items-start gap-3 text-gray-600">✓ Second photographer included</li>
-                    <li className="flex items-start gap-3 text-gray-600">✓ Engagement session</li>
-                    <li className="flex items-start gap-3 text-gray-600">✓ High-resolution edited images</li>
-                  </ul>
-                  <div className="text-2xl font-light text-gray-900 mb-6">Starting at $2,500</div>
-                  <button onClick={() => showPage('contact')} className="bg-gray-900 hover:bg-gray-800 rounded-full px-8 py-3 text-white">Book This Service</button>
-                </div>
-              </div>
-              {/* Portrait Sessions */}
-              <div className="grid md:grid-cols-2 gap-12 items-center">
-                <div className="md:order-2">
-                  <img src="https://images.unsplash.com/photo-1554048612-b6a482bc67e5?w=800&h=600&fit=crop" alt="Portrait Sessions" className="w-full h-auto" />
-                </div>
-                <div className="md:order-1">
-                  <h2 className="text-3xl md:text-4xl font-light mb-4 tracking-wide">Portrait Sessions</h2>
-                  <p className="text-gray-600 mb-6 leading-relaxed">Individual, couple, family, and senior portraits in studio or on location</p>
-                  <ul className="space-y-3 mb-6">
-                    <li className="flex items-start gap-3 text-gray-600">✓ 1-2 hour session</li>
-                    <li className="flex items-start gap-3 text-gray-600">✓ Multiple outfit changes</li>
-                    <li className="flex items-start gap-3 text-gray-600">✓ Location of your choice</li>
-                    <li className="flex items-start gap-3 text-gray-600">✓ 25+ edited high-resolution images</li>
-                  </ul>
-                  <div className="text-2xl font-light text-gray-900 mb-6">Starting at $350</div>
-                  <button onClick={() => showPage('contact')} className="bg-gray-900 hover:bg-gray-800 rounded-full px-8 py-3 text-white">Book This Service</button>
-                </div>
-              </div>
-              {/* Event Photography */}
-              <div className="grid md:grid-cols-2 gap-12 items-center">
-                <div>
-                  <img src="https://images.unsplash.com/photo-1511285560929-80b456fea0bc?w=800&h=600&fit=crop" alt="Event Photography" className="w-full h-auto" />
-                </div>
-                <div>
-                  <h2 className="text-3xl md:text-4xl font-light mb-4 tracking-wide">Event Photography</h2>
-                  <p className="text-gray-600 mb-6 leading-relaxed">Corporate events, parties, and special celebrations captured professionally</p>
-                  <ul className="space-y-3 mb-6">
-                    <li className="flex items-start gap-3 text-gray-600">✓ Flexible hourly packages</li>
-                    <li className="flex items-start gap-3 text-gray-600">✓ Candid and formal shots</li>
-                    <li className="flex items-start gap-3 text-gray-600">✓ Fast turnaround time</li>
-                    <li className="flex items-start gap-3 text-gray-600">✓ High-resolution edited images</li>
-                  </ul>
-                  <div className="text-2xl font-light text-gray-900 mb-6">Starting at $200/hour</div>
-                  <button onClick={() => showPage('contact')} className="bg-gray-900 hover:bg-gray-800 rounded-full px-8 py-3 text-white">Book This Service</button>
-                </div>
-              </div>
+              ))}
             </div>
           </section>
         </div>
