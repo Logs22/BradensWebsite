@@ -1,44 +1,24 @@
 {
   "items": [
     {
-      "image": "https://images.unsplash.com/photo-1606216794074-735e91aa2c92?w=800&h=1000&fit=crop",
+      "image": "/BradensWebsite/images/SnapInsta.to_545239237_179799344848800_44_8564359939012858758_n.jpg",
       "category": "weddings",
-      "title": "Wedding 1"
+      "title": "Berger Wedding"
     },
     {
-      "image": "https://images.unsplash.com/photo-1519741497674-611481863552?w=800&h=600&fit=crop",
+      "image": "/BradensWebsite/images/SnapInsta.to_624845916_17994990734880044_4650095150698570657_n.jpg",
       "category": "portraits",
-      "title": "Portrait 1"
+      "title": "Mirror Shot"
     },
     {
-      "image": "https://images.unsplash.com/photo-1523438885200-e635ba2c371e?w=800&h=1000&fit=crop",
+      "image": "/BradensWebsite/images/SnapInsta.to_543810470_17979934508880044_7596406450075831608_n.jpg",
       "category": "weddings",
-      "title": "Wedding 2"
+      "title": "Berger Wedding 2"
     },
     {
-      "image": "https://images.unsplash.com/photo-1511285560929-80b456fea0bc?w=800&h=600&fit=crop",
+      "image": "/BradensWebsite/images/SnapInsta.to_534310447_17977314911880044_2654716348572056699_n.jpg",
       "category": "events",
-      "title": "Event 1"
-    },
-    {
-      "image": "https://images.unsplash.com/photo-1529635731460-8504839715b6?w=800&h=1000&fit=crop",
-      "category": "portraits",
-      "title": "Portrait 2"
-    },
-    {
-      "image": "https://images.unsplash.com/photo-1583939003579-730e3918a45a?w=800&h=600&fit=crop",
-      "category": "weddings",
-      "title": "Wedding 3"
-    },
-    {
-      "image": "/BradensWebsite/images/alex-albon-williams-mercedes-fw44-2022-saudi-arabian-gp-1920×1080.jpg",
-      "category": "events",
-      "title": "Test Photo"
-    },
-    {
-      "image": "/BradensWebsite/images/2021-qatar-grand-prix-valtteri-bottas-mercedes-1920×1200.jpg",
-      "category": "portraits",
-      "title": "another test"
+      "title": "NKU Soccer"
     }
   ]
 }
