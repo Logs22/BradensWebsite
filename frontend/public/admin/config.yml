@@ -40,6 +40,16 @@ collections:
             name: "items"
             widget: "list"
             fields:
-              - { label: "Image", name: "image", widget: "image" }
-              - { label: "Category", name: "category", widget: "select", options: ["weddings", "portraits", "events"] }
-              - { label: "Title", name: "title", widget: "string" }
+              - label: "Image"
+                name: "image"
+                widget: "image"
+              - label: "Category"
+                name: "category"
+                widget: "select"
+                options: 
+                  - "weddings"
+                  - "portraits"
+                  - "events"
+              - label: "Title"
+                name: "title"
+                widget: "string"
