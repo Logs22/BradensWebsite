@@ -1,0 +1,29 @@
+name: Diagnose Pushes
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Print GitHub context
+        run: |
+          echo "Commit: ${{ github.sha }}"
+          echo "Event before: ${{ github.event.before }}"
+          echo "Ref: ${{ github.ref }}"
+
+      - name: Show remote main ref
+        run: |
+          git ls-remote origin refs/heads/main || true
+
+      - name: Show changed files between commits
+        run: |
+          git --no-pager fetch origin main || true
+          git --no-pager diff --name-only ${{ github.event.before }} ${{ github.sha }} || true
+
+      - name: Debug environment
+        run: env | sort
