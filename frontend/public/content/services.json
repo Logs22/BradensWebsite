@@ -1,0 +1,40 @@
+{
+  "services": [
+    {
+      "title": "Wedding Photography",
+      "desc": "Comprehensive coverage of your special day from preparation to reception.",
+      "features": [
+        "Full day coverage (8-12 hours)",
+        "Second photographer included",
+        "Engagement session",
+        "High-resolution edited images"
+      ],
+      "price": "Starting at $2,500",
+      "image": ""
+    },
+    {
+      "title": "Portrait Sessions",
+      "desc": "Individual, couple, family, and senior portraits in studio or on location.",
+      "features": [
+        "1-2 hour session",
+        "Multiple outfit changes",
+        "Location of your choice",
+        "25+ edited high-resolution images"
+      ],
+      "price": "Starting at $350",
+      "image": ""
+    },
+    {
+      "title": "Event Photography",
+      "desc": "Corporate events, parties, and special celebrations captured professionally.",
+      "features": [
+        "Flexible hourly packages",
+        "Candid and formal shots",
+        "Fast turnaround time",
+        "High-resolution edited images"
+      ],
+      "price": "Starting at $200/hour",
+      "image": ""
+    }
+  ]
+}
