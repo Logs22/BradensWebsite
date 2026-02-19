@@ -1,0 +1,42 @@
+backend:
+  name: github
+  repo: logs22/BradensWebsite
+  branch: main
+  base_url: https://auth.decapcms.com
+  auth_endpoint: github
+  client_id: Ov23li1bIuX6xlBqkojs
+
+media_folder: "frontend/public/images"
+public_folder: "/BradensWebsite/images"
+
+collections:
+  - name: "pages"
+    label: "Pages"
+    files:
+      - name: "hero"
+        label: "Hero Section"
+        file: "frontend/src/content/hero.json"
+        fields:
+          - { label: "Hero Image", name: "heroImage", widget: "image" }
+          - { label: "Hero Title", name: "heroTitle", widget: "string" }
+          - { label: "Hero Subtitle", name: "heroSubtitle", widget: "string" }
+      
+      - name: "about"
+        label: "About Section"
+        file: "frontend/src/content/about.json"
+        fields:
+          - { label: "About Image", name: "aboutImage", widget: "image" }
+          - { label: "About Title", name: "aboutTitle", widget: "string" }
+          - { label: "About Text", name: "aboutText", widget: "markdown" }
+  
+  - name: "portfolio"
+    label: "Portfolio"
+    file: "frontend/src/content/portfolio.json"
+    fields:
+      - label: "Portfolio Items"
+        name: "items"
+        widget: "list"
+        fields:
+          - { label: "Image", name: "image", widget: "image" }
+          - { label: "Category", name: "category", widget: "select", options: ["weddings", "portraits", "events"] }
+          - { label: "Title", name: "title", widget: "string" }
