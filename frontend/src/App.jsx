@@ -263,21 +263,59 @@ function App() {
               <h1 className="text-5xl md:text-7xl font-light text-white tracking-wide">About Me</h1>
             </div>
           </section>
-          
+
           <section className="max-w-4xl mx-auto px-6 mb-24">
             <div className="space-y-6 text-gray-700 leading-relaxed text-lg">
               <p className="text-2xl font-light text-gray-900 mb-8">
                 Hi, I'm Braden Blackburn — a photographer passionate about capturing the beauty in everyday moments.
               </p>
-              
-              {about?.aboutText ? about.aboutText.split('\n\n').map((para, idx) => (
-                <p key={idx}>{para}</p>
-              )) : (
-                <>
-                  <p>Photography has always been more than just a profession for me; it's a way to freeze time and preserve the emotions, connections, and stories that make life meaningful.</p>
-                  <p>My journey into photography began when I picked up my first camera. Since then, I've had the privilege of working with amazing clients.</p>
-                </>
-              )}
+              <p>Photography has always been more than just a profession for me; it's a way to freeze time and preserve the emotions, connections, and stories that make life meaningful. From intimate portraits to grand celebrations, I believe every moment deserves to be remembered.</p>
+              <p>My journey into photography began when I picked up my first camera. Since then, I've had the privilege of working with amazing clients, capturing everything from weddings and engagements to family portraits and special events.</p>
+              <p>What sets my work apart is my commitment to authenticity. I don't believe in overly posed or artificial shots. Instead, I focus on creating a comfortable environment where genuine emotions and connections can shine through. The result? Images that feel timeless, natural, and uniquely yours.</p>
+            </div>
+          </section>
+
+          <section className="bg-gray-50 py-20 mb-24">
+            <div className="max-w-6xl mx-auto px-6">
+              <div className="grid md:grid-cols-4 gap-8">
+                <div className="text-center">
+                  <div className="text-4xl font-light mb-2">500+</div>
+                  <div className="text-gray-600 text-sm tracking-wide">Sessions Completed</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-4xl font-light mb-2">100+</div>
+                  <div className="text-gray-600 text-sm tracking-wide">Happy Couples</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-4xl font-light mb-2">5+</div>
+                  <div className="text-gray-600 text-sm tracking-wide">Years Experience</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-4xl font-light mb-2">1000+</div>
+                  <div className="text-gray-600 text-sm tracking-wide">Satisfied Clients</div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section className="max-w-6xl mx-auto px-6 mb-24">
+            <div className="text-center mb-12">
+              <h2 className="text-4xl md:text-5xl font-light mb-4 tracking-wide">My Philosophy</h2>
+              <p className="text-gray-600 text-lg font-light">What guides my approach to photography</p>
+            </div>
+            <div className="grid md:grid-cols-3 gap-8">
+              <div className="text-center p-8">
+                <h3 className="text-2xl font-light mb-4 tracking-wide">Authenticity</h3>
+                <p className="text-gray-600 leading-relaxed">I capture real emotions and genuine moments, not forced poses. Your photos should reflect who you truly are.</p>
+              </div>
+              <div className="text-center p-8">
+                <h3 className="text-2xl font-light mb-4 tracking-wide">Connection</h3>
+                <p className="text-gray-600 leading-relaxed">Building trust with my clients is essential. When you're comfortable, the best moments naturally unfold.</p>
+              </div>
+              <div className="text-center p-8">
+                <h3 className="text-2xl font-light mb-4 tracking-wide">Timelessness</h3>
+                <p className="text-gray-600 leading-relaxed">Trends come and go, but great photography endures. I focus on creating images you'll cherish forever.</p>
+              </div>
             </div>
           </section>
         </div>
@@ -285,39 +323,127 @@ function App() {
 
       {/* SERVICES PAGE */}
       {currentPage === 'services' && (
-        <div className="pt-24 pb-16">
-          <div className="max-w-7xl mx-auto px-6">
-            <h1 className="text-5xl md:text-6xl font-light mb-16 tracking-wide">Services</h1>
-            <div className="grid md:grid-cols-3 gap-8">
-              {[
-                { title: 'Weddings', desc: 'Complete coverage of your special day from preparation to celebration' },
-                { title: 'Portraits', desc: 'Individual, couple, and family sessions tailored to your style' },
-                { title: 'Events', desc: 'Corporate and private event photography capturing every moment' }
-              ].map((service, idx) => (
-                <div key={idx} className="border border-gray-200 p-8">
-                  <h3 className="text-2xl font-light mb-3 tracking-wide">{service.title}</h3>
-                  <p className="text-gray-600">{service.desc}</p>
+        <div className="pt-24 pb-16 bg-white">
+          <section className="max-w-5xl mx-auto px-6 mb-20 text-center">
+            <h1 className="text-5xl md:text-6xl font-light mb-6 tracking-wide">Services & Investment</h1>
+            <p className="text-gray-600 text-lg font-light max-w-2xl mx-auto leading-relaxed">
+              Quality photography is an investment in memories that last a lifetime. I offer flexible packages to suit your needs and budget.
+            </p>
+          </section>
+          <section className="max-w-7xl mx-auto px-6 mb-20">
+            <div className="space-y-20">
+              {/* Wedding Photography */}
+              <div className="grid md:grid-cols-2 gap-12 items-center">
+                <div>
+                  <img src="https://images.unsplash.com/photo-1606216794074-735e91aa2c92?w=800&h=600&fit=crop" alt="Wedding Photography" className="w-full h-auto" />
                 </div>
-              ))}
+                <div>
+                  <h2 className="text-3xl md:text-4xl font-light mb-4 tracking-wide">Wedding Photography</h2>
+                  <p className="text-gray-600 mb-6 leading-relaxed">Comprehensive coverage of your special day from preparation to reception</p>
+                  <ul className="space-y-3 mb-6">
+                    <li className="flex items-start gap-3 text-gray-600">✓ Full day coverage (8-12 hours)</li>
+                    <li className="flex items-start gap-3 text-gray-600">✓ Second photographer included</li>
+                    <li className="flex items-start gap-3 text-gray-600">✓ Engagement session</li>
+                    <li className="flex items-start gap-3 text-gray-600">✓ High-resolution edited images</li>
+                  </ul>
+                  <div className="text-2xl font-light text-gray-900 mb-6">Starting at $2,500</div>
+                  <button onClick={() => showPage('contact')} className="bg-gray-900 hover:bg-gray-800 rounded-full px-8 py-3 text-white">Book This Service</button>
+                </div>
+              </div>
+              {/* Portrait Sessions */}
+              <div className="grid md:grid-cols-2 gap-12 items-center">
+                <div className="md:order-2">
+                  <img src="https://images.unsplash.com/photo-1554048612-b6a482bc67e5?w=800&h=600&fit=crop" alt="Portrait Sessions" className="w-full h-auto" />
+                </div>
+                <div className="md:order-1">
+                  <h2 className="text-3xl md:text-4xl font-light mb-4 tracking-wide">Portrait Sessions</h2>
+                  <p className="text-gray-600 mb-6 leading-relaxed">Individual, couple, family, and senior portraits in studio or on location</p>
+                  <ul className="space-y-3 mb-6">
+                    <li className="flex items-start gap-3 text-gray-600">✓ 1-2 hour session</li>
+                    <li className="flex items-start gap-3 text-gray-600">✓ Multiple outfit changes</li>
+                    <li className="flex items-start gap-3 text-gray-600">✓ Location of your choice</li>
+                    <li className="flex items-start gap-3 text-gray-600">✓ 25+ edited high-resolution images</li>
+                  </ul>
+                  <div className="text-2xl font-light text-gray-900 mb-6">Starting at $350</div>
+                  <button onClick={() => showPage('contact')} className="bg-gray-900 hover:bg-gray-800 rounded-full px-8 py-3 text-white">Book This Service</button>
+                </div>
+              </div>
+              {/* Event Photography */}
+              <div className="grid md:grid-cols-2 gap-12 items-center">
+                <div>
+                  <img src="https://images.unsplash.com/photo-1511285560929-80b456fea0bc?w=800&h=600&fit=crop" alt="Event Photography" className="w-full h-auto" />
+                </div>
+                <div>
+                  <h2 className="text-3xl md:text-4xl font-light mb-4 tracking-wide">Event Photography</h2>
+                  <p className="text-gray-600 mb-6 leading-relaxed">Corporate events, parties, and special celebrations captured professionally</p>
+                  <ul className="space-y-3 mb-6">
+                    <li className="flex items-start gap-3 text-gray-600">✓ Flexible hourly packages</li>
+                    <li className="flex items-start gap-3 text-gray-600">✓ Candid and formal shots</li>
+                    <li className="flex items-start gap-3 text-gray-600">✓ Fast turnaround time</li>
+                    <li className="flex items-start gap-3 text-gray-600">✓ High-resolution edited images</li>
+                  </ul>
+                  <div className="text-2xl font-light text-gray-900 mb-6">Starting at $200/hour</div>
+                  <button onClick={() => showPage('contact')} className="bg-gray-900 hover:bg-gray-800 rounded-full px-8 py-3 text-white">Book This Service</button>
+                </div>
+              </div>
             </div>
-          </div>
+          </section>
         </div>
       )}
 
       {/* CONTACT PAGE */}
       {currentPage === 'contact' && (
-        <div className="pt-24 pb-16 min-h-screen flex items-center">
-          <div className="max-w-2xl mx-auto px-6 w-full text-center">
-            <h1 className="text-5xl md:text-6xl font-light mb-6 tracking-wide">Get In Touch</h1>
-            <p className="text-gray-600 text-lg mb-12 font-light">Ready to capture your story? Contact me for inquiries and bookings.</p>
-            
-            <div className="space-y-6">
-              <p className="text-gray-700">
-                Email: <a href="mailto:contact@bradenblackburn.com" className="text-gray-900 hover:underline">contact@bradenblackburn.com</a>
-              </p>
-              <p className="text-gray-700">
-                Phone: <a href="tel:+1234567890" className="text-gray-900 hover:underline">(123) 456-7890</a>
-              </p>
+        <div className="pt-24 pb-16 bg-white">
+          <section className="max-w-5xl mx-auto px-6 mb-20 text-center">
+            <h1 className="text-5xl md:text-6xl font-light mb-6 tracking-wide">Let's Connect</h1>
+            <p className="text-gray-600 text-lg font-light max-w-2xl mx-auto leading-relaxed">
+              Ready to capture your story? Fill out the form below or reach out directly. I typically respond within 24 hours.
+            </p>
+          </section>
+          <div className="max-w-7xl mx-auto px-6">
+            <div className="grid lg:grid-cols-5 gap-16">
+              <div className="lg:col-span-3">
+                {/* Contact form placeholder - implement as needed */}
+                <div className="space-y-6 bg-gray-50 p-8 rounded-lg mb-8">
+                  <h3 className="text-2xl font-light mb-6 tracking-wide">Get In Touch</h3>
+                  <div className="space-y-6">
+                    <div className="flex items-start gap-4">
+                      <div className="text-gray-900">📍 Fort Mitchell, Kentucky</div>
+                    </div>
+                    <div className="flex items-start gap-4">
+                      <div className="text-gray-900">📞 (555) 123-4567</div>
+                    </div>
+                    <div className="flex items-start gap-4">
+                      <div className="text-gray-900">✉️ braden@photography.com</div>
+                    </div>
+                    <div className="flex items-start gap-4">
+                      <div className="text-gray-900">📷 @bradenblackburn</div>
+                    </div>
+                  </div>
+                </div>
+                <div className="bg-gray-900 p-8 rounded-lg text-white mb-8">
+                  <h3 className="text-xl font-light mb-4 tracking-wide">Response Time</h3>
+                  <p className="text-gray-400 text-sm leading-relaxed">
+                    I typically respond to all inquiries within 24 hours. If you haven't heard back, please check your spam folder or reach out directly via phone.
+                  </p>
+                </div>
+                <div className="border border-gray-200 p-8 rounded-lg">
+                  <h3 className="text-xl font-light mb-4 tracking-wide">Booking Notice</h3>
+                  <p className="text-gray-600 text-sm leading-relaxed">
+                    For weddings and large events, I recommend booking 6-12 months in advance. Portrait sessions can typically be scheduled within 2-4 weeks.
+                  </p>
+                </div>
+              </div>
+              <div className="lg:col-span-2 flex flex-col items-center justify-center">
+                <div className="space-y-6 text-center">
+                  <p className="text-gray-700">
+                    Email: <a href="mailto:contact@bradenblackburn.com" className="text-gray-900 hover:underline">contact@bradenblackburn.com</a>
+                  </p>
+                  <p className="text-gray-700">
+                    Phone: <a href="tel:+1234567890" className="text-gray-900 hover:underline">(123) 456-7890</a>
+                  </p>
+                </div>
+              </div>
             </div>
           </div>
         </div>
