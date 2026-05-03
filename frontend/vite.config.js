@@ -1,8 +1,11 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 
-// https://vite.dev/config/
+// https://vitejs.dev/config/
 export default defineConfig({
-  base: '/BradensWebsite/',
   plugins: [react()],
+  server: {
+    host: '127.0.0.1', // Forces standard IPv4
+    port: 5173,        // Locks the port
+  }
 })
