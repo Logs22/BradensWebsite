@@ -3,6 +3,7 @@ import hero from './hero'
 import about from './about'
 import services from './services'
 import contact from './contact'
+import downloadableDocument from './downloadableDocument'
 
 export const schemaTypes = [
   portfolio,
@@ -10,4 +11,5 @@ export const schemaTypes = [
   about,
   services,
   contact,
+  downloadableDocument
 ]
