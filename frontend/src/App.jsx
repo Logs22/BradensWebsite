@@ -90,8 +90,8 @@ function App() {
       <nav className="fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-md shadow-sm py-4">
         <div className="max-w-7xl mx-auto px-6 flex items-center justify-between">
           <a href="#" onClick={() => showPage('home')} className="text-2xl font-light tracking-wider cursor-pointer">
-            <span className="text-gray-900">BRADEN</span>
-            <span className="ml-1 font-normal text-gray-900">BLACKBURN</span>
+            <span className="text-accent">BRADEN</span>
+            <span className="ml-1 font-normal text-accent">BLACKBURN</span>
           </a>
 
           <div className="hidden md:flex items-center gap-8">
@@ -101,11 +101,11 @@ function App() {
                 href="#"
                 onClick={(e) => { e.preventDefault(); showPage(page) }}
                 className={`text-sm tracking-wide transition-all duration-300 relative group font-light cursor-pointer ${
-                  currentPage === page ? 'text-gray-900' : 'text-gray-600'
+                  currentPage === page ? 'text-accent' : 'text-gray-600'
                 }`}
               >
                 {page.charAt(0).toUpperCase() + page.slice(1)}
-                <span className={`absolute -bottom-1 left-0 h-px bg-gray-900 transition-all duration-300 ${
+                <span className={`absolute -bottom-1 left-0 h-px bg-accent transition-all duration-300 ${
                   currentPage === page ? 'w-full' : 'w-0 group-hover:w-full'
                 }`}></span>
               </a>
@@ -114,7 +114,7 @@ function App() {
 
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="md:hidden text-gray-900"
+            className="md:hidden text-accent"
           >
             <svg width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2">
               <line x1="3" y1="12" x2="21" y2="12" />
@@ -132,7 +132,7 @@ function App() {
                   key={page}
                   href="#"
                   onClick={(e) => { e.preventDefault(); showPage(page) }}
-                  className="block text-gray-700 font-light cursor-pointer hover:text-gray-900"
+                  className="block text-gray-700 font-light cursor-pointer hover:text-accent"
                 >
                   {page.charAt(0).toUpperCase() + page.slice(1)}
                 </a>
@@ -167,7 +167,7 @@ function App() {
               </p>
               <button
                 onClick={() => showPage('portfolio')}
-                className="bg-white text-gray-900 hover:bg-gray-100 rounded-full px-8 py-4 text-base tracking-wide transition-colors cursor-pointer"
+                className="bg-white text-accent hover:bg-gray-100 rounded-full px-8 py-4 text-base tracking-wide transition-colors cursor-pointer"
               >
                 View Portfolio →
               </button>
@@ -205,7 +205,7 @@ function App() {
               <div className="text-center mt-12">
                 <button
                   onClick={() => showPage('portfolio')}
-                  className="rounded-full px-8 py-3 border border-gray-300 hover:bg-gray-900 hover:text-white hover:border-gray-900 transition-all duration-300 cursor-pointer"
+                  className="rounded-full px-8 py-3 border border-gray-300 hover:bg-accent hover:text-white hover:border-gray-900 transition-all duration-300 cursor-pointer"
                 >
                   Explore Full Portfolio
                 </button>
@@ -238,7 +238,7 @@ function App() {
                         </>
                       )}
                   </div>
-                  <button onClick={() => showPage('about')} className="mt-6 text-gray-900 hover:underline cursor-pointer">
+                  <button onClick={() => showPage('about')} className="mt-6 text-accent hover:underline cursor-pointer">
                     Learn More About Me →
                   </button>
                 </div>
@@ -247,7 +247,7 @@ function App() {
           </section>
 
           {/* Services Preview */}
-          <section className="py-24 px-6 bg-gray-900 text-white">
+          <section className="py-24 px-6 bg-accent text-white">
             <div className="max-w-7xl mx-auto">
               <div className="text-center mb-16">
                 <h2 className="text-4xl md:text-5xl font-light mb-4 tracking-wide">Services</h2>
@@ -276,7 +276,7 @@ function App() {
             <div className="max-w-4xl mx-auto text-center">
               <h2 className="text-4xl md:text-5xl font-light mb-6 tracking-wide">Let's Create Something Beautiful</h2>
               <p className="text-gray-600 text-lg mb-8 font-light">Ready to capture your story? Get in touch to discuss your photography needs.</p>
-              <button onClick={() => showPage('contact')} className="bg-gray-900 hover:bg-gray-800 rounded-full px-12 py-4 text-white text-base tracking-wide cursor-pointer">
+              <button onClick={() => showPage('contact')} className="bg-accent hover:bg-gray-800 rounded-full px-12 py-4 text-white text-base tracking-wide cursor-pointer">
                 Get In Touch
               </button>
             </div>
@@ -300,8 +300,8 @@ function App() {
                   onClick={() => filterPortfolio(category)}
                   className={`px-6 py-2 rounded-full text-sm tracking-wide transition-colors cursor-pointer ${
                     activeFilter === category
-                      ? 'bg-gray-900 text-white'
-                      : 'bg-gray-100 text-gray-700 hover:bg-gray-900 hover:text-white'
+                      ? 'bg-accent text-white'
+                      : 'bg-gray-100 text-gray-700 hover:bg-accent hover:text-white'
                   }`}
                 >
                   {category.charAt(0).toUpperCase() + category.slice(1)}
@@ -355,7 +355,7 @@ function App() {
 
           <section className="max-w-4xl mx-auto px-6 mb-24">
             <div className="space-y-6 text-gray-700 leading-relaxed text-lg">
-              <p className="text-2xl font-light text-gray-900 mb-8">
+              <p className="text-2xl font-light text-accent mb-8">
                 Hi, I'm Braden Blackburn — a photographer passionate about capturing the beauty in everyday moments.
               </p>
               {about?.aboutText
@@ -435,10 +435,10 @@ function App() {
                         <li key={fIdx} className="flex items-start gap-3 text-gray-600">✓ {feature}</li>
                       ))}
                     </ul>
-                    <div className="text-2xl font-light text-gray-900 mb-6">{service.price}</div>
+                    <div className="text-2xl font-light text-accent mb-6">{service.price}</div>
                     <button
                       onClick={() => showPage('contact')}
-                      className="bg-gray-900 hover:bg-gray-800 rounded-full px-8 py-3 text-white cursor-pointer"
+                      className="bg-accent hover:bg-gray-800 rounded-full px-8 py-3 text-white cursor-pointer"
                     >
                       Book This Service
                     </button>
@@ -503,7 +503,7 @@ function App() {
                     <label className="text-gray-700 block text-sm">Tell Me About Your Vision *</label>
                     <textarea required className="border border-gray-300 p-3 w-full rounded min-h-[150px] focus:outline-none focus:border-gray-900" placeholder="Share details about your event, location preferences, style inspiration..." />
                   </div>
-                  <button type="submit" className="w-full md:w-auto bg-gray-900 hover:bg-gray-800 rounded-full px-12 py-4 text-white text-base tracking-wide cursor-pointer">
+                  <button type="submit" className="w-full md:w-auto bg-accent hover:bg-gray-800 rounded-full px-12 py-4 text-white text-base tracking-wide cursor-pointer">
                     Send Message
                   </button>
                 </form>
@@ -520,7 +520,7 @@ function App() {
                   </div>
                 </div>
 
-                <div className="bg-gray-900 p-8 rounded-lg text-white">
+                <div className="bg-accent p-8 rounded-lg text-white">
                   <h3 className="text-xl font-light mb-4 tracking-wide">Response Time</h3>
                   <p className="text-gray-400 text-sm leading-relaxed">
                     {contact?.responseTime || "I typically respond to all inquiries within 24 hours. If you haven't heard back, please check your spam folder or reach out directly via phone."}
@@ -540,7 +540,7 @@ function App() {
       )}
 
       {/* ── FOOTER ────────────────────────────────────────────────────── */}
-      <footer className="bg-gray-900 text-white py-12 px-6">
+      <footer className="bg-accent text-white py-12 px-6">
         <div className="max-w-7xl mx-auto text-center">
           <p className="text-gray-400 font-light">© {new Date().getFullYear()} Braden Blackburn Photography. All rights reserved.</p>
         </div>
