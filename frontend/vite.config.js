@@ -4,9 +4,10 @@ import react from '@vitejs/plugin-react'
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [react()],
+  // Relative base keeps asset URLs valid on both root and subpath hosting.
+  base: './',
   server: {
-    host: '127.0.0.1', // Forces standard IPv4
-    base:'/bradenswebsite/',
-    port: 3001,        // Locks the port
+    host: '127.0.0.1',
+    port: 3001,
   }
 })
