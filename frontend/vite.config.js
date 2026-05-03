@@ -6,6 +6,6 @@ export default defineConfig({
   plugins: [react()],
   server: {
     host: '127.0.0.1', // Forces standard IPv4
-    port: 5173,        // Locks the port
+    port: 3001,        // Locks the port
   }
 })
