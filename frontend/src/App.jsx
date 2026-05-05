@@ -1,46 +1,29 @@
 import { useState, useEffect } from 'react'
 import { createClient } from '@sanity/client'
-import { client, urlFor } from './sanityClient'
-import { ImageUrlBuilder } from '@sanity/image-url'
+import imageUrlBuilder from '@sanity/image-url'
 import './App.css'
 
-// Sanity Client //
-
+// ── SANITY SETUP ────────────────────────────────────────────────────────
 const client = createClient({
-  projectID: '23vvbmgr',
+  projectId: '23vvbmgr', // Note: usually named projectId, not projectID
   dataset: 'production',
   useCdn: true,
   apiVersion: '2024-05-05',
 })
 
-// Image Builder for Sanity images //
 const builder = imageUrlBuilder(client);
 function urlFor(source) {
   return builder.image(source);
 }
 
-// ─── GROQ Queries ────────────────────────────────────────────────────────────
+// ── GROQ QUERIES ────────────────────────────────────────────────────────
 const HERO_QUERY = `*[_type == "hero"][0]{ heading, subheading, backgroundImage }`
-
 const ABOUT_QUERY = `*[_type == "about"][0]{ title, bio, profileImage }`
+const PORTFOLIO_QUERY = `*[_type == "portfolioImage"] | order(_createdAt desc) { _id, title, image, caption }`
+const SERVICES_QUERY = `*[_type == "service"] | order(_createdAt asc) { _id, title, desc, features, price, image }`
+const CONTACT_QUERY = `*[_type == "contact"][0]{ location, phone, email, instagram, responseTime, bookingNotice }`
 
-const PORTFOLIO_QUERY = `
-  *[_type == "portfolioImage"] | order(order asc, _createdAt desc) {
-    _id, title, image, caption
-  }
-`
-
-const SERVICES_QUERY = `
-  *[_type == "service"] | order(order asc) {
-    _id, title, desc, features, price, image
-  }
-`
-
-const CONTACT_QUERY = `*[_type == "contact"][0]{
-  location, phone, email, instagram, responseTime, bookingNotice
-}`
-
-// ─── Component ────────────────────────────────────────────────────────────────
+// ── COMPONENT ───────────────────────────────────────────────────────────
 function App() {
   const [currentPage, setCurrentPage] = useState('home')
   const [hero, setHero] = useState(null)
@@ -52,64 +35,58 @@ function App() {
   const [contact, setContact] = useState(null)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [loading, setLoading] = useState(true)
+  
+  // Image URL States
   const [heroImageUrl, setHeroImageUrl] = useState(null)
+  const [aboutImageUrl, setAboutImageUrl] = useState(null)
 
-  // ── SANITY DATA FETCHING ─────────────────────────────────────────
+  // ── SANITY DATA FETCHING (Combined into one clean call) ─────────────
   useEffect(() => {
     const fetchSanityData = async () => {
       try {
-        // 1. Fetch the Hero Data
-        const heroData = await client.fetch(HERO_QUERY);
+        const [heroData, aboutData, portfolioData, servicesData, contactData] = await Promise.all([
+          client.fetch(HERO_QUERY),
+          client.fetch(ABOUT_QUERY),
+          client.fetch(PORTFOLIO_QUERY),
+          client.fetch(SERVICES_QUERY),
+          client.fetch(CONTACT_QUERY),
+        ]);
+
+        // 1. Set Hero
         if (heroData) {
           setHero(heroData);
-          // Note: make sure you add const [heroImageUrl, setHeroImageUrl] = useState(null) up with your other states!
           if (heroData.backgroundImage) {
             setHeroImageUrl(urlFor(heroData.backgroundImage).url());
           }
         }
 
-        // 2. Fetch the About Data
-        const aboutData = await client.fetch(ABOUT_QUERY);
-        if (aboutData) setAbout(aboutData);
-
-        // 3. Fetch the Portfolio Data
-        const portfolioData = await client.fetch(PORTFOLIO_QUERY);
-        if (portfolioData) {
-          setPortfolio(portfolioData);
-          setFilteredPortfolio(portfolioData); // Set initial filtered state
+        // 2. Set About
+        if (aboutData) {
+          setAbout(aboutData);
+          if (aboutData.profileImage) {
+            setAboutImageUrl(urlFor(aboutData.profileImage).width(800).height(1000).url());
+          }
         }
 
+        // 3. Set Portfolio
+        if (portfolioData) {
+          setPortfolio(portfolioData);
+          setFilteredPortfolio(portfolioData);
+        }
+
+        // 4. Set Remaining Data
+        if (servicesData) setServices(servicesData);
+        if (contactData) setContact(contactData);
+
       } catch (error) {
-        console.error("Error fetching Sanity data:", error);
+        console.error("Error fetching from Sanity:", error);
       } finally {
-        // Turn off the loading screen once everything is fetched!
         setLoading(false); 
       }
     };
 
     fetchSanityData();
-  }, []); // The empty bracket means "only run this once when the page loads"
-
-  useEffect(() => {
-    Promise.all([
-      client.fetch(HERO_QUERY),
-      client.fetch(ABOUT_QUERY),
-      client.fetch(PORTFOLIO_QUERY),
-      client.fetch(SERVICES_QUERY),
-      client.fetch(CONTACT_QUERY),
-    ]).then(([heroData, aboutData, portfolioData, servicesData, contactData]) => {
-      setHero(heroData)
-      setAbout(aboutData)
-      setPortfolio(portfolioData)
-      setFilteredPortfolio(portfolioData)
-      setServices(servicesData)
-      setContact(contactData)
-      setLoading(false)
-    }).catch(err => {
-      console.error('Error fetching from Sanity:', err)
-      setLoading(false)
-    })
-  }, [])
+  }, []);
 
   const showPage = (page) => {
     setCurrentPage(page)
@@ -125,15 +102,6 @@ function App() {
       setFilteredPortfolio(portfolio.filter(item => item.category === category))
     }
   }
-
-  // Resolve hero image URL
-  const heroImageUrl = hero?.heroImage
-    ? urlFor(hero.heroImage).width(2000).height(1200).url()
-    : null
-
-  const aboutImageUrl = about?.aboutImage
-    ? urlFor(about.aboutImage).width(800).height(1000).url()
-    : null
 
   const featuredPortfolio = portfolio.filter(i => i.featured).slice(0, 4)
     .concat(portfolio.filter(i => !i.featured)).slice(0, 4)
@@ -280,11 +248,12 @@ function App() {
                 </div>
                 <div>
                   <h2 className="text-4xl md:text-5xl font-light mb-6 tracking-wide">
-                    {about?.aboutTitle || 'Meet Braden'}
+                    {about?.title || 'Meet Braden'}
                   </h2>
                   <div className="space-y-4 text-gray-600 leading-relaxed">
-                    {about?.aboutText
-                      ? about.aboutText.split('\n\n').map((para, idx) => <p key={idx}>{para}</p>)
+                    {/* Note: If your 'bio' is an array in Sanity, you may need a PortableText renderer here instead of .split */}
+                    {about?.bio
+                      ? String(about.bio).split('\n\n').map((para, idx) => <p key={idx}>{para}</p>)
                       : (
                         <>
                           <p>With a passion for storytelling through imagery, I specialize in capturing authentic moments that you'll treasure forever.</p>
@@ -412,8 +381,8 @@ function App() {
               <p className="text-2xl font-light text-accent mb-8">
                 Hi, I'm Braden Blackburn — a photographer passionate about capturing the beauty in everyday moments.
               </p>
-              {about?.aboutText
-                ? about.aboutText.split('\n\n').map((para, idx) => <p key={idx}>{para}</p>)
+              {about?.bio
+                ? String(about.bio).split('\n\n').map((para, idx) => <p key={idx}>{para}</p>)
                 : (
                   <>
                     <p>Photography has always been more than just a profession for me; it's a way to freeze time and preserve the emotions, connections, and stories that make life meaningful.</p>
