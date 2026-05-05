@@ -1,6 +1,6 @@
 export default {
-  name: 'portfolio',
-  title: 'Portfolio Gallery',
+  name: 'portfolioImage',
+  title: 'Portfolio Image',
   type: 'document',
   fields: [
     {

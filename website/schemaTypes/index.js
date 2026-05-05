@@ -1,15 +1,15 @@
-import portfolio from './portfolio'
+import portfolioImage from './portfolioImage'
 import hero from './hero'
 import about from './about'
-import services from './services'
+import service from './service'
 import contact from './contact'
 import downloadableDocument from './downloadableDocument'
 
 export const schemaTypes = [
-  portfolio,
+  portfolioImage,
   hero,
   about,
-  services,
+  service,
   contact,
   downloadableDocument
 ]
