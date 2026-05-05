@@ -106,6 +106,19 @@ function App() {
   const featuredPortfolio = portfolio.filter(i => i.featured).slice(0, 4)
     .concat(portfolio.filter(i => !i.featured)).slice(0, 4)
 
+
+// ── LOADING SCREEN ────────────────────────────────────────────────
+  // This completely prevents the "flash" of Unsplash images!
+  if (loading) {
+    return (
+      <div className="h-screen w-screen flex items-center justify-center bg-white">
+        <div className="text-accent text-xl font-light tracking-widest animate-pulse">
+          LOADING...
+        </div>
+      </div>
+    );
+  }
+    
   return (
     <div className="bg-white">
       {/* ── Navigation ───────────────────────────────────────────────── */}
