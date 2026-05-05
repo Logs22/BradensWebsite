@@ -1,15 +1,32 @@
 import { useState, useEffect } from 'react'
+import { createClient } from '@sanity/client'
 import { client, urlFor } from './sanityClient'
+import { ImageUrlBuilder } from '@sanity/image-url'
 import './App.css'
 
-// ─── GROQ Queries ────────────────────────────────────────────────────────────
-const HERO_QUERY = `*[_type == "hero"][0]{ heroTitle, heroSubtitle, heroImage }`
+// Sanity Client //
 
-const ABOUT_QUERY = `*[_type == "about"][0]{ aboutTitle, aboutText, aboutImage }`
+const client = createClient({
+  projectID: '23vvbmgr',
+  dataset: 'production',
+  useCdn: true,
+  apiVersion: '2024-05-05',
+})
+
+// Image Builder for Sanity images //
+const builder = imageUrlBuilder(client);
+function urlFor(source) {
+  return builder.image(source);
+}
+
+// ─── GROQ Queries ────────────────────────────────────────────────────────────
+const HERO_QUERY = `*[_type == "hero"][0]{ heading, subheading, backgroundImage }`
+
+const ABOUT_QUERY = `*[_type == "about"][0]{ title, bio, profileImage }`
 
 const PORTFOLIO_QUERY = `
   *[_type == "portfolioImage"] | order(order asc, _createdAt desc) {
-    _id, title, category, image, featured
+    _id, title, image, caption
   }
 `
 
@@ -35,6 +52,43 @@ function App() {
   const [contact, setContact] = useState(null)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [loading, setLoading] = useState(true)
+  const [heroImageUrl, setHeroImageUrl] = useState(null)
+
+  // ── SANITY DATA FETCHING ─────────────────────────────────────────
+  useEffect(() => {
+    const fetchSanityData = async () => {
+      try {
+        // 1. Fetch the Hero Data
+        const heroData = await client.fetch(HERO_QUERY);
+        if (heroData) {
+          setHero(heroData);
+          // Note: make sure you add const [heroImageUrl, setHeroImageUrl] = useState(null) up with your other states!
+          if (heroData.backgroundImage) {
+            setHeroImageUrl(urlFor(heroData.backgroundImage).url());
+          }
+        }
+
+        // 2. Fetch the About Data
+        const aboutData = await client.fetch(ABOUT_QUERY);
+        if (aboutData) setAbout(aboutData);
+
+        // 3. Fetch the Portfolio Data
+        const portfolioData = await client.fetch(PORTFOLIO_QUERY);
+        if (portfolioData) {
+          setPortfolio(portfolioData);
+          setFilteredPortfolio(portfolioData); // Set initial filtered state
+        }
+
+      } catch (error) {
+        console.error("Error fetching Sanity data:", error);
+      } finally {
+        // Turn off the loading screen once everything is fetched!
+        setLoading(false); 
+      }
+    };
+
+    fetchSanityData();
+  }, []); // The empty bracket means "only run this once when the page loads"
 
   useEffect(() => {
     Promise.all([
@@ -159,11 +213,11 @@ function App() {
             <div className="absolute inset-0 bg-black/30" />
             <div className="relative text-center text-white px-6">
               <h1 className="text-6xl md:text-8xl font-light tracking-wider mb-4">
-                {hero?.heroTitle || 'Capturing'}<br />
+                {hero?.heading || 'Capturing'}<br />
                 <span className="font-normal italic">Moments</span>
               </h1>
               <p className="text-lg md:text-xl text-gray-200 mb-8 font-light tracking-wide">
-                {hero?.heroSubtitle || 'Through the lens of Braden Blackburn'}
+                {hero?.subheading || 'Through the lens of Braden Blackburn'}
               </p>
               <button
                 onClick={() => showPage('portfolio')}
