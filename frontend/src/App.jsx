@@ -447,7 +447,7 @@ function App() {
                       <p>📍 {contact?.location || 'Fort Mitchell, Kentucky'}</p>
                       <p>📞 {contact?.phone || '(555) 123-4567'}</p>
                       <p>✉️ {contact?.email || 'braden@photography.com'}</p>
-                      <p>📷 {contact?.instagram || '@bradenblackburn'}</p>
+                      <p>📷 <a href="https://www.instagram.com/blackburn_creative/" target="_blank" rel="noopener noreferrer" className="hover:underline">{contact?.instagram || '@blackburn_creative'}</a></p>
                     </div>
                   </div>
 
@@ -496,8 +496,20 @@ function App() {
           <div>
             <h4 className="text-sm font-semibold tracking-wider mb-6 uppercase">Connect</h4>
             <div className="flex gap-4">
-              <button className="w-10 h-10 rounded-full border border-white/30 flex items-center justify-center hover:bg-white hover:text-slate-900 transition-all cursor-pointer">IG</button>
-              <button className="w-10 h-10 rounded-full border border-white/30 flex items-center justify-center hover:bg-white hover:text-slate-900 transition-all cursor-pointer">EM</button>
+              <a 
+                href="https://www.instagram.com/blackburn_creative/" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="w-10 h-10 rounded-full border border-white/30 flex items-center justify-center hover:bg-white hover:text-slate-900 transition-all cursor-pointer overflow-hidden"
+              >
+                <img src="/BradensWebsite/instagram-icon.jpg" alt="Instagram" className="w-full h-full object-cover" />
+              </a>
+              <a 
+                href={`mailto:${contact?.email || 'braden@photography.com'}`}
+                className="w-10 h-10 rounded-full border border-white/30 flex items-center justify-center hover:bg-white hover:text-slate-900 transition-all cursor-pointer text-xs"
+              >
+                EM
+              </a>
             </div>
           </div>
         </div>
