@@ -238,7 +238,7 @@ function App() {
           {/* CTA */}
           <section className="py-24 px-6 text-center">
             <h2 className="text-4xl md:text-5xl font-light mb-6 tracking-wide">Let's Create Something Beautiful</h2>
-            <button onClick={() => showPage('contact')} className="rounded-full px-12 py-4 text-white text-base tracking-wide cursor-pointer bg-slate-900 hover:bg-slate-800">Get In Touch</button>
+            <button onClick={() => showPage('contact')} className="rounded-full px-12 py-4 text-slate-900 text-base tracking-wide cursor-pointer bg-[#CDEDF6] hover:bg-white transition-colors">Get In Touch</button>
           </section>
         </div>
       )}
@@ -259,8 +259,8 @@ function App() {
                   onClick={() => filterPortfolio(category)}
                   className={`px-6 py-2 rounded-full text-sm tracking-wide transition-colors cursor-pointer ${
                     activeFilter === category
-                      ? 'bg-[#042A2B] text-white'
-                      : 'bg-gray-100 text-gray-700 hover:bg-[#042A2B] hover:text-white'
+                      ? 'bg-[#CDEDF6] text-slate-900'
+                      : 'bg-gray-100 text-gray-700 hover:bg-[#CDEDF6] hover:text-slate-900'
                   }`}
                 >
                   {category.charAt(0).toUpperCase() + category.slice(1)}
