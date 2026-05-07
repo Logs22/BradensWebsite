@@ -19,7 +19,7 @@ function urlFor(source) {
 // ── GROQ QUERIES ────────────────────────────────────────────────────────
 const HERO_QUERY = `*[_type == "hero"][0]{ heading, subheading, backgroundImage }`
 const ABOUT_QUERY = `*[_type == "about"][0]{ title, bio, profileImage }`
-const PORTFOLIO_QUERY = `*[_type == "portfolioImage"] | order(_createdAt desc) { _id, title, image, caption }`
+const PORTFOLIO_QUERY = `*[_type == "portfolioImage"] | order(_createdAt desc) { _id, title, image, caption, category, featured }`
 const SERVICES_QUERY = `*[_type == "service"] | order(_createdAt asc) { _id, title, desc, features, price, image }`
 const CONTACT_QUERY = `*[_type == "contact"][0]{ location, phone, email, instagram, responseTime, bookingNotice }`
 
@@ -140,6 +140,23 @@ function App() {
             </svg>
           </button>
         </div>
+
+        {mobileMenuOpen && (
+          <div className="md:hidden bg-white border-t">
+            <div className="max-w-7xl mx-auto px-6 py-4 space-y-4">
+              {['home', 'portfolio', 'about', 'services', 'contact'].map(page => (
+                <a
+                  key={page}
+                  href="#"
+                  onClick={(e) => { e.preventDefault(); showPage(page) }}
+                  className="block text-gray-700 font-light cursor-pointer hover:text-slate-900"
+                >
+                  {page.charAt(0).toUpperCase() + page.slice(1)}
+                </a>
+              ))}
+            </div>
+          </div>
+        )}
       </nav>
 
       {/* ── HOME PAGE ─────────────────────────────────────────────────── */}
@@ -223,6 +240,261 @@ function App() {
             <h2 className="text-4xl md:text-5xl font-light mb-6 tracking-wide">Let's Create Something Beautiful</h2>
             <button onClick={() => showPage('contact')} className="rounded-full px-12 py-4 text-white text-base tracking-wide cursor-pointer bg-slate-900 hover:bg-slate-800">Get In Touch</button>
           </section>
+        </div>
+      )}
+
+      {/* ── PORTFOLIO PAGE ────────────────────────────────────────────── */}
+      {currentPage === 'portfolio' && (
+        <div className="pt-24 pb-16 bg-white">
+          <div className="max-w-7xl mx-auto px-6">
+            <div className="text-center mb-16">
+              <h1 className="text-5xl md:text-6xl font-light mb-4 tracking-wide">Portfolio</h1>
+              <p className="text-gray-600 text-lg font-light">A collection of my favorite moments</p>
+            </div>
+
+            <div className="flex flex-wrap justify-center gap-4 mb-12">
+              {['all', 'weddings', 'portraits', 'events'].map(category => (
+                <button
+                  key={category}
+                  onClick={() => filterPortfolio(category)}
+                  className={`px-6 py-2 rounded-full text-sm tracking-wide transition-colors cursor-pointer ${
+                    activeFilter === category
+                      ? 'bg-[#8a9d72] text-white'
+                      : 'bg-gray-100 text-gray-700 hover:bg-[#8a9d72] hover:text-white'
+                  }`}
+                >
+                  {category.charAt(0).toUpperCase() + category.slice(1)}
+                </button>
+              ))}
+            </div>
+
+            {loading ? (
+              <div className="grid md:grid-cols-3 gap-6">
+                {[1, 2, 3, 4, 5, 6].map(i => (
+                  <div key={i} className="aspect-square bg-gray-200 animate-pulse" />
+                ))}
+              </div>
+            ) : filteredPortfolio.length === 0 ? (
+              <p className="text-center text-gray-500 py-20">No images in this category yet.</p>
+            ) : (
+              <div className="grid md:grid-cols-3 gap-6">
+                {filteredPortfolio.map((item) => (
+                  <div key={item._id} className="group cursor-pointer overflow-hidden">
+                    <img
+                      src={urlFor(item.image).width(800).url()}
+                      alt={item.title || 'Portfolio image'}
+                      className="w-full h-auto transition-transform duration-700 group-hover:scale-110"
+                      loading="lazy"
+                    />
+                    {item.title && (
+                      <p className="text-sm text-gray-500 mt-2 text-center">{item.title}</p>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* ── ABOUT PAGE ────────────────────────────────────────────────── */}
+      {currentPage === 'about' && (
+        <div className="pt-24 pb-16 bg-white">
+          <section className="relative h-[60vh] overflow-hidden mb-24">
+            <img
+              src={aboutImageUrl || 'https://images.unsplash.com/photo-1554048612-b6a482bc67e5?w=2000&h=1200&fit=crop'}
+              alt="Braden Blackburn"
+              className="w-full h-full object-cover"
+            />
+            <div className="absolute inset-0 bg-gradient-to-b from-black/40 to-black/60" />
+            <div className="absolute inset-0 flex items-center justify-center">
+              <h1 className="text-5xl md:text-7xl font-light text-white tracking-wide">About Me</h1>
+            </div>
+          </section>
+
+          <section className="max-w-4xl mx-auto px-6 mb-24">
+            <div className="space-y-6 text-gray-700 leading-relaxed text-lg">
+              <p className="text-2xl font-light text-[#8a9d72] mb-8">
+                Hi, I'm Braden Blackburn — a photographer passionate about capturing the beauty in everyday moments.
+              </p>
+              {about?.bio
+                ? String(about.bio).split('\n\n').map((para, idx) => <p key={idx}>{para}</p>)
+                : (
+                  <>
+                    <p>Photography has always been more than just a profession for me; it's a way to freeze time and preserve the emotions, connections, and stories that make life meaningful.</p>
+                    <p>My journey into photography began when I picked up my first camera. Since then, I've had the privilege of working with amazing clients, capturing everything from weddings and engagements to family portraits and special events.</p>
+                    <p>What sets my work apart is my commitment to authenticity. I don't believe in overly posed or artificial shots. Instead, I focus on creating a comfortable environment where genuine emotions and connections can shine through.</p>
+                  </>
+                )}
+            </div>
+          </section>
+
+          <section className="bg-gray-50 py-20 mb-24">
+            <div className="max-w-6xl mx-auto px-6">
+              <div className="grid md:grid-cols-4 gap-8">
+                {[['500+', 'Sessions Completed'], ['100+', 'Happy Couples'], ['5+', 'Years Experience'], ['1000+', 'Satisfied Clients']].map(([num, label]) => (
+                  <div key={label} className="text-center">
+                    <div className="text-4xl font-light mb-2">{num}</div>
+                    <div className="text-gray-600 text-sm tracking-wide">{label}</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </section>
+
+          <section className="max-w-6xl mx-auto px-6 mb-24">
+            <div className="text-center mb-12">
+              <h2 className="text-4xl md:text-5xl font-light mb-4 tracking-wide">My Philosophy</h2>
+              <p className="text-gray-600 text-lg font-light">What guides my approach to photography</p>
+            </div>
+            <div className="grid md:grid-cols-3 gap-8">
+              {[
+                ['Authenticity', "I capture real emotions and genuine moments, not forced poses. Your photos should reflect who you truly are."],
+                ['Connection', "Building trust with my clients is essential. When you're comfortable, the best moments naturally unfold."],
+                ['Timelessness', "Trends come and go, but great photography endures. I focus on creating images you'll cherish forever."],
+              ].map(([title, desc]) => (
+                <div key={title} className="text-center p-8">
+                  <h3 className="text-2xl font-light mb-4 tracking-wide">{title}</h3>
+                  <p className="text-gray-600 leading-relaxed">{desc}</p>
+                </div>
+              ))}
+            </div>
+          </section>
+        </div>
+      )}
+
+      {/* ── SERVICES PAGE ─────────────────────────────────────────────── */}
+      {currentPage === 'services' && (
+        <div className="pt-24 pb-16 bg-white">
+          <section className="max-w-5xl mx-auto px-6 mb-20 text-center">
+            <h1 className="text-5xl md:text-6xl font-light mb-6 tracking-wide">Services & Investment</h1>
+            <p className="text-gray-600 text-lg font-light max-w-2xl mx-auto leading-relaxed">
+              Quality photography is an investment in memories that last a lifetime. I offer flexible packages to suit your needs and budget.
+            </p>
+          </section>
+
+          <section className="max-w-7xl mx-auto px-6 mb-20">
+            <div className="space-y-20">
+              {services.map((service, idx) => (
+                <div key={service._id} className="grid md:grid-cols-2 gap-12 items-center">
+                  <div className={idx % 2 !== 0 ? 'md:order-2' : ''}>
+                    {service.image && (
+                      <img
+                        src={urlFor(service.image).width(800).height(600).url()}
+                        alt={service.title}
+                        className="w-full h-auto"
+                      />
+                    )}
+                  </div>
+                  <div className={idx % 2 !== 0 ? 'md:order-1' : ''}>
+                    <h2 className="text-3xl md:text-4xl font-light mb-4 tracking-wide">{service.title}</h2>
+                    <p className="text-gray-600 mb-6 leading-relaxed">{service.desc}</p>
+                    <ul className="space-y-3 mb-6">
+                      {service.features?.map((feature, fIdx) => (
+                        <li key={fIdx} className="flex items-start gap-3 text-gray-600">✓ {feature}</li>
+                      ))}
+                    </ul>
+                    <div className="text-2xl font-light text-[#8a9d72] mb-6">{service.price}</div>
+                    <button
+                      onClick={() => showPage('contact')}
+                      className="bg-slate-900 hover:bg-slate-800 rounded-full px-8 py-3 text-white cursor-pointer"
+                    >
+                      Book This Service
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </section>
+        </div>
+      )}
+
+      {/* ── CONTACT PAGE ──────────────────────────────────────────────── */}
+      {currentPage === 'contact' && (
+        <div className="pt-24 pb-16 bg-white">
+          <section className="max-w-5xl mx-auto px-6 mb-20 text-center">
+            <h1 className="text-5xl md:text-6xl font-light mb-6 tracking-wide">Let's Connect</h1>
+            <p className="text-gray-600 text-lg font-light max-w-2xl mx-auto leading-relaxed">
+              {contact?.responseTime
+                ? 'Ready to capture your story? Reach out and I\'ll get back to you shortly.'
+                : 'Ready to capture your story? Fill out the form below or reach out directly.'}
+            </p>
+          </section>
+
+          <div className="max-w-7xl mx-auto px-6">
+            <div className="grid lg:grid-cols-5 gap-16">
+              <div className="lg:col-span-3">
+                <form
+                  onSubmit={(e) => {
+                    e.preventDefault()
+                    alert("Thank you! I'll be in touch within 24 hours.")
+                    e.target.reset()
+                  }}
+                  className="space-y-6"
+                >
+                  <div className="grid md:grid-cols-2 gap-6">
+                    <div className="space-y-2">
+                      <label className="text-gray-700 block text-sm">Full Name *</label>
+                      <input required className="border border-gray-300 p-3 w-full rounded focus:outline-none focus:border-gray-900" placeholder="Jane Smith" />
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-gray-700 block text-sm">Email Address *</label>
+                      <input type="email" required className="border border-gray-300 p-3 w-full rounded focus:outline-none focus:border-gray-900" placeholder="jane@example.com" />
+                    </div>
+                  </div>
+                  <div className="grid md:grid-cols-2 gap-6">
+                    <div className="space-y-2">
+                      <label className="text-gray-700 block text-sm">Phone Number</label>
+                      <input type="tel" className="border border-gray-300 p-3 w-full rounded focus:outline-none focus:border-gray-900" placeholder="(555) 123-4567" />
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-gray-700 block text-sm">Service Type *</label>
+                      <select required className="border border-gray-300 p-3 w-full rounded focus:outline-none focus:border-gray-900">
+                        <option value="">Select a service</option>
+                        <option value="wedding">Wedding Photography</option>
+                        <option value="portrait">Portrait Session</option>
+                        <option value="event">Event Photography</option>
+                        <option value="other">Other</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-gray-700 block text-sm">Tell Me About Your Vision *</label>
+                    <textarea required className="border border-gray-300 p-3 w-full rounded min-h-[150px] focus:outline-none focus:border-gray-900" placeholder="Share details about your event, location preferences, style inspiration..." />
+                  </div>
+                  <button type="submit" className="w-full md:w-auto bg-slate-900 hover:bg-slate-800 rounded-full px-12 py-4 text-white text-base tracking-wide cursor-pointer">
+                    Send Message
+                  </button>
+                </form>
+              </div>
+
+              <div className="lg:col-span-2 space-y-8">
+                <div className="bg-gray-50 p-8 rounded-lg">
+                  <h3 className="text-2xl font-light mb-6 tracking-wide">Get In Touch</h3>
+                  <div className="space-y-4 text-gray-700">
+                    <p>📍 {contact?.location || 'Fort Mitchell, Kentucky'}</p>
+                    <p>📞 {contact?.phone || '(555) 123-4567'}</p>
+                    <p>✉️ {contact?.email || 'braden@photography.com'}</p>
+                    <p>📷 {contact?.instagram || '@bradenblackburn'}</p>
+                  </div>
+                </div>
+
+                <div className="p-8 rounded-lg text-white" style={{ backgroundColor: '#8a9d72' }}>
+                  <h3 className="text-xl font-light mb-4 tracking-wide">Response Time</h3>
+                  <p className="text-white/80 text-sm leading-relaxed">
+                    {contact?.responseTime || "I typically respond to all inquiries within 24 hours. If you haven't heard back, please check your spam folder or reach out directly via phone."}
+                  </p>
+                </div>
+
+                <div className="border border-gray-200 p-8 rounded-lg">
+                  <h3 className="text-xl font-light mb-4 tracking-wide">Booking Notice</h3>
+                  <p className="text-gray-600 text-sm leading-relaxed">
+                    {contact?.bookingNotice || 'For weddings and large events, I recommend booking 6-12 months in advance. Portrait sessions can typically be scheduled within 2-4 weeks.'}
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       )}
 
