@@ -123,11 +123,11 @@ function App() {
                 href="#"
                 onClick={(e) => { e.preventDefault(); showPage(page) }}
                 className={`text-sm tracking-wide transition-all duration-300 relative group font-light cursor-pointer ${
-                  currentPage === page ? 'text-[#042A2B]' : 'text-gray-600 hover:text-[#042A2B]'
+                  currentPage === page ? 'text-slate-900' : 'text-gray-600 hover:text-slate-900'
                 }`}
               >
                 {page.charAt(0).toUpperCase() + page.slice(1)}
-                <span className={`absolute -bottom-1 left-0 h-px bg-[#042A2B] transition-all duration-300 ${
+                <span className={`absolute -bottom-1 left-0 h-px bg-[#CDEDF6] transition-all duration-300 ${
                   currentPage === page ? 'w-full' : 'w-0 group-hover:w-full'
                 }`}></span>
               </a>
@@ -183,7 +183,7 @@ function App() {
               </p>
               <button
                 onClick={() => showPage('portfolio')}
-                className="bg-white text-slate-900 hover:bg-gray-100 rounded-full px-8 py-4 text-base tracking-wide transition-colors cursor-pointer"
+                className="bg-[#CDEDF6] text-slate-900 hover:bg-white rounded-full px-8 py-4 text-base tracking-wide transition-colors cursor-pointer"
               >
                 View Portfolio →
               </button>
@@ -203,7 +203,7 @@ function App() {
                   ))
                 ) : ( [1, 2, 3, 4].map(i => <div key={i} className="aspect-[4/5] bg-gray-200 animate-pulse" />) )}
               </div>
-              <button onClick={() => showPage('portfolio')} className="mt-12 rounded-full px-8 py-3 border border-gray-300 hover:bg-slate-900 hover:text-white transition-all duration-300 cursor-pointer">Explore Full Portfolio</button>
+              <button onClick={() => showPage('portfolio')} className="bg-[#CDEDF6] text-slate-900 hover:bg-white rounded-full px-8 py-3 border border-gray-300 transition-all duration-300 cursor-pointer">Explore Full Portfolio</button>
             </div>
           </section>
 
@@ -397,7 +397,7 @@ function App() {
                     <div className="text-2xl font-light text-[#042A2B] mb-6">{service.price}</div>
                     <button
                       onClick={() => showPage('contact')}
-                      className="bg-slate-900 hover:bg-slate-800 rounded-full px-8 py-3 text-white cursor-pointer"
+                      className="bg-[#CDEDF6] text-slate-900 hover:bg-white rounded-full px-8 py-3 text-slate-900 cursor-pointer"
                     >
                       Book This Service
                     </button>
@@ -462,7 +462,7 @@ function App() {
                     <label className="text-gray-700 block text-sm">Tell Me About Your Vision *</label>
                     <textarea required className="border border-gray-300 p-3 w-full rounded min-h-[150px] focus:outline-none focus:border-gray-900" placeholder="Share details about your event, location preferences, style inspiration..." />
                   </div>
-                  <button type="submit" className="w-full md:w-auto bg-slate-900 hover:bg-slate-800 rounded-full px-12 py-4 text-white text-base tracking-wide cursor-pointer">
+                  <button type="submit" className="w-full md:w-auto bg-[#CDEDF6] hover:bg-white rounded-full px-12 py-4 text-slate-900 text-base tracking-wide cursor-pointer">
                     Send Message
                   </button>
                 </form>
