@@ -495,20 +495,20 @@ function App() {
           </div>
           <div>
             <h4 className="text-sm font-semibold tracking-wider mb-6 uppercase">Connect</h4>
-            <div className="flex gap-4">
+            <div className="flex gap-6">
               <a 
                 href="https://www.instagram.com/blackburn_creative/" 
                 target="_blank" 
                 rel="noopener noreferrer"
-                className="w-10 h-10 rounded-full border border-white/30 flex items-center justify-center hover:bg-white hover:text-slate-900 transition-all cursor-pointer overflow-hidden"
+                className="text-[#CDEDF6] hover:text-white transition-all cursor-pointer text-2xl"
               >
-                <img src="/BradensWebsite/instagram-icon.jpg" alt="Instagram" className="w-full h-full object-cover" />
+                <i className="fa-brands fa-instagram"></i>
               </a>
               <a 
                 href={`mailto:${contact?.email || 'braden@photography.com'}`}
-                className="w-10 h-10 rounded-full border border-white/30 flex items-center justify-center hover:bg-white hover:text-slate-900 transition-all cursor-pointer text-xs"
+                className="text-[#CDEDF6] hover:text-white transition-all cursor-pointer text-2xl"
               >
-                EM
+                <i className="fa-regular fa-envelope"></i>
               </a>
             </div>
           </div>
