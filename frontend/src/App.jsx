@@ -222,7 +222,7 @@ function App() {
           </section>
 
           {/* Services Preview - Using Green BG */}
-          <section className="py-24 px-6 text-white text-center" style={{ backgroundColor: '#8a9d72' }}>
+          <section className="py-24 px-6 text-white text-center" style={{ backgroundColor: '#042A2B' }}>
             <h2 className="text-4xl md:text-5xl font-light mb-4 tracking-wide">Services</h2>
             <div className="grid md:grid-cols-3 gap-8 max-w-7xl mx-auto mt-16">
               {services.map((s) => (
@@ -259,8 +259,8 @@ function App() {
                   onClick={() => filterPortfolio(category)}
                   className={`px-6 py-2 rounded-full text-sm tracking-wide transition-colors cursor-pointer ${
                     activeFilter === category
-                      ? 'bg-[#8a9d72] text-white'
-                      : 'bg-gray-100 text-gray-700 hover:bg-[#8a9d72] hover:text-white'
+                      ? 'bg-[#042A2B] text-white'
+                      : 'bg-gray-100 text-gray-700 hover:bg-[#042A2B] hover:text-white'
                   }`}
                 >
                   {category.charAt(0).toUpperCase() + category.slice(1)}
@@ -314,7 +314,7 @@ function App() {
 
           <section className="max-w-4xl mx-auto px-6 mb-24">
             <div className="space-y-6 text-gray-700 leading-relaxed text-lg">
-              <p className="text-2xl font-light text-[#8a9d72] mb-8">
+              <p className="text-2xl font-light text-[#042A2B] mb-8">
                 Hi, I'm Braden Blackburn — a photographer passionate about capturing the beauty in everyday moments.
               </p>
               {about?.bio
@@ -394,7 +394,7 @@ function App() {
                         <li key={fIdx} className="flex items-start gap-3 text-gray-600">✓ {feature}</li>
                       ))}
                     </ul>
-                    <div className="text-2xl font-light text-[#8a9d72] mb-6">{service.price}</div>
+                    <div className="text-2xl font-light text-[#042A2B] mb-6">{service.price}</div>
                     <button
                       onClick={() => showPage('contact')}
                       className="bg-slate-900 hover:bg-slate-800 rounded-full px-8 py-3 text-white cursor-pointer"
@@ -479,7 +479,7 @@ function App() {
                   </div>
                 </div>
 
-                <div className="p-8 rounded-lg text-white" style={{ backgroundColor: '#8a9d72' }}>
+                <div className="p-8 rounded-lg text-white" style={{ backgroundColor: '#042A2B' }}>
                   <h3 className="text-xl font-light mb-4 tracking-wide">Response Time</h3>
                   <p className="text-white/80 text-sm leading-relaxed">
                     {contact?.responseTime || "I typically respond to all inquiries within 24 hours. If you haven't heard back, please check your spam folder or reach out directly via phone."}
@@ -499,7 +499,7 @@ function App() {
       )}
 
       {/* ── FOOTER ────────────────────────────────────────────────────── */}
-      <footer className="text-white py-16 px-6" style={{ backgroundColor: '#8a9d72' }}>
+      <footer className="text-white py-16 px-6" style={{ backgroundColor: '#042A2B' }}>
         <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-12 mb-12 border-b border-white/20 pb-12 text-white">
           <div>
             <h3 className="text-2xl font-light tracking-widest mb-4">BRADEN <span className="font-normal">BLACKBURN</span></h3>
