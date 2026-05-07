@@ -333,38 +333,6 @@ function App() {
               </div>
             </div>
           </section>
-
-          <section className="bg-gray-50 py-20 mb-24">
-            <div className="max-w-6xl mx-auto px-6">
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-                {[['500+', 'Sessions Completed'], ['100+', 'Happy Couples'], ['5+', 'Years Experience'], ['1000+', 'Satisfied Clients']].map(([num, label]) => (
-                  <div key={label} className="text-center">
-                    <div className="text-4xl font-light mb-2">{num}</div>
-                    <div className="text-gray-600 text-sm tracking-wide">{label}</div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </section>
-
-          <section className="max-w-6xl mx-auto px-6 mb-24">
-            <div className="text-center mb-12">
-              <h2 className="text-4xl md:text-5xl font-light mb-4 tracking-wide">My Philosophy</h2>
-              <p className="text-gray-600 text-lg font-light">What guides my approach to photography</p>
-            </div>
-            <div className="grid md:grid-cols-3 gap-8">
-              {[
-                ['Authenticity', "I capture real emotions and genuine moments, not forced poses. Your photos should reflect who you truly are."],
-                ['Connection', "Building trust with my clients is essential. When you're comfortable, the best moments naturally unfold."],
-                ['Timelessness', "Trends come and go, but great photography endures. I focus on creating images you'll cherish forever."],
-              ].map(([title, desc]) => (
-                <div key={title} className="text-center p-8">
-                  <h3 className="text-2xl font-light mb-4 tracking-wide">{title}</h3>
-                  <p className="text-gray-600 leading-relaxed">{desc}</p>
-                </div>
-              ))}
-            </div>
-          </section>
         </div>
       )}
 
