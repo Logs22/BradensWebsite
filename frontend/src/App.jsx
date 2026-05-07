@@ -300,38 +300,43 @@ function App() {
       {/* ── ABOUT PAGE ────────────────────────────────────────────────── */}
       {currentPage === 'about' && (
         <div className="pt-24 pb-16 bg-white">
-          <section className="relative h-[60vh] overflow-hidden mb-24">
-            <img
-              src={aboutImageUrl || 'https://images.unsplash.com/photo-1554048612-b6a482bc67e5?w=2000&h=1200&fit=crop'}
-              alt="Braden Blackburn"
-              className="w-full h-full object-cover"
-            />
-            <div className="absolute inset-0 bg-gradient-to-b from-black/40 to-black/60" />
-            <div className="absolute inset-0 flex items-center justify-center">
-              <h1 className="text-5xl md:text-7xl font-light text-white tracking-wide">About Me</h1>
-            </div>
-          </section>
+          <section className="max-w-7xl mx-auto px-6 mb-24">
+            <div className="grid lg:grid-cols-2 gap-16 items-center">
+              {/* Text Content (Left) */}
+              <div className="order-2 lg:order-1">
+                <h1 className="text-5xl md:text-6xl font-light mb-8 tracking-wide">About Me</h1>
+                <div className="space-y-6 text-gray-700 leading-relaxed text-lg">
+                  <p className="text-2xl font-light text-[#042A2B] mb-8">
+                    {about?.title || "Hi, I'm Braden Blackburn — a photographer passionate about capturing the beauty in everyday moments."}
+                  </p>
+                  {about?.bio
+                    ? String(about.bio).split('\n\n').map((para, idx) => <p key={idx}>{para}</p>)
+                    : (
+                      <>
+                        <p>Photography has always been more than just a profession for me; it's a way to freeze time and preserve the emotions, connections, and stories that make life meaningful.</p>
+                        <p>My journey into photography began when I picked up my first camera. Since then, I've had the privilege of working with amazing clients, capturing everything from weddings and engagements to family portraits and special events.</p>
+                        <p>What sets my work apart is my commitment to authenticity. I don't believe in overly posed or artificial shots. Instead, I focus on creating a comfortable environment where genuine emotions and connections can shine through.</p>
+                      </>
+                    )}
+                </div>
+              </div>
 
-          <section className="max-w-4xl mx-auto px-6 mb-24">
-            <div className="space-y-6 text-gray-700 leading-relaxed text-lg">
-              <p className="text-2xl font-light text-[#042A2B] mb-8">
-                Hi, I'm Braden Blackburn — a photographer passionate about capturing the beauty in everyday moments.
-              </p>
-              {about?.bio
-                ? String(about.bio).split('\n\n').map((para, idx) => <p key={idx}>{para}</p>)
-                : (
-                  <>
-                    <p>Photography has always been more than just a profession for me; it's a way to freeze time and preserve the emotions, connections, and stories that make life meaningful.</p>
-                    <p>My journey into photography began when I picked up my first camera. Since then, I've had the privilege of working with amazing clients, capturing everything from weddings and engagements to family portraits and special events.</p>
-                    <p>What sets my work apart is my commitment to authenticity. I don't believe in overly posed or artificial shots. Instead, I focus on creating a comfortable environment where genuine emotions and connections can shine through.</p>
-                  </>
-                )}
+              {/* Portrait Image (Right) */}
+              <div className="order-1 lg:order-2">
+                <div className="relative aspect-[3/4] overflow-hidden rounded-sm shadow-xl">
+                  <img
+                    src={aboutImageUrl || 'https://images.unsplash.com/photo-1554048612-b6a482bc67e5?w=1200&h=1600&fit=crop'}
+                    alt="Braden Blackburn"
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+              </div>
             </div>
           </section>
 
           <section className="bg-gray-50 py-20 mb-24">
             <div className="max-w-6xl mx-auto px-6">
-              <div className="grid md:grid-cols-4 gap-8">
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
                 {[['500+', 'Sessions Completed'], ['100+', 'Happy Couples'], ['5+', 'Years Experience'], ['1000+', 'Satisfied Clients']].map(([num, label]) => (
                   <div key={label} className="text-center">
                     <div className="text-4xl font-light mb-2">{num}</div>
