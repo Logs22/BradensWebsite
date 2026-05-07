@@ -123,11 +123,11 @@ function App() {
                 href="#"
                 onClick={(e) => { e.preventDefault(); showPage(page) }}
                 className={`text-sm tracking-wide transition-all duration-300 relative group font-light cursor-pointer ${
-                  currentPage === page ? 'text-slate-900' : 'text-gray-600'
+                  currentPage === page ? 'text-[#042A2B]' : 'text-gray-600 hover:text-[#042A2B]'
                 }`}
               >
                 {page.charAt(0).toUpperCase() + page.slice(1)}
-                <span className={`absolute -bottom-1 left-0 h-px bg-slate-900 transition-all duration-300 ${
+                <span className={`absolute -bottom-1 left-0 h-px bg-[#042A2B] transition-all duration-300 ${
                   currentPage === page ? 'w-full' : 'w-0 group-hover:w-full'
                 }`}></span>
               </a>
