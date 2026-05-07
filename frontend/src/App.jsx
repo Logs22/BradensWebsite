@@ -20,7 +20,7 @@ function urlFor(source) {
 const HERO_QUERY = `*[_type == "hero"][0]{ heading, subheading, backgroundImage }`
 const ABOUT_QUERY = `*[_type == "about"][0]{ title, bio, profileImage }`
 const PORTFOLIO_QUERY = `*[_type == "portfolioImage"] | order(_createdAt desc) { _id, title, image, caption, category, featured }`
-const SERVICES_QUERY = `*[_type == "service"] | order(_createdAt asc) { _id, title, desc, features, price, image }`
+const SERVICES_QUERY = `*[_type == "service"] | order(_createdAt asc) { _id, title, description, features, price, image }`
 const CONTACT_QUERY = `*[_type == "contact"][0]{ location, phone, email, instagram, responseTime, bookingNotice }`
 
 // ── COMPONENT ───────────────────────────────────────────────────────────
@@ -388,7 +388,7 @@ function App() {
                   </div>
                   <div className={idx % 2 !== 0 ? 'md:order-1' : ''}>
                     <h2 className="text-3xl md:text-4xl font-light mb-4 tracking-wide">{service.title}</h2>
-                    <p className="text-gray-600 mb-6 leading-relaxed">{service.desc}</p>
+                    <p className="text-gray-600 mb-6 leading-relaxed">{service.description}</p>
                     <ul className="space-y-3 mb-6">
                       {service.features?.map((feature, fIdx) => (
                         <li key={fIdx} className="flex items-start gap-3 text-gray-600">✓ {feature}</li>
