@@ -656,19 +656,20 @@ function App() {
                 <div className="max-w-7xl mx-auto text-center">
                   <h2 className="text-4xl md:text-5xl font-light mb-4 tracking-wide">Client Stories</h2>
                   <p className="text-gray-500 font-light mb-12">Discover recent client sessions and featured stories</p>
-                  <div className="grid md:grid-cols-3 gap-10">
+                  <div className="columns-1 md:columns-3 gap-8 text-center">
                     {clientGalleries.slice(0, 3).map(cg => (
                       <Link
                         key={cg._id}
                         to="/clients"
-                        className="group flex flex-col text-center cursor-pointer"
+                        className="break-inside-avoid mb-8 group flex flex-col text-center cursor-pointer"
                       >
-                        <div className="relative aspect-[3/2] overflow-hidden bg-gray-100 mb-5 shadow-sm group-hover:shadow-md transition-shadow">
+                        <div className="relative overflow-hidden rounded bg-gray-100 mb-4 shadow-sm group-hover:shadow-md transition-shadow">
                           {cg.coverImage && (
                             <img
-                              src={urlFor(cg.coverImage).width(800).height(533).url()}
+                              src={urlFor(cg.coverImage).width(1200).auto('format').fit('max').url()}
                               alt={cg.title}
-                              className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                              className="w-full h-auto object-contain transition-transform duration-700 group-hover:scale-105"
+                              loading="lazy"
                             />
                           )}
                           <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
@@ -875,7 +876,7 @@ function App() {
                   <p className="text-gray-400 text-sm font-light">Add your first client shoot in Sanity Studio under "Client Gallery"!</p>
                 </div>
               ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
+                <div className="columns-1 md:columns-2 lg:columns-3 gap-10 text-center">
                   {clientGalleries.map((gallery) => (
                     <div
                       key={gallery._id}
@@ -888,14 +889,15 @@ function App() {
                           setActiveModalGallery(gallery)
                         }
                       }}
-                      className="group cursor-pointer flex flex-col text-center"
+                      className="break-inside-avoid mb-10 group cursor-pointer flex flex-col text-center"
                     >
-                      <div className="relative aspect-[3/2] overflow-hidden bg-gray-100 mb-5 shadow-sm group-hover:shadow-md transition-shadow">
+                      <div className="relative overflow-hidden rounded bg-gray-100 mb-4 shadow-sm group-hover:shadow-md transition-shadow">
                         {gallery.coverImage && (
                           <img
-                            src={urlFor(gallery.coverImage).width(900).height(600).url()}
+                            src={urlFor(gallery.coverImage).width(1200).auto('format').fit('max').url()}
                             alt={gallery.title}
-                            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                            className="w-full h-auto object-contain transition-transform duration-700 group-hover:scale-105"
+                            loading="lazy"
                           />
                         )}
                         <div className="absolute inset-0 bg-black/25 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
