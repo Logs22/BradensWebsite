@@ -18,7 +18,7 @@ function urlFor(source) {
 }
 
 // ── GROQ QUERIES ────────────────────────────────────────────────────────
-const HERO_QUERY = `*[_type == "hero"][0]{ heading, highlightWord, subheading, backgroundImage }`
+const HERO_QUERY = `*[_type == "hero"][0]{ heading, heroTitle, subheading, heroSubtitle, backgroundImage, heroImage }`
 const ABOUT_QUERY = `*[_type == "about"][0]{ title, tagline, bio, profileImage }`
 const PORTFOLIO_QUERY = `*[_type == "portfolioImage"] | order(_createdAt desc) { _id, title, image, caption, category, featured, _createdAt }`
 const CLIENT_GALLERIES_QUERY = `*[_type == "clientGallery"] | order(date desc, _createdAt desc) {
@@ -190,7 +190,8 @@ function App() {
 
         if (heroData) {
           setHero(heroData)
-          if (heroData.backgroundImage) setHeroImageUrl(urlFor(heroData.backgroundImage).url())
+          const bg = heroData.backgroundImage || heroData.heroImage
+          if (bg) setHeroImageUrl(urlFor(bg).url())
         }
 
         if (aboutData) {
@@ -371,18 +372,16 @@ function App() {
             >
               <div className="absolute inset-0 bg-black/30" />
               <div className="relative text-center text-white px-6">
-                <h1 className="text-6xl md:text-8xl font-light tracking-wider mb-4">
-                  {hero?.heading || 'Capturing'}
-                  {hero?.highlightWord !== '' && (
-                    <>
-                      <br />
-                      <span className="font-normal italic">{hero?.highlightWord || 'Moments'}</span>
-                    </>
-                  )}
-                </h1>
-                <p className="text-lg md:text-xl text-gray-200 mb-8 font-light tracking-wide">
-                  {hero?.subheading || 'Through the lens of Braden Blackburn'}
-                </p>
+                {(hero?.heading || hero?.heroTitle) && (
+                  <h1 className="text-5xl md:text-7xl lg:text-8xl font-light tracking-wider mb-4">
+                    {hero?.heading || hero?.heroTitle}
+                  </h1>
+                )}
+                {(hero?.subheading || hero?.heroSubtitle) && (
+                  <p className="text-lg md:text-xl text-gray-200 mb-8 font-light tracking-wide max-w-2xl mx-auto">
+                    {hero?.subheading || hero?.heroSubtitle}
+                  </p>
+                )}
                 <div className="flex flex-wrap justify-center gap-4">
                   <Link
                     to="/portfolio"

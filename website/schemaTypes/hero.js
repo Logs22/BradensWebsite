@@ -5,31 +5,23 @@ export default {
   fields: [
     {
       name: 'heading',
-      title: 'Heading',
+      title: 'Main Heading (Title)',
       type: 'string',
-      description: 'The main catchphrase or title at the top of the site (e.g., "Capturing").',
-      initialValue: 'Capturing',
-    },
-    {
-      name: 'highlightWord',
-      title: 'Italic Highlight Word (Optional)',
-      type: 'string',
-      description: 'An optional accented/italicized word placed below the main heading (e.g., "Moments").',
-      initialValue: 'Moments',
+      description: 'The main headline displayed on the home page hero image (e.g., "Braden Blackburn Photography").',
     },
     {
       name: 'subheading',
-      title: 'Subheading',
+      title: 'Subheading (Optional)',
       type: 'text',
-      description: 'A brief sentence or two below the main heading (e.g., "Through the lens of Braden Blackburn").',
-      initialValue: 'Through the lens of Braden Blackburn',
+      description: 'An optional tagline or subtitle below the heading. Leave blank if you do not want a subheading.',
     },
     {
       name: 'backgroundImage',
       title: 'Background Image',
       type: 'image',
+      description: 'The full-screen background image displayed behind the title.',
       options: {
-        hotspot: true, // Allows Braden to crop the image inside Sanity
+        hotspot: true,
       },
     },
   ],
@@ -38,6 +30,13 @@ export default {
       title: 'heading',
       subtitle: 'subheading',
       media: 'backgroundImage',
+    },
+    prepare({ title, subtitle, media }) {
+      return {
+        title: title || 'Hero Banner',
+        subtitle: subtitle || 'No subheading',
+        media,
+      }
     },
   },
 }
