@@ -1,4 +1,4 @@
-﻿export default {
+export default {
   name: 'contact',
   title: 'Contact & Business Info',
   type: 'document',
@@ -8,7 +8,7 @@
       title: 'Contact Email',
       type: 'string',
       description: 'Email address where clients can reach Braden.',
-      initialValue: 'braden@photography.com',
+      initialValue: 'contact@bradenblackburnphotography.com',
     },
     {
       name: 'phone',

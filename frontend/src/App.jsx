@@ -381,7 +381,7 @@ function App() {
       const phone = formData.get('phone') || ''
       const service = formData.get('service') || ''
       const message = formData.get('message') || ''
-      const targetEmail = contact?.email || 'braden@photography.com'
+      const targetEmail = contact?.email || 'contact@bradenblackburnphotography.com'
       const mailtoUrl = `mailto:${encodeURIComponent(targetEmail)}?subject=${encodeURIComponent(`Photography Inquiry: ${service} (${name})`)}&body=${encodeURIComponent(`Name: ${name}\nEmail: ${email}\nPhone: ${phone}\nService: ${service}\n\nMessage:\n${message}`)}`
       window.location.href = mailtoUrl
       setFormStatus({
@@ -1294,7 +1294,15 @@ function App() {
                     <div className="space-y-4 text-gray-700">
                       <p>📍 {contact?.location || 'Fort Mitchell, Kentucky'}</p>
                       <p>📞 {contact?.phone || '(555) 123-4567'}</p>
-                      <p>✉️ {contact?.email || 'braden@photography.com'}</p>
+                      <p>
+                        ✉️{' '}
+                        <a
+                          href={`mailto:${contact?.email || 'contact@bradenblackburnphotography.com'}`}
+                          className="hover:underline"
+                        >
+                          {contact?.email || 'contact@bradenblackburnphotography.com'}
+                        </a>
+                      </p>
                       <p>
                         📷{' '}
                         <a
@@ -1446,8 +1454,10 @@ function App() {
                 <i className="fa-brands fa-instagram"></i>
               </a>
               <a 
-                href={`mailto:${contact?.email || 'braden@photography.com'}`}
+                href={`mailto:${contact?.email || 'contact@bradenblackburnphotography.com'}`}
                 className="text-[#CDEDF6] hover:text-white transition-all cursor-pointer text-2xl"
+                title="Email Braden"
+                aria-label="Email Braden"
               >
                 <i className="fa-regular fa-envelope"></i>
               </a>
