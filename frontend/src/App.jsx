@@ -20,12 +20,35 @@ function urlFor(source) {
 // ── GROQ QUERIES ────────────────────────────────────────────────────────
 const HERO_QUERY = `*[_type == "hero"][0]{ heading, highlightWord, subheading, backgroundImage }`
 const ABOUT_QUERY = `*[_type == "about"][0]{ title, tagline, bio, profileImage }`
-const PORTFOLIO_QUERY = `{
-  "singleImages": *[_type == "portfolioImage"] | order(_createdAt desc) { _id, title, image, caption, category, featured, _createdAt },
-  "galleries": *[_type == "gallery"] | order(_createdAt desc) { _id, title, category, featured, images[]{ _key, asset, caption, hotspot, crop }, _createdAt }
+const PORTFOLIO_QUERY = `*[_type == "portfolioImage"] | order(_createdAt desc) { _id, title, image, caption, category, featured, _createdAt }`
+const CLIENT_GALLERIES_QUERY = `*[_type == "clientGallery"] | order(date desc, _createdAt desc) {
+  _id,
+  title,
+  date,
+  category,
+  coverImage,
+  externalUrl,
+  photos,
+  featured,
+  _createdAt
 }`
 const SERVICES_QUERY = `*[_type == "service"] | order(order asc, _createdAt asc) { _id, title, description, features, price, image }`
 const CONTACT_QUERY = `*[_type == "contact"][0]{ location, phone, email, instagram, instagramUrl, responseTime, bookingNotice, web3FormsAccessKey }`
+
+// ── HELPER: FORMAT DISPLAY DATE ─────────────────────────────────────────
+function formatDisplayDate(dateString) {
+  if (!dateString) return ''
+  try {
+    const [year, month, day] = dateString.split('-')
+    if (year && month && day) {
+      const d = new Date(parseInt(year, 10), parseInt(month, 10) - 1, parseInt(day, 10))
+      return d.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })
+    }
+    return dateString
+  } catch (e) {
+    return dateString
+  }
+}
 
 // ── HELPER: RENDER BIO (HANDLES SANITY RICH TEXT & PLAIN TEXT) ──────────
 function renderBioText(bio) {
@@ -78,6 +101,13 @@ function App() {
   const [portfolio, setPortfolio] = useState([])
   const [filteredPortfolio, setFilteredPortfolio] = useState([])
   const [activeFilter, setActiveFilter] = useState('all')
+
+  const [clientGalleries, setClientGalleries] = useState([])
+  const [filteredClientGalleries, setFilteredClientGalleries] = useState([])
+  const [activeClientFilter, setActiveClientFilter] = useState('all')
+  const [activeModalGallery, setActiveModalGallery] = useState(null)
+  const [lightboxImage, setLightboxImage] = useState(null)
+
   const [services, setServices] = useState([])
   const [contact, setContact] = useState(null)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
@@ -97,10 +127,11 @@ function App() {
   useEffect(() => {
     const fetchSanityData = async () => {
       try {
-        const [heroData, aboutData, portfolioData, servicesData, contactData] = await Promise.all([
+        const [heroData, aboutData, portfolioData, clientData, servicesData, contactData] = await Promise.all([
           client.fetch(HERO_QUERY),
           client.fetch(ABOUT_QUERY),
           client.fetch(PORTFOLIO_QUERY),
+          client.fetch(CLIENT_GALLERIES_QUERY),
           client.fetch(SERVICES_QUERY),
           client.fetch(CONTACT_QUERY),
         ])
@@ -116,33 +147,15 @@ function App() {
         }
 
         if (portfolioData) {
-          let combined = []
-          if (portfolioData.singleImages && Array.isArray(portfolioData.singleImages)) {
-            combined = [...portfolioData.singleImages]
-          } else if (Array.isArray(portfolioData)) {
-            combined = [...portfolioData]
-          }
+          const list = Array.isArray(portfolioData) ? portfolioData : []
+          setPortfolio(list)
+          setFilteredPortfolio(list)
+        }
 
-          if (portfolioData.galleries && Array.isArray(portfolioData.galleries)) {
-            portfolioData.galleries.forEach(g => {
-              if (g.images && Array.isArray(g.images)) {
-                g.images.forEach((img, idx) => {
-                  combined.push({
-                    _id: `${g._id}-${img._key || idx}`,
-                    title: img.caption || g.title,
-                    image: img,
-                    category: g.category,
-                    featured: g.featured,
-                    _createdAt: g._createdAt,
-                  })
-                })
-              }
-            })
-          }
-
-          combined.sort((a, b) => new Date(b._createdAt || 0) - new Date(a._createdAt || 0))
-          setPortfolio(combined)
-          setFilteredPortfolio(combined)
+        if (clientData) {
+          const list = Array.isArray(clientData) ? clientData : []
+          setClientGalleries(list)
+          setFilteredClientGalleries(list)
         }
 
         if (servicesData) setServices(servicesData)
@@ -165,6 +178,17 @@ function App() {
     } else {
       setFilteredPortfolio(
         portfolio.filter(item => item.category && item.category.toLowerCase() === category.toLowerCase())
+      )
+    }
+  }
+
+  const filterClientGalleries = (category) => {
+    setActiveClientFilter(category)
+    if (category === 'all') {
+      setFilteredClientGalleries(clientGalleries)
+    } else {
+      setFilteredClientGalleries(
+        clientGalleries.filter(cg => cg.category && cg.category.toLowerCase() === category.toLowerCase())
       )
     }
   }
@@ -238,10 +262,12 @@ function App() {
     return location.pathname === `/${path}`
   }
 
+  const navPages = ['home', 'portfolio', 'clients', 'about', 'services', 'contact']
+
   return (
     <div className="bg-white">
       {/* ── Navigation ───────────────────────────────────────────────── */}
-      <nav className="absolute top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-md shadow-sm py-4">
+      <nav className="absolute top-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md shadow-sm py-4">
         <div className="max-w-7xl mx-auto px-6 flex items-center justify-between">
           <Link to="/" className="text-2xl font-light tracking-wider cursor-pointer">
             <span className="text-slate-900">BRADEN</span>
@@ -249,12 +275,12 @@ function App() {
           </Link>
 
           <div className="hidden md:flex items-center gap-8">
-            {['home', 'portfolio', 'about', 'services', 'contact'].map(page => (
+            {navPages.map(page => (
               <Link
                 key={page}
                 to={page === 'home' ? '/' : `/${page}`}
                 className={`text-sm tracking-wide transition-all duration-300 relative group font-light cursor-pointer ${
-                  isCurrentPage(page) ? 'text-slate-900' : 'text-gray-600 hover:text-slate-900'
+                  isCurrentPage(page) ? 'text-slate-900 font-normal' : 'text-gray-600 hover:text-slate-900'
                 }`}
               >
                 {page.charAt(0).toUpperCase() + page.slice(1)}
@@ -275,7 +301,7 @@ function App() {
         {mobileMenuOpen && (
           <div className="md:hidden bg-white border-t">
             <div className="max-w-7xl mx-auto px-6 py-4 space-y-4">
-              {['home', 'portfolio', 'about', 'services', 'contact'].map(page => (
+              {navPages.map(page => (
                 <Link
                   key={page}
                   to={page === 'home' ? '/' : `/${page}`}
@@ -317,12 +343,20 @@ function App() {
                 <p className="text-lg md:text-xl text-gray-200 mb-8 font-light tracking-wide">
                   {hero?.subheading || 'Through the lens of Braden Blackburn'}
                 </p>
-                <Link
-                  to="/portfolio"
-                  className="bg-[#CDEDF6] text-slate-900 hover:bg-white rounded-full px-8 py-4 text-base tracking-wide transition-colors cursor-pointer inline-block"
-                >
-                  View Portfolio →
-                </Link>
+                <div className="flex flex-wrap justify-center gap-4">
+                  <Link
+                    to="/portfolio"
+                    className="bg-[#CDEDF6] text-slate-900 hover:bg-white rounded-full px-8 py-4 text-base tracking-wide transition-colors cursor-pointer inline-block"
+                  >
+                    View Portfolio →
+                  </Link>
+                  <Link
+                    to="/clients"
+                    className="bg-white/10 hover:bg-white text-white hover:text-slate-900 backdrop-blur-sm border border-white/40 rounded-full px-8 py-4 text-base tracking-wide transition-colors cursor-pointer inline-block"
+                  >
+                    Client Galleries →
+                  </Link>
+                </div>
               </div>
             </section>
 
@@ -356,8 +390,49 @@ function App() {
               </div>
             </section>
 
+            {/* Client Galleries Teaser */}
+            {clientGalleries.length > 0 && (
+              <section className="py-24 px-6 bg-white">
+                <div className="max-w-7xl mx-auto text-center">
+                  <h2 className="text-4xl md:text-5xl font-light mb-4 tracking-wide">Client Stories</h2>
+                  <p className="text-gray-500 font-light mb-12">Discover our recent weddings, couples, and portrait sessions</p>
+                  <div className="grid md:grid-cols-3 gap-8">
+                    {clientGalleries.slice(0, 3).map(cg => (
+                      <Link
+                        key={cg._id}
+                        to="/clients"
+                        className="group flex flex-col bg-white border border-gray-100 overflow-hidden shadow-sm hover:shadow-lg transition-all rounded-sm text-center"
+                      >
+                        <div className="relative aspect-[3/2] overflow-hidden bg-gray-100">
+                          {cg.coverImage && (
+                            <img
+                              src={urlFor(cg.coverImage).width(800).height(533).url()}
+                              alt={cg.title}
+                              className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                            />
+                          )}
+                          <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                            <span className="bg-white text-slate-900 px-5 py-2 text-xs tracking-widest uppercase font-medium rounded-full shadow">
+                              View Shoot →
+                            </span>
+                          </div>
+                        </div>
+                        <div className="p-6">
+                          <h3 className="text-xl font-light text-slate-900 mb-1">{cg.title}</h3>
+                          {cg.date && <p className="text-xs text-gray-400 font-light tracking-wide">{formatDisplayDate(cg.date)}</p>}
+                        </div>
+                      </Link>
+                    ))}
+                  </div>
+                  <Link to="/clients" className="inline-block mt-12 bg-[#CDEDF6] text-slate-900 hover:bg-white rounded-full px-8 py-3 border border-gray-300 transition-all duration-300 cursor-pointer">
+                    Browse All Client Galleries →
+                  </Link>
+                </div>
+              </section>
+            )}
+
             {/* About Preview */}
-            <section className="py-24 px-6">
+            <section className="py-24 px-6 bg-gray-50">
               <div className="max-w-6xl mx-auto grid md:grid-cols-2 gap-16 items-center">
                 <img
                   src={aboutImageUrl || 'https://images.unsplash.com/photo-1554048612-b6a482bc67e5?w=800&h=1000&fit=crop'}
@@ -444,6 +519,176 @@ function App() {
                 </div>
               )}
             </div>
+          </div>
+        } />
+
+        {/* ── CLIENTS PAGE (PIXIESET STYLE) ────────────────────────────── */}
+        <Route path="/clients" element={
+          <div className="pt-24 pb-16 bg-white min-h-screen">
+            <div className="max-w-7xl mx-auto px-6">
+              <div className="text-center mb-16">
+                <h1 className="text-5xl md:text-6xl font-light mb-4 tracking-wide">Client Galleries</h1>
+                <p className="text-gray-600 text-lg font-light">Client stories, weddings, and featured collections</p>
+              </div>
+
+              {/* Category Filter */}
+              <div className="flex flex-wrap justify-center gap-4 mb-14">
+                {['all', 'weddings', 'couples', 'portraits', 'events'].map(category => (
+                  <button
+                    key={category}
+                    onClick={() => filterClientGalleries(category)}
+                    className={`px-6 py-2 rounded-full text-sm tracking-wide transition-colors cursor-pointer ${
+                      activeClientFilter === category
+                        ? 'bg-[#CDEDF6] text-slate-900 font-normal'
+                        : 'bg-gray-100 text-gray-700 hover:bg-[#CDEDF6] hover:text-slate-900'
+                    }`}
+                  >
+                    {category.charAt(0).toUpperCase() + category.slice(1)}
+                  </button>
+                ))}
+              </div>
+
+              {filteredClientGalleries.length === 0 ? (
+                <div className="text-center py-20">
+                  <p className="text-gray-500 text-lg font-light mb-4">No client galleries published yet in this category.</p>
+                  <p className="text-gray-400 text-sm font-light">Add your first client shoot in Sanity Studio under "Client Gallery"!</p>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                  {filteredClientGalleries.map((gallery) => (
+                    <div
+                      key={gallery._id}
+                      onClick={() => {
+                        if (gallery.photos && gallery.photos.length > 0) {
+                          setActiveModalGallery(gallery)
+                        } else if (gallery.externalUrl) {
+                          window.open(gallery.externalUrl, '_blank', 'noopener,noreferrer')
+                        } else {
+                          setActiveModalGallery(gallery)
+                        }
+                      }}
+                      className="group cursor-pointer flex flex-col bg-white border border-gray-200/80 overflow-hidden shadow-sm hover:shadow-xl transition-all duration-500 rounded-sm"
+                    >
+                      <div className="relative aspect-[3/2] overflow-hidden bg-gray-100">
+                        {gallery.coverImage && (
+                          <img
+                            src={urlFor(gallery.coverImage).width(900).height(600).url()}
+                            alt={gallery.title}
+                            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                          />
+                        )}
+                        <div className="absolute inset-0 bg-black/25 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                          <span className="bg-white/95 text-slate-900 px-5 py-2 text-xs tracking-widest uppercase font-medium rounded-full shadow">
+                            View Gallery →
+                          </span>
+                        </div>
+                        {gallery.category && (
+                          <span className="absolute top-4 left-4 bg-white/95 backdrop-blur-sm text-slate-900 text-xs px-3 py-1 uppercase tracking-wider rounded font-light shadow-sm">
+                            {gallery.category}
+                          </span>
+                        )}
+                      </div>
+                      <div className="p-6 text-center">
+                        <h3 className="text-2xl font-light text-slate-900 mb-2 group-hover:text-slate-600 transition-colors">
+                          {gallery.title}
+                        </h3>
+                        {gallery.date && (
+                          <p className="text-sm text-gray-500 font-light tracking-wide">
+                            {formatDisplayDate(gallery.date)}
+                          </p>
+                        )}
+                        {gallery.photos && gallery.photos.length > 0 && (
+                          <p className="text-xs text-gray-400 mt-2 font-light">
+                            {gallery.photos.length} photo{gallery.photos.length === 1 ? '' : 's'}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* ── CLIENT GALLERY LIGHTBOX MODAL ───────────────────────── */}
+            {activeModalGallery && (
+              <div className="fixed inset-0 z-50 bg-black/90 backdrop-blur-sm overflow-y-auto p-4 md:p-10 flex flex-col items-center">
+                <div className="w-full max-w-6xl relative">
+                  <div className="flex flex-wrap items-center justify-between py-6 border-b border-white/20 mb-8 text-white gap-4">
+                    <div>
+                      <h2 className="text-3xl md:text-4xl font-light">{activeModalGallery.title}</h2>
+                      {activeModalGallery.date && (
+                        <p className="text-sm text-gray-300 font-light mt-1">
+                          {formatDisplayDate(activeModalGallery.date)}
+                        </p>
+                      )}
+                    </div>
+                    <div className="flex items-center gap-4">
+                      {activeModalGallery.externalUrl && (
+                        <a
+                          href={activeModalGallery.externalUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="bg-[#CDEDF6] text-slate-900 hover:bg-white px-5 py-2 rounded-full text-sm font-light transition-colors"
+                        >
+                          Open Pixieset Collection ↗
+                        </a>
+                      )}
+                      <button
+                        onClick={() => setActiveModalGallery(null)}
+                        className="text-white hover:text-gray-300 text-3xl cursor-pointer p-2"
+                        title="Close Gallery"
+                      >
+                        ✕
+                      </button>
+                    </div>
+                  </div>
+
+                  {activeModalGallery.photos && activeModalGallery.photos.length > 0 ? (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 pb-20">
+                      {activeModalGallery.photos.map((photo, pIdx) => (
+                        <div
+                          key={photo._key || pIdx}
+                          onClick={() => setLightboxImage(urlFor(photo).width(1600).url())}
+                          className="cursor-pointer overflow-hidden rounded group aspect-[3/2] bg-black/30 shadow"
+                        >
+                          <img
+                            src={urlFor(photo).width(800).height(533).url()}
+                            alt=""
+                            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                            loading="lazy"
+                          />
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="text-center text-gray-300 py-24">
+                      <p className="text-lg mb-6">No additional photos uploaded in this collection yet.</p>
+                      {activeModalGallery.externalUrl && (
+                        <a
+                          href={activeModalGallery.externalUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-block bg-[#CDEDF6] text-slate-900 hover:bg-white px-8 py-3 rounded-full text-base transition-colors"
+                        >
+                          View Full Gallery on Pixieset ↗
+                        </a>
+                      )}
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* Lightbox Single Photo Fullscreen View */}
+            {lightboxImage && (
+              <div
+                onClick={() => setLightboxImage(null)}
+                className="fixed inset-0 z-60 bg-black/95 flex items-center justify-center p-4 cursor-zoom-out"
+              >
+                <img src={lightboxImage} alt="" className="max-h-[92vh] max-w-[92vw] object-contain rounded shadow-2xl" />
+                <button onClick={() => setLightboxImage(null)} className="absolute top-6 right-6 text-white text-4xl hover:text-gray-300">✕</button>
+              </div>
+            )}
           </div>
         } />
 
@@ -647,7 +892,7 @@ function App() {
           <div>
             <h4 className="text-sm font-semibold tracking-wider mb-6 uppercase">Quick Links</h4>
             <ul className="space-y-3">
-              {['home', 'portfolio', 'about', 'services', 'contact'].map(p => (
+              {navPages.map(p => (
                 <li key={p}>
                   <Link
                     to={p === 'home' ? '/' : `/${p}`}
