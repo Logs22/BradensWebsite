@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+﻿import { useState, useEffect } from 'react'
 import { createClient } from '@sanity/client'
 import imageUrlBuilder from '@sanity/image-url'
 import { Routes, Route, Link, useLocation } from 'react-router-dom'
@@ -8,23 +8,66 @@ import './App.css'
 const client = createClient({
   projectId: '23vvbmgr',
   dataset: 'production',
-  useCdn: true,
+  useCdn: false, // Set to false to ensure Braden sees published changes immediately
   apiVersion: '2024-05-05',
 })
 
-const builder = imageUrlBuilder(client);
+const builder = imageUrlBuilder(client)
 function urlFor(source) {
-  return builder.image(source);
+  return builder.image(source)
 }
 
 // ── GROQ QUERIES ────────────────────────────────────────────────────────
-const HERO_QUERY = `*[_type == "hero"][0]{ heading, subheading, backgroundImage }`
-const ABOUT_QUERY = `*[_type == "about"][0]{ title, bio, profileImage }`
+const HERO_QUERY = `*[_type == "hero"][0]{ heading, highlightWord, subheading, backgroundImage }`
+const ABOUT_QUERY = `*[_type == "about"][0]{ title, tagline, bio, profileImage }`
 const PORTFOLIO_QUERY = `*[_type == "portfolioImage"] | order(_createdAt desc) { _id, title, image, caption, category, featured }`
-const SERVICES_QUERY = `*[_type == "service"] | order(_createdAt asc) { _id, title, description, features, price, image }`
-const CONTACT_QUERY = `*[_type == "contact"][0]{ location, phone, email, instagram, responseTime, bookingNotice }`
+const SERVICES_QUERY = `*[_type == "service"] | order(order asc, _createdAt asc) { _id, title, description, features, price, image }`
+const CONTACT_QUERY = `*[_type == "contact"][0]{ location, phone, email, instagram, instagramUrl, responseTime, bookingNotice, web3FormsAccessKey }`
 
-// ── COMPONENT ───────────────────────────────────────────────────────────
+// ── HELPER: RENDER BIO (HANDLES SANITY RICH TEXT & PLAIN TEXT) ──────────
+function renderBioText(bio) {
+  if (!bio) {
+    return (
+      <>
+        <p>Photography has always been more than just a profession for me; it's a way to freeze time and preserve the emotions, connections, and stories that make life meaningful.</p>
+        <p>My journey into photography began when I picked up my first camera. Since then, I've had the privilege of working with amazing clients, capturing everything from weddings and engagements to family portraits and special events.</p>
+        <p>What sets my work apart is my commitment to authenticity. I don't believe in overly posed or artificial shots. Instead, I focus on creating a comfortable environment where genuine emotions and connections can shine through.</p>
+      </>
+    )
+  }
+
+  // Handle Sanity block content array
+  if (Array.isArray(bio)) {
+    return bio.map((block, idx) => {
+      if (block._type === 'block' && block.children) {
+        return (
+          <p key={block._key || idx}>
+            {block.children.map((child, cIdx) => {
+              let text = child.text
+              if (child.marks && child.marks.includes('strong')) {
+                return <strong key={cIdx}>{text}</strong>
+              }
+              if (child.marks && child.marks.includes('em')) {
+                return <em key={cIdx}>{text}</em>
+              }
+              return <span key={cIdx}>{text}</span>
+            })}
+          </p>
+        )
+      }
+      return null
+    })
+  }
+
+  // Handle plain string
+  if (typeof bio === 'string') {
+    return bio.split('\n\n').map((para, idx) => <p key={idx}>{para}</p>)
+  }
+
+  return <p>{String(bio)}</p>
+}
+
+// ── MAIN APP COMPONENT ──────────────────────────────────────────────────
 function App() {
   const location = useLocation()
   const [hero, setHero] = useState(null)
@@ -36,9 +79,11 @@ function App() {
   const [contact, setContact] = useState(null)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [loading, setLoading] = useState(true)
-  
+
   const [heroImageUrl, setHeroImageUrl] = useState(null)
   const [aboutImageUrl, setAboutImageUrl] = useState(null)
+
+  const [formStatus, setFormStatus] = useState({ state: 'idle', message: '' })
 
   // Scroll to top on route change
   useEffect(() => {
@@ -55,47 +100,100 @@ function App() {
           client.fetch(PORTFOLIO_QUERY),
           client.fetch(SERVICES_QUERY),
           client.fetch(CONTACT_QUERY),
-        ]);
+        ])
 
         if (heroData) {
-          setHero(heroData);
-          if (heroData.backgroundImage) setHeroImageUrl(urlFor(heroData.backgroundImage).url());
+          setHero(heroData)
+          if (heroData.backgroundImage) setHeroImageUrl(urlFor(heroData.backgroundImage).url())
         }
 
         if (aboutData) {
-          setAbout(aboutData);
-          if (aboutData.profileImage) setAboutImageUrl(urlFor(aboutData.profileImage).width(800).height(1000).url());
+          setAbout(aboutData)
+          if (aboutData.profileImage) setAboutImageUrl(urlFor(aboutData.profileImage).width(800).height(1000).url())
         }
 
         if (portfolioData) {
-          setPortfolio(portfolioData);
-          setFilteredPortfolio(portfolioData);
+          setPortfolio(portfolioData)
+          setFilteredPortfolio(portfolioData)
         }
 
-        if (servicesData) setServices(servicesData);
-        if (contactData) setContact(contactData);
+        if (servicesData) setServices(servicesData)
+        if (contactData) setContact(contactData)
 
       } catch (error) {
-        console.error("Error fetching from Sanity:", error);
+        console.error("Error fetching from Sanity:", error)
       } finally {
-        setLoading(false); 
+        setLoading(false)
       }
-    };
+    }
 
-    fetchSanityData();
-  }, []);
+    fetchSanityData()
+  }, [])
 
   const filterPortfolio = (category) => {
     setActiveFilter(category)
     if (category === 'all') {
       setFilteredPortfolio(portfolio)
     } else {
-      setFilteredPortfolio(portfolio.filter(item => item.category === category))
+      setFilteredPortfolio(
+        portfolio.filter(item => item.category && item.category.toLowerCase() === category.toLowerCase())
+      )
     }
   }
 
-  const featuredPortfolio = portfolio.filter(i => i.featured).slice(0, 4)
-    .concat(portfolio.filter(i => !i.featured)).slice(0, 4)
+  // Display featured images, or fallback to the 4 most recent images
+  const featuredOnly = portfolio.filter(i => i.featured)
+  const displayFeatured = featuredOnly.length > 0 ? featuredOnly.slice(0, 4) : portfolio.slice(0, 4)
+
+  const handleContactSubmit = async (e) => {
+    e.preventDefault()
+    setFormStatus({ state: 'submitting', message: '' })
+    const form = e.target
+    const formData = new FormData(form)
+
+    if (contact?.web3FormsAccessKey) {
+      formData.append('access_key', contact.web3FormsAccessKey)
+      formData.append('subject', `Photography Inquiry from ${formData.get('name') || 'Client'}`)
+      try {
+        const res = await fetch('https://api.web3forms.com/submit', {
+          method: 'POST',
+          body: formData,
+        })
+        const result = await res.json()
+        if (result.success) {
+          setFormStatus({
+            state: 'success',
+            message: "Thank you! Your message has been sent directly to Braden. He'll get back to you shortly.",
+          })
+          form.reset()
+        } else {
+          setFormStatus({
+            state: 'error',
+            message: result.message || 'Something went wrong. Please try emailing directly.',
+          })
+        }
+      } catch (err) {
+        setFormStatus({
+          state: 'error',
+          message: 'Failed to send message. Please reach out directly by email or phone.',
+        })
+      }
+    } else {
+      const name = formData.get('name') || ''
+      const email = formData.get('email') || ''
+      const phone = formData.get('phone') || ''
+      const service = formData.get('service') || ''
+      const message = formData.get('message') || ''
+      const targetEmail = contact?.email || 'braden@photography.com'
+      const mailtoUrl = `mailto:${encodeURIComponent(targetEmail)}?subject=${encodeURIComponent(`Photography Inquiry: ${service} (${name})`)}&body=${encodeURIComponent(`Name: ${name}\nEmail: ${email}\nPhone: ${phone}\nService: ${service}\n\nMessage:\n${message}`)}`
+      window.location.href = mailtoUrl
+      setFormStatus({
+        state: 'success',
+        message: 'Opening your email client to send this message directly to Braden.',
+      })
+      form.reset()
+    }
+  }
 
   if (loading) {
     return (
@@ -104,7 +202,7 @@ function App() {
           LOADING...
         </div>
       </div>
-    );
+    )
   }
 
   const isCurrentPage = (path) => {
@@ -180,8 +278,13 @@ function App() {
               <div className="absolute inset-0 bg-black/30" />
               <div className="relative text-center text-white px-6">
                 <h1 className="text-6xl md:text-8xl font-light tracking-wider mb-4">
-                  {hero?.heading || 'Capturing'}<br />
-                  <span className="font-normal italic">Moments</span>
+                  {hero?.heading || 'Capturing'}
+                  {hero?.highlightWord !== '' && (
+                    <>
+                      <br />
+                      <span className="font-normal italic">{hero?.highlightWord || 'Moments'}</span>
+                    </>
+                  )}
                 </h1>
                 <p className="text-lg md:text-xl text-gray-200 mb-8 font-light tracking-wide">
                   {hero?.subheading || 'Through the lens of Braden Blackburn'}
@@ -200,13 +303,26 @@ function App() {
               <div className="max-w-7xl mx-auto text-center mb-16">
                 <h2 className="text-4xl md:text-5xl font-light mb-4 tracking-wide">Featured Work</h2>
                 <div className="grid md:grid-cols-2 gap-6 mt-16">
-                  {featuredPortfolio.length > 0 ? (
-                    featuredPortfolio.map((item) => (
+                  {displayFeatured.length > 0 ? (
+                    displayFeatured.map((item) => (
                       <div key={item._id} className="group relative overflow-hidden aspect-[4/5] cursor-pointer">
-                        <img src={urlFor(item.image).width(800).height(1000).url()} alt={item.title} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
+                        {item.image && (
+                          <img
+                            src={urlFor(item.image).width(800).height(1000).url()}
+                            alt={item.title || 'Featured Work'}
+                            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                          />
+                        )}
+                        {item.title && (
+                          <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/60 to-transparent p-6 text-white text-left opacity-0 group-hover:opacity-100 transition-opacity">
+                            <p className="text-lg font-light">{item.title}</p>
+                          </div>
+                        )}
                       </div>
                     ))
-                  ) : ( [1, 2, 3, 4].map(i => <div key={i} className="aspect-[4/5] bg-gray-200 animate-pulse" />) )}
+                  ) : (
+                    [1, 2, 3, 4].map(i => <div key={i} className="aspect-[4/5] bg-gray-200 animate-pulse rounded" />)
+                  )}
                 </div>
                 <Link to="/portfolio" className="inline-block mt-12 bg-[#CDEDF6] text-slate-900 hover:bg-white rounded-full px-8 py-3 border border-gray-300 transition-all duration-300 cursor-pointer">Explore Full Portfolio</Link>
               </div>
@@ -215,11 +331,15 @@ function App() {
             {/* About Preview */}
             <section className="py-24 px-6">
               <div className="max-w-6xl mx-auto grid md:grid-cols-2 gap-16 items-center">
-                <img src={aboutImageUrl || 'https://images.unsplash.com/photo-1554048612-b6a482bc67e5?w=800&h=1000&fit=crop'} alt="Braden" className="w-full h-[600px] object-cover" />
+                <img
+                  src={aboutImageUrl || 'https://images.unsplash.com/photo-1554048612-b6a482bc67e5?w=800&h=1000&fit=crop'}
+                  alt="Braden"
+                  className="w-full h-[600px] object-cover"
+                />
                 <div>
                   <h2 className="text-4xl md:text-5xl font-light mb-6 tracking-wide">{about?.title || 'Meet Braden'}</h2>
                   <div className="space-y-4 text-gray-600 leading-relaxed">
-                    {about?.bio ? String(about.bio).split('\n\n').map((p, i) => <p key={i}>{p}</p>) : <p>Professional photographer.</p>}
+                    {renderBioText(about?.bio)}
                   </div>
                   <Link to="/about" className="mt-6 text-slate-900 hover:underline cursor-pointer inline-block">Learn More About Me →</Link>
                 </div>
@@ -231,10 +351,11 @@ function App() {
               <h2 className="text-4xl md:text-5xl font-light mb-4 tracking-wide">Services</h2>
               <div className="grid md:grid-cols-3 gap-8 max-w-7xl mx-auto mt-16">
                 {services.map((s) => (
-                  <div key={s._id} className="border border-white/20 p-8 hover:border-white/50 transition-colors bg-white/5 backdrop-blur-sm">
+                  <div key={s._id} className="border border-white/20 p-8 hover:border-white/50 transition-colors bg-white/5 backdrop-blur-sm text-left">
                     <h3 className="text-2xl font-light mb-3 tracking-wide">{s.title}</h3>
-                    <p className="text-white/80 mb-6">{s.desc}</p>
-                    <Link to="/services" className="text-white hover:underline cursor-pointer">View Details →</Link>
+                    {s.price && <div className="text-lg text-[#CDEDF6] font-light mb-4">{s.price}</div>}
+                    <p className="text-white/80 mb-6 leading-relaxed">{s.description || s.desc}</p>
+                    <Link to="/services" className="text-white hover:underline cursor-pointer font-light">View Details →</Link>
                   </div>
                 ))}
               </div>
@@ -279,14 +400,16 @@ function App() {
                 <div className="grid md:grid-cols-3 gap-6">
                   {filteredPortfolio.map((item) => (
                     <div key={item._id} className="group cursor-pointer overflow-hidden">
-                      <img
-                        src={urlFor(item.image).width(800).url()}
-                        alt={item.title || 'Portfolio image'}
-                        className="w-full h-auto transition-transform duration-700 group-hover:scale-110"
-                        loading="lazy"
-                      />
+                      {item.image && (
+                        <img
+                          src={urlFor(item.image).width(800).url()}
+                          alt={item.title || 'Portfolio image'}
+                          className="w-full h-auto transition-transform duration-700 group-hover:scale-105"
+                          loading="lazy"
+                        />
+                      )}
                       {item.title && (
-                        <p className="text-sm text-gray-500 mt-2 text-center">{item.title}</p>
+                        <p className="text-sm text-gray-600 mt-2 text-center font-light">{item.title}</p>
                       )}
                     </div>
                   ))}
@@ -303,20 +426,12 @@ function App() {
               <div className="grid lg:grid-cols-2 gap-16 items-center">
                 {/* Text Content (Left) */}
                 <div className="order-2 lg:order-1">
-                  <h1 className="text-5xl md:text-6xl font-light mb-8 tracking-wide">About Me</h1>
+                  <h1 className="text-5xl md:text-6xl font-light mb-8 tracking-wide">{about?.title || 'About Me'}</h1>
                   <div className="space-y-6 text-gray-700 leading-relaxed text-lg">
                     <p className="text-2xl font-light text-[#042A2B] mb-8">
-                      {about?.title || "Hi, I'm Braden Blackburn — a photographer passionate about capturing the beauty in everyday moments."}
+                      {about?.tagline || "Hi, I'm Braden Blackburn — a photographer passionate about capturing the beauty in everyday moments."}
                     </p>
-                    {about?.bio
-                      ? String(about.bio).split('\n\n').map((para, idx) => <p key={idx}>{para}</p>)
-                      : (
-                        <>
-                          <p>Photography has always been more than just a profession for me; it's a way to freeze time and preserve the emotions, connections, and stories that make life meaningful.</p>
-                          <p>My journey into photography began when I picked up my first camera. Since then, I've had the privilege of working with amazing clients, capturing everything from weddings and engagements to family portraits and special events.</p>
-                          <p>What sets my work apart is my commitment to authenticity. I don't believe in overly posed or artificial shots. Instead, I focus on creating a comfortable environment where genuine emotions and connections can shine through.</p>
-                        </>
-                      )}
+                    {renderBioText(about?.bio)}
                   </div>
                 </div>
 
@@ -354,22 +469,26 @@ function App() {
                         <img
                           src={urlFor(service.image).width(800).height(600).url()}
                           alt={service.title}
-                          className="w-full h-auto"
+                          className="w-full h-auto rounded shadow"
                         />
                       )}
                     </div>
                     <div className={idx % 2 !== 0 ? 'md:order-1' : ''}>
                       <h2 className="text-3xl md:text-4xl font-light mb-4 tracking-wide">{service.title}</h2>
                       <p className="text-gray-600 mb-6 leading-relaxed">{service.description}</p>
-                      <ul className="space-y-3 mb-6">
-                        {service.features?.map((feature, fIdx) => (
-                          <li key={fIdx} className="flex items-start gap-3 text-gray-600">✓ {feature}</li>
-                        ))}
-                      </ul>
-                      <div className="text-2xl font-light text-[#042A2B] mb-6">{service.price}</div>
+                      {service.features && service.features.length > 0 && (
+                        <ul className="space-y-3 mb-6">
+                          {service.features.map((feature, fIdx) => (
+                            <li key={fIdx} className="flex items-start gap-3 text-gray-600">✓ {feature}</li>
+                          ))}
+                        </ul>
+                      )}
+                      {service.price && (
+                        <div className="text-2xl font-light text-[#042A2B] mb-6">{service.price}</div>
+                      )}
                       <Link
                         to="/contact"
-                        className="bg-[#CDEDF6] text-slate-900 hover:bg-white rounded-full px-8 py-3 text-slate-900 cursor-pointer inline-block"
+                        className="bg-[#CDEDF6] text-slate-900 hover:bg-white rounded-full px-8 py-3 text-slate-900 cursor-pointer inline-block transition-colors"
                       >
                         Book This Service
                       </Link>
@@ -387,55 +506,64 @@ function App() {
             <section className="max-w-5xl mx-auto px-6 mb-20 text-center">
               <h1 className="text-5xl md:text-6xl font-light mb-6 tracking-wide">Let's Connect</h1>
               <p className="text-gray-600 text-lg font-light max-w-2xl mx-auto leading-relaxed">
-                {contact?.responseTime
-                  ? 'Ready to capture your story? Reach out and I\'ll get back to you shortly.'
-                  : 'Ready to capture your story? Fill out the form below or reach out directly.'}
+                Ready to capture your story? Fill out the form below or reach out directly.
               </p>
             </section>
 
             <div className="max-w-7xl mx-auto px-6">
               <div className="grid lg:grid-cols-5 gap-16">
                 <div className="lg:col-span-3">
-                  <form
-                    onSubmit={(e) => {
-                      e.preventDefault()
-                      alert("Thank you! I'll be in touch within 24 hours.")
-                      e.target.reset()
-                    }}
-                    className="space-y-6"
-                  >
+                  <form onSubmit={handleContactSubmit} className="space-y-6">
+                    {formStatus.state === 'success' && (
+                      <div className="p-4 bg-emerald-50 border border-emerald-200 text-emerald-800 rounded-md text-sm">
+                        {formStatus.message}
+                      </div>
+                    )}
+                    {formStatus.state === 'error' && (
+                      <div className="p-4 bg-rose-50 border border-rose-200 text-rose-800 rounded-md text-sm">
+                        {formStatus.message}
+                      </div>
+                    )}
+
                     <div className="grid md:grid-cols-2 gap-6">
                       <div className="space-y-2">
                         <label className="text-gray-700 block text-sm">Full Name *</label>
-                        <input required className="border border-gray-300 p-3 w-full rounded focus:outline-none focus:border-gray-900" placeholder="Jane Smith" />
+                        <input name="name" required className="border border-gray-300 p-3 w-full rounded focus:outline-none focus:border-gray-900" placeholder="Jane Smith" />
                       </div>
                       <div className="space-y-2">
                         <label className="text-gray-700 block text-sm">Email Address *</label>
-                        <input type="email" required className="border border-gray-300 p-3 w-full rounded focus:outline-none focus:border-gray-900" placeholder="jane@example.com" />
+                        <input name="email" type="email" required className="border border-gray-300 p-3 w-full rounded focus:outline-none focus:border-gray-900" placeholder="jane@example.com" />
                       </div>
                     </div>
+
                     <div className="grid md:grid-cols-2 gap-6">
                       <div className="space-y-2">
                         <label className="text-gray-700 block text-sm">Phone Number</label>
-                        <input type="tel" className="border border-gray-300 p-3 w-full rounded focus:outline-none focus:border-gray-900" placeholder="(555) 123-4567" />
+                        <input name="phone" type="tel" className="border border-gray-300 p-3 w-full rounded focus:outline-none focus:border-gray-900" placeholder="(555) 123-4567" />
                       </div>
                       <div className="space-y-2">
                         <label className="text-gray-700 block text-sm">Service Type *</label>
-                        <select required className="border border-gray-300 p-3 w-full rounded focus:outline-none focus:border-gray-900">
+                        <select name="service" required className="border border-gray-300 p-3 w-full rounded focus:outline-none focus:border-gray-900">
                           <option value="">Select a service</option>
-                          <option value="wedding">Wedding Photography</option>
-                          <option value="portrait">Portrait Session</option>
-                          <option value="event">Event Photography</option>
-                          <option value="other">Other</option>
+                          <option value="Weddings">Wedding Photography</option>
+                          <option value="Portraits">Portrait Session</option>
+                          <option value="Events">Event Photography</option>
+                          <option value="Other">Other</option>
                         </select>
                       </div>
                     </div>
+
                     <div className="space-y-2">
                       <label className="text-gray-700 block text-sm">Tell Me About Your Vision *</label>
-                      <textarea required className="border border-gray-300 p-3 w-full rounded min-h-[150px] focus:outline-none focus:border-gray-900" placeholder="Share details about your event, location preferences, style inspiration..." />
+                      <textarea name="message" required className="border border-gray-300 p-3 w-full rounded min-h-[150px] focus:outline-none focus:border-gray-900" placeholder="Share details about your event, location preferences, style inspiration..." />
                     </div>
-                    <button type="submit" className="w-full md:w-auto bg-[#CDEDF6] hover:bg-white rounded-full px-12 py-4 text-slate-900 text-base tracking-wide cursor-pointer">
-                      Send Message
+
+                    <button
+                      type="submit"
+                      disabled={formStatus.state === 'submitting'}
+                      className="w-full md:w-auto bg-[#CDEDF6] hover:bg-white rounded-full px-12 py-4 text-slate-900 text-base tracking-wide cursor-pointer disabled:opacity-60 transition-colors border border-transparent hover:border-slate-300"
+                    >
+                      {formStatus.state === 'submitting' ? 'Sending...' : 'Send Message'}
                     </button>
                   </form>
                 </div>
@@ -447,7 +575,17 @@ function App() {
                       <p>📍 {contact?.location || 'Fort Mitchell, Kentucky'}</p>
                       <p>📞 {contact?.phone || '(555) 123-4567'}</p>
                       <p>✉️ {contact?.email || 'braden@photography.com'}</p>
-                      <p>📷 <a href="https://www.instagram.com/blackburn_creative/" target="_blank" rel="noopener noreferrer" className="hover:underline">{contact?.instagram || '@blackburn_creative'}</a></p>
+                      <p>
+                        📷{' '}
+                        <a
+                          href={contact?.instagramUrl || 'https://www.instagram.com/blackburn_creative/'}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="hover:underline"
+                        >
+                          {contact?.instagram || '@blackburn_creative'}
+                        </a>
+                      </p>
                     </div>
                   </div>
 
@@ -497,7 +635,7 @@ function App() {
             <h4 className="text-sm font-semibold tracking-wider mb-6 uppercase">Connect</h4>
             <div className="flex gap-6">
               <a 
-                href="https://www.instagram.com/blackburn_creative/" 
+                href={contact?.instagramUrl || "https://www.instagram.com/blackburn_creative/"} 
                 target="_blank" 
                 rel="noopener noreferrer"
                 className="text-[#CDEDF6] hover:text-white transition-all cursor-pointer text-2xl"

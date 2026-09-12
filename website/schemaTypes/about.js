@@ -1,13 +1,21 @@
 export default {
   name: 'about',
-  title: 'About Section',
+  title: 'About Me',
   type: 'document',
   fields: [
     {
       name: 'title',
       title: 'Section Title',
       type: 'string',
+      description: 'The heading for the section (e.g., "About Me" or "Meet Braden").',
       initialValue: 'About Me',
+    },
+    {
+      name: 'tagline',
+      title: 'Intro Tagline / Quote',
+      type: 'text',
+      description: 'The prominent intro quote (e.g., "Hi, I\'m Braden Blackburn — a photographer passionate about capturing the beauty in everyday moments.").',
+      initialValue: "Hi, I'm Braden Blackburn — a photographer passionate about capturing the beauty in everyday moments.",
     },
     {
       name: 'profileImage',
@@ -19,10 +27,23 @@ export default {
     },
     {
       name: 'bio',
-      title: 'Biography',
+      title: 'Biography / Story',
       type: 'array',
-      of: [{ type: 'block' }], // This enables a rich text editor (bold, italics, etc.)
+      of: [{ type: 'block' }], // Enables rich text editor (paragraphs, bold, italics)
       description: 'Write about Braden and his photography experience.',
     },
   ],
+  preview: {
+    select: {
+      title: 'title',
+      media: 'profileImage',
+    },
+    prepare({ title, media }) {
+      return {
+        title: title || 'About Me',
+        subtitle: 'About page & home preview content',
+        media,
+      }
+    },
+  },
 }
