@@ -25,7 +25,6 @@ const CLIENT_GALLERIES_QUERY = `*[_type == "clientGallery"] | order(date desc, _
   _id,
   title,
   date,
-  category,
   coverImage,
   externalUrl,
   photos,
@@ -103,8 +102,6 @@ function App() {
   const [activeFilter, setActiveFilter] = useState('all')
 
   const [clientGalleries, setClientGalleries] = useState([])
-  const [filteredClientGalleries, setFilteredClientGalleries] = useState([])
-  const [activeClientFilter, setActiveClientFilter] = useState('all')
   const [activeModalGallery, setActiveModalGallery] = useState(null)
   const [lightboxImage, setLightboxImage] = useState(null)
 
@@ -155,7 +152,6 @@ function App() {
         if (clientData) {
           const list = Array.isArray(clientData) ? clientData : []
           setClientGalleries(list)
-          setFilteredClientGalleries(list)
         }
 
         if (servicesData) setServices(servicesData)
@@ -178,17 +174,6 @@ function App() {
     } else {
       setFilteredPortfolio(
         portfolio.filter(item => item.category && item.category.toLowerCase() === category.toLowerCase())
-      )
-    }
-  }
-
-  const filterClientGalleries = (category) => {
-    setActiveClientFilter(category)
-    if (category === 'all') {
-      setFilteredClientGalleries(clientGalleries)
-    } else {
-      setFilteredClientGalleries(
-        clientGalleries.filter(cg => cg.category && cg.category.toLowerCase() === category.toLowerCase())
       )
     }
   }
@@ -395,15 +380,15 @@ function App() {
               <section className="py-24 px-6 bg-white">
                 <div className="max-w-7xl mx-auto text-center">
                   <h2 className="text-4xl md:text-5xl font-light mb-4 tracking-wide">Client Stories</h2>
-                  <p className="text-gray-500 font-light mb-12">Discover our recent weddings, couples, and portrait sessions</p>
-                  <div className="grid md:grid-cols-3 gap-8">
+                  <p className="text-gray-500 font-light mb-12">Discover recent client sessions and featured stories</p>
+                  <div className="grid md:grid-cols-3 gap-10">
                     {clientGalleries.slice(0, 3).map(cg => (
                       <Link
                         key={cg._id}
                         to="/clients"
-                        className="group flex flex-col bg-white border border-gray-100 overflow-hidden shadow-sm hover:shadow-lg transition-all rounded-sm text-center"
+                        className="group flex flex-col text-center cursor-pointer"
                       >
-                        <div className="relative aspect-[3/2] overflow-hidden bg-gray-100">
+                        <div className="relative aspect-[3/2] overflow-hidden bg-gray-100 mb-5 shadow-sm group-hover:shadow-md transition-shadow">
                           {cg.coverImage && (
                             <img
                               src={urlFor(cg.coverImage).width(800).height(533).url()}
@@ -412,14 +397,20 @@ function App() {
                             />
                           )}
                           <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                            <span className="bg-white text-slate-900 px-5 py-2 text-xs tracking-widest uppercase font-medium rounded-full shadow">
+                            <span className="bg-white text-slate-900 px-6 py-2.5 text-xs tracking-widest uppercase font-medium rounded-full shadow">
                               View Shoot →
                             </span>
                           </div>
                         </div>
-                        <div className="p-6">
-                          <h3 className="text-xl font-light text-slate-900 mb-1">{cg.title}</h3>
-                          {cg.date && <p className="text-xs text-gray-400 font-light tracking-wide">{formatDisplayDate(cg.date)}</p>}
+                        <div className="space-y-1">
+                          <h3 className="text-lg md:text-xl font-light tracking-[0.12em] uppercase text-slate-900 group-hover:text-gray-600 transition-colors">
+                            {cg.title}
+                          </h3>
+                          {cg.date && (
+                            <p className="text-xs text-gray-400 font-light tracking-widest uppercase">
+                              {formatDisplayDate(cg.date)}
+                            </p>
+                          )}
                         </div>
                       </Link>
                     ))}
@@ -531,31 +522,14 @@ function App() {
                 <p className="text-gray-600 text-lg font-light">Client stories, weddings, and featured collections</p>
               </div>
 
-              {/* Category Filter */}
-              <div className="flex flex-wrap justify-center gap-4 mb-14">
-                {['all', 'weddings', 'couples', 'portraits', 'events'].map(category => (
-                  <button
-                    key={category}
-                    onClick={() => filterClientGalleries(category)}
-                    className={`px-6 py-2 rounded-full text-sm tracking-wide transition-colors cursor-pointer ${
-                      activeClientFilter === category
-                        ? 'bg-[#CDEDF6] text-slate-900 font-normal'
-                        : 'bg-gray-100 text-gray-700 hover:bg-[#CDEDF6] hover:text-slate-900'
-                    }`}
-                  >
-                    {category.charAt(0).toUpperCase() + category.slice(1)}
-                  </button>
-                ))}
-              </div>
-
-              {filteredClientGalleries.length === 0 ? (
+              {clientGalleries.length === 0 ? (
                 <div className="text-center py-20">
-                  <p className="text-gray-500 text-lg font-light mb-4">No client galleries published yet in this category.</p>
+                  <p className="text-gray-500 text-lg font-light mb-4">No client galleries published yet.</p>
                   <p className="text-gray-400 text-sm font-light">Add your first client shoot in Sanity Studio under "Client Gallery"!</p>
                 </div>
               ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                  {filteredClientGalleries.map((gallery) => (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
+                  {clientGalleries.map((gallery) => (
                     <div
                       key={gallery._id}
                       onClick={() => {
@@ -567,9 +541,9 @@ function App() {
                           setActiveModalGallery(gallery)
                         }
                       }}
-                      className="group cursor-pointer flex flex-col bg-white border border-gray-200/80 overflow-hidden shadow-sm hover:shadow-xl transition-all duration-500 rounded-sm"
+                      className="group cursor-pointer flex flex-col text-center"
                     >
-                      <div className="relative aspect-[3/2] overflow-hidden bg-gray-100">
+                      <div className="relative aspect-[3/2] overflow-hidden bg-gray-100 mb-5 shadow-sm group-hover:shadow-md transition-shadow">
                         {gallery.coverImage && (
                           <img
                             src={urlFor(gallery.coverImage).width(900).height(600).url()}
@@ -578,28 +552,18 @@ function App() {
                           />
                         )}
                         <div className="absolute inset-0 bg-black/25 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                          <span className="bg-white/95 text-slate-900 px-5 py-2 text-xs tracking-widest uppercase font-medium rounded-full shadow">
+                          <span className="bg-white/95 text-slate-900 px-6 py-2.5 text-xs tracking-widest uppercase font-medium rounded-full shadow">
                             View Gallery →
                           </span>
                         </div>
-                        {gallery.category && (
-                          <span className="absolute top-4 left-4 bg-white/95 backdrop-blur-sm text-slate-900 text-xs px-3 py-1 uppercase tracking-wider rounded font-light shadow-sm">
-                            {gallery.category}
-                          </span>
-                        )}
                       </div>
-                      <div className="p-6 text-center">
-                        <h3 className="text-2xl font-light text-slate-900 mb-2 group-hover:text-slate-600 transition-colors">
+                      <div className="space-y-1">
+                        <h3 className="text-xl md:text-2xl font-light tracking-[0.14em] uppercase text-slate-900 group-hover:text-gray-600 transition-colors">
                           {gallery.title}
                         </h3>
                         {gallery.date && (
-                          <p className="text-sm text-gray-500 font-light tracking-wide">
+                          <p className="text-xs text-gray-400 font-light tracking-widest uppercase">
                             {formatDisplayDate(gallery.date)}
-                          </p>
-                        )}
-                        {gallery.photos && gallery.photos.length > 0 && (
-                          <p className="text-xs text-gray-400 mt-2 font-light">
-                            {gallery.photos.length} photo{gallery.photos.length === 1 ? '' : 's'}
                           </p>
                         )}
                       </div>

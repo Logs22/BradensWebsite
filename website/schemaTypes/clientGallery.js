@@ -1,4 +1,4 @@
-﻿export default {
+export default {
   name: 'clientGallery',
   title: 'Client Gallery',
   type: 'document',
@@ -17,22 +17,6 @@
       description: 'Date of the session or wedding (displayed under the client name).',
       options: {
         dateFormat: 'MMMM D, YYYY',
-      },
-      validation: (Rule) => Rule.required(),
-    },
-    {
-      name: 'category',
-      title: 'Category',
-      type: 'string',
-      description: 'Which category filter this shoot appears under.',
-      options: {
-        list: [
-          { title: 'Weddings', value: 'weddings' },
-          { title: 'Couples / Engagements', value: 'couples' },
-          { title: 'Portraits', value: 'portraits' },
-          { title: 'Events', value: 'events' },
-        ],
-        layout: 'radio',
       },
       validation: (Rule) => Rule.required(),
     },
@@ -81,17 +65,15 @@
     select: {
       title: 'title',
       date: 'date',
-      category: 'category',
       media: 'coverImage',
       photos: 'photos',
     },
-    prepare({ title, date, category, media, photos }) {
+    prepare({ title, date, media, photos }) {
       const count = photos ? photos.length : 0
-      const cat = category ? category.charAt(0).toUpperCase() + category.slice(1) : ''
-      const dateStr = date ? ` • ${date}` : ''
+      const dateStr = date ? ` (${date})` : ''
       return {
         title: title || 'Untitled Client Shoot',
-        subtitle: `${cat}${dateStr} (${count} photo${count === 1 ? '' : 's'})`,
+        subtitle: `${count} photo${count === 1 ? '' : 's'}${dateStr}`,
         media,
       }
     },
