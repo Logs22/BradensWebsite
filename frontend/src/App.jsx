@@ -107,6 +107,7 @@ function App() {
   const [portfolioLightboxIndex, setPortfolioLightboxIndex] = useState(null)
   const [generalLightbox, setGeneralLightbox] = useState(null)
   const [heroSlideIndex, setHeroSlideIndex] = useState(0)
+  const [featuredLightboxIndex, setFeaturedLightboxIndex] = useState(null)
 
   const [services, setServices] = useState([])
   const [contact, setContact] = useState(null)
@@ -146,7 +147,7 @@ function App() {
 
   // Lock body scroll when modal or lightbox is open
   useEffect(() => {
-    if (activeModalGallery || lightboxIndex !== null || portfolioLightboxIndex !== null || generalLightbox !== null) {
+    if (activeModalGallery || lightboxIndex !== null || portfolioLightboxIndex !== null || generalLightbox !== null || featuredLightboxIndex !== null) {
       document.body.style.overflow = 'hidden'
     } else {
       document.body.style.overflow = ''
@@ -154,7 +155,7 @@ function App() {
     return () => {
       document.body.style.overflow = ''
     }
-  }, [activeModalGallery, lightboxIndex, portfolioLightboxIndex, generalLightbox])
+  }, [activeModalGallery, lightboxIndex, portfolioLightboxIndex, generalLightbox, featuredLightboxIndex])
 
   // Keyboard navigation for client gallery lightbox
   useEffect(() => {
@@ -253,14 +254,20 @@ function App() {
           const flattened = []
           list.forEach((doc) => {
             if (Array.isArray(doc.photos) && doc.photos.length > 0) {
+              const hasIndividuallyFeatured = doc.photos.some((p) => p.featured === true)
+
               doc.photos.forEach((photo, pIdx) => {
+                const isFeatured = hasIndividuallyFeatured
+                  ? photo.featured === true
+                  : Boolean(doc.featured)
+
                 flattened.push({
                   _id: `${doc._id}-${photo._key || pIdx}`,
-                  title: doc.title,
+                  title: photo.caption || doc.title,
                   image: photo,
                   category: doc.category,
-                  featured: doc.featured,
-                  caption: doc.caption,
+                  featured: isFeatured,
+                  caption: photo.caption || doc.caption,
                   _createdAt: doc._createdAt,
                 })
               })
@@ -271,7 +278,7 @@ function App() {
                 title: doc.title,
                 image: doc.image,
                 category: doc.category,
-                featured: doc.featured,
+                featured: Boolean(doc.featured),
                 caption: doc.caption,
                 _createdAt: doc._createdAt,
               })
@@ -311,8 +318,29 @@ function App() {
   }
 
   // Display featured images, or fallback to the 4 most recent images
-  const featuredOnly = portfolio.filter(i => i.featured)
-  const displayFeatured = featuredOnly.length > 0 ? featuredOnly.slice(0, 4) : portfolio.slice(0, 4)
+  const featuredOnly = portfolio.filter((i) => i.featured)
+  const displayFeatured = featuredOnly.length > 0 ? featuredOnly : portfolio.slice(0, 4)
+
+  // Keyboard navigation for featured work fullscreen lightbox
+  useEffect(() => {
+    if (featuredLightboxIndex === null || !displayFeatured?.length) return
+
+    const handleKeyDown = (e) => {
+      if (e.key === 'ArrowLeft') {
+        e.preventDefault()
+        setFeaturedLightboxIndex((prev) => (prev > 0 ? prev - 1 : displayFeatured.length - 1))
+      } else if (e.key === 'ArrowRight') {
+        e.preventDefault()
+        setFeaturedLightboxIndex((prev) => (prev < displayFeatured.length - 1 ? prev + 1 : 0))
+      } else if (e.key === 'Escape') {
+        e.preventDefault()
+        setFeaturedLightboxIndex(null)
+      }
+    }
+
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [featuredLightboxIndex, displayFeatured])
 
   const handleContactSubmit = async (e) => {
     e.preventDefault()
@@ -498,31 +526,129 @@ function App() {
             <section className="py-24 px-6 bg-gray-50">
               <div className="max-w-7xl mx-auto text-center mb-16">
                 <h2 className="text-4xl md:text-5xl font-light mb-4 tracking-wide">Featured Work</h2>
-                <div className="grid md:grid-cols-2 gap-6 mt-16">
+                <p className="text-gray-500 font-light text-base max-w-xl mx-auto">
+                  A curated selection of highlighted moments and signature captures
+                </p>
+
+                {/* Natural uploaded aspect ratio photo columns */}
+                <div className="columns-1 md:columns-2 gap-8 mt-16 text-left">
                   {displayFeatured.length > 0 ? (
-                    displayFeatured.map((item) => (
-                      <div key={item._id} className="group relative overflow-hidden aspect-[4/5] cursor-pointer">
+                    displayFeatured.map((item, idx) => (
+                      <div
+                        key={item._id}
+                        onClick={() => setFeaturedLightboxIndex(idx)}
+                        className="break-inside-avoid mb-8 group relative overflow-hidden rounded cursor-pointer shadow-sm hover:shadow-xl transition-all duration-300 bg-white"
+                      >
                         {item.image && (
                           <img
-                            src={urlFor(item.image).width(800).height(1000).url()}
+                            src={urlFor(item.image).width(1400).auto('format').fit('max').url()}
                             alt={item.title || 'Featured Work'}
-                            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                            className="w-full h-auto object-contain transition-transform duration-700 group-hover:scale-[1.02]"
+                            loading="lazy"
                           />
                         )}
-                        {item.title && (
-                          <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/60 to-transparent p-6 text-white text-left opacity-0 group-hover:opacity-100 transition-opacity">
-                            <p className="text-lg font-light">{item.title}</p>
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/20 to-transparent p-6 text-white text-left opacity-0 group-hover:opacity-100 transition-opacity flex items-end justify-between">
+                          <div>
+                            {item.title && <p className="text-lg font-light tracking-wide">{item.title}</p>}
+                            {item.caption && <p className="text-xs text-gray-300 font-light mt-1">{item.caption}</p>}
                           </div>
-                        )}
+                          <span className="text-xs uppercase tracking-widest bg-white/20 backdrop-blur-sm px-3 py-1.5 rounded-full text-white/90">
+                            Expand ↗
+                          </span>
+                        </div>
                       </div>
                     ))
                   ) : (
-                    [1, 2, 3, 4].map(i => <div key={i} className="aspect-[4/5] bg-gray-200 animate-pulse rounded" />)
+                    [1, 2, 3, 4].map((i) => (
+                      <div key={i} className="break-inside-avoid mb-8 aspect-[4/3] bg-gray-200 animate-pulse rounded" />
+                    ))
                   )}
                 </div>
-                <Link to="/portfolio" className="inline-block mt-12 bg-[#CDEDF6] text-slate-900 hover:bg-white rounded-full px-8 py-3 border border-gray-300 transition-all duration-300 cursor-pointer">Explore Full Portfolio</Link>
+                <Link
+                  to="/portfolio"
+                  className="inline-block mt-8 bg-[#CDEDF6] text-slate-900 hover:bg-white rounded-full px-8 py-3 border border-gray-300 transition-all duration-300 cursor-pointer"
+                >
+                  Explore Full Portfolio →
+                </Link>
               </div>
             </section>
+
+            {/* Featured Work Fullscreen Single-View Lightbox */}
+            {featuredLightboxIndex !== null && displayFeatured[featuredLightboxIndex] && (
+              <div
+                style={{ zIndex: 9999 }}
+                className="fixed inset-0 bg-black/95 flex items-center justify-center p-2 md:p-4 select-none cursor-pointer"
+                onClick={() => setFeaturedLightboxIndex(null)}
+              >
+                {/* Close Button */}
+                <button
+                  onClick={() => setFeaturedLightboxIndex(null)}
+                  className="absolute top-4 right-4 z-30 bg-white/10 hover:bg-white/25 text-white w-11 h-11 flex items-center justify-center rounded-full backdrop-blur-md transition-all text-xl cursor-pointer"
+                  title="Close (Esc)"
+                  aria-label="Close fullscreen"
+                >
+                  ✕
+                </button>
+
+                {/* Left / Prev Arrow */}
+                {displayFeatured.length > 1 && (
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      setFeaturedLightboxIndex((prev) => (prev > 0 ? prev - 1 : displayFeatured.length - 1))
+                    }}
+                    className="absolute left-2 md:left-6 top-1/2 -translate-y-1/2 z-30 bg-white/10 hover:bg-white/30 text-white w-12 h-12 md:w-14 md:h-14 flex items-center justify-center rounded-full backdrop-blur-md transition-all text-2xl md:text-3xl cursor-pointer"
+                    title="Previous photo (Left Arrow)"
+                    aria-label="Previous photo"
+                  >
+                    ‹
+                  </button>
+                )}
+
+                {/* Right / Next Arrow */}
+                {displayFeatured.length > 1 && (
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      setFeaturedLightboxIndex((prev) => (prev < displayFeatured.length - 1 ? prev + 1 : 0))
+                    }}
+                    className="absolute right-2 md:right-6 top-1/2 -translate-y-1/2 z-30 bg-white/10 hover:bg-white/30 text-white w-12 h-12 md:w-14 md:h-14 flex items-center justify-center rounded-full backdrop-blur-md transition-all text-2xl md:text-3xl cursor-pointer"
+                    title="Next photo (Right Arrow)"
+                    aria-label="Next photo"
+                  >
+                    ›
+                  </button>
+                )}
+
+                {/* Single Fullscreen Image with uploaded aspect ratio */}
+                <div
+                  className="relative flex flex-col items-center justify-center max-w-full max-h-full"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <img
+                    key={featuredLightboxIndex}
+                    src={urlFor(displayFeatured[featuredLightboxIndex].image).width(2400).auto('format').fit('max').url()}
+                    alt={displayFeatured[featuredLightboxIndex].title || 'Featured photo'}
+                    className="max-h-[94vh] max-w-[96vw] w-auto h-auto object-contain rounded-sm shadow-2xl transition-opacity duration-200"
+                  />
+                  {displayFeatured[featuredLightboxIndex].title && (
+                    <p className="text-white/85 text-sm font-light mt-2 tracking-wide text-center">
+                      {displayFeatured[featuredLightboxIndex].title}
+                    </p>
+                  )}
+                </div>
+
+                {/* Counter */}
+                {displayFeatured.length > 1 && (
+                  <div
+                    className="absolute bottom-4 left-1/2 -translate-x-1/2 z-30 bg-black/60 backdrop-blur-md px-4 py-1.5 rounded-full text-white/90 text-xs font-light tracking-widest uppercase"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    {featuredLightboxIndex + 1} / {displayFeatured.length}
+                  </div>
+                )}
+              </div>
+            )}
 
             {/* Client Galleries Teaser */}
             {clientGalleries.length > 0 && (

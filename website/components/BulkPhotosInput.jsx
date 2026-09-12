@@ -28,12 +28,46 @@ export function BulkPhotosInput(props) {
   const [confirmClearOpen, setConfirmClearOpen] = useState(false)
   const [selectMode, setSelectMode] = useState(false)
   const [selectedKeys, setSelectedKeys] = useState(new Set())
+  const [featureMode, setFeatureMode] = useState(false)
+
+  const hasFeaturedField = Boolean(
+    props.schemaType?.of?.[0]?.fields?.some((f) => f.name === 'featured')
+  )
+  const featuredCount = photos.filter((p) => p.featured === true).length
+
+  // Handler: Toggle featured status of a single photo
+  const toggleFeaturePhoto = (key) => {
+    const next = photos.map((p, idx) => {
+      const k = p._key || String(idx)
+      if (k === key) {
+        return {
+          ...p,
+          featured: !p.featured,
+        }
+      }
+      return p
+    })
+    onChange(set(next))
+  }
+
+  // Handler: Feature All Photos
+  const handleFeatureAll = () => {
+    const next = photos.map((p) => ({ ...p, featured: true }))
+    onChange(set(next))
+  }
+
+  // Handler: Unfeature All Photos
+  const handleUnfeatureAll = () => {
+    const next = photos.map((p) => ({ ...p, featured: false }))
+    onChange(set(next))
+  }
 
   // Handler: Delete All Photos
   const handleClearAll = () => {
     onChange(unset())
     setConfirmClearOpen(false)
     setSelectMode(false)
+    setFeatureMode(false)
     setSelectedKeys(new Set())
   }
 
@@ -81,18 +115,39 @@ export function BulkPhotosInput(props) {
               <Text weight="semibold" size={1}>
                 {count} Photo{count === 1 ? '' : 's'} Uploaded
               </Text>
+              {hasFeaturedField && featuredCount > 0 && !featureMode && (
+                <Text size={1} muted>
+                  • ({featuredCount} Featured ⭐)
+                </Text>
+              )}
             </Flex>
 
             <Flex align="center" gap={2} wrap="wrap">
-              {!selectMode ? (
+              {!selectMode && !featureMode && (
                 <>
+                  {hasFeaturedField && (
+                    <Button
+                      mode={featuredCount > 0 ? 'default' : 'ghost'}
+                      tone={featuredCount > 0 ? 'caution' : 'default'}
+                      fontSize={1}
+                      padding={2}
+                      text={featuredCount > 0 ? `⭐ Featured (${featuredCount})` : '⭐ Feature Photos'}
+                      onClick={() => {
+                        setFeatureMode(true)
+                        setSelectMode(false)
+                      }}
+                    />
+                  )}
                   <Button
                     mode="ghost"
                     tone="default"
                     fontSize={1}
                     padding={2}
                     text="Select to Delete"
-                    onClick={() => setSelectMode(true)}
+                    onClick={() => {
+                      setSelectMode(true)
+                      setFeatureMode(false)
+                    }}
                   />
                   <Button
                     mode="ghost"
@@ -104,7 +159,29 @@ export function BulkPhotosInput(props) {
                     onClick={() => setConfirmClearOpen(true)}
                   />
                 </>
-              ) : (
+              )}
+
+              {featureMode && (
+                <>
+                  <Button
+                    mode="bleed"
+                    fontSize={1}
+                    padding={2}
+                    text={featuredCount === count ? 'Unfeature All' : 'Feature All'}
+                    onClick={featuredCount === count ? handleUnfeatureAll : handleFeatureAll}
+                  />
+                  <Button
+                    mode="default"
+                    tone="primary"
+                    fontSize={1}
+                    padding={2}
+                    text="Done"
+                    onClick={() => setFeatureMode(false)}
+                  />
+                </>
+              )}
+
+              {selectMode && (
                 <>
                   <Button
                     mode="bleed"
@@ -228,6 +305,96 @@ export function BulkPhotosInput(props) {
               </div>
             </Box>
           )}
+
+          {/* Individual Featured Photo Selector Grid */}
+          {featureMode && (
+            <Box marginTop={3} paddingTop={3} style={{ borderTop: '1px solid var(--card-border-color)' }}>
+              <Text size={1} muted style={{ marginBottom: '12px' }}>
+                Click any photo to toggle whether it appears in the <strong>"Featured Work"</strong> showcase on the home page:
+              </Text>
+              <div
+                style={{
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(auto-fill, minmax(120px, 1fr))',
+                  gap: '10px',
+                  maxHeight: '420px',
+                  overflowY: 'auto',
+                  padding: '4px',
+                }}
+              >
+                {photos.map((photo, idx) => {
+                  const key = photo._key || String(idx)
+                  const isFeatured = photo.featured === true
+                  const thumb = getPhotoThumbnail(photo)
+
+                  return (
+                    <div
+                      key={key}
+                      onClick={() => toggleFeaturePhoto(key)}
+                      style={{
+                        position: 'relative',
+                        aspectRatio: '1 / 1',
+                        borderRadius: '6px',
+                        overflow: 'hidden',
+                        cursor: 'pointer',
+                        border: isFeatured ? '3px solid #eab308' : '1px solid #444',
+                        boxShadow: isFeatured ? '0 0 0 2px rgba(234, 179, 8, 0.4)' : 'none',
+                        backgroundColor: '#1a1a1a',
+                        transition: 'all 0.15s ease',
+                      }}
+                    >
+                      {thumb ? (
+                        <img
+                          src={thumb}
+                          alt=""
+                          style={{
+                            width: '100%',
+                            height: '100%',
+                            objectFit: 'cover',
+                          }}
+                        />
+                      ) : (
+                        <div
+                          style={{
+                            width: '100%',
+                            height: '100%',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            color: '#888',
+                            fontSize: '12px',
+                          }}
+                        >
+                          Photo #{idx + 1}
+                        </div>
+                      )}
+
+                      {/* Star Badge */}
+                      <div
+                        style={{
+                          position: 'absolute',
+                          top: '6px',
+                          right: '6px',
+                          padding: '2px 7px',
+                          borderRadius: '12px',
+                          backgroundColor: isFeatured ? '#eab308' : 'rgba(0,0,0,0.65)',
+                          color: isFeatured ? '#000' : '#fff',
+                          fontSize: '11px',
+                          fontWeight: 600,
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '3px',
+                          backdropFilter: 'blur(4px)',
+                        }}
+                      >
+                        {isFeatured ? '⭐ Featured' : '☆ Not Featured'}
+                      </div>
+                    </div>
+                  )
+                })}
+              </div>
+            </Box>
+          )}
         </Card>
       )}
 
@@ -267,7 +434,7 @@ export function BulkPhotosInput(props) {
       )}
 
       {/* Render the default Sanity array input (handles bulk drag & drop, uploads, preview, reordering) */}
-      {!selectMode && renderDefault(props)}
+      {!selectMode && !featureMode && renderDefault(props)}
     </Stack>
   )
 }

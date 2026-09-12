@@ -30,9 +30,9 @@ export default {
     },
     {
       name: 'featured',
-      title: 'Feature on Home Page',
+      title: 'Feature Entire Shoot on Home Page',
       type: 'boolean',
-      description: 'Turn this on to display these photos in the "Featured Work" section on the home page.',
+      description: 'Turn this on to feature this whole shoot, OR use the individual "⭐ Feature Photos" toggle below to pick specific photos.',
       initialValue: false,
     },
     {
@@ -45,6 +45,21 @@ export default {
           options: {
             hotspot: true,
           },
+          fields: [
+            {
+              name: 'featured',
+              title: 'Feature this photo on Home Page',
+              type: 'boolean',
+              initialValue: false,
+              description: 'Turn on to feature this individual photo in "Featured Work" on the home page.',
+            },
+            {
+              name: 'caption',
+              title: 'Caption / Title (Optional)',
+              type: 'string',
+              description: 'Optional caption or title for this photo.',
+            },
+          ],
         },
       ],
       options: {
@@ -53,7 +68,7 @@ export default {
       components: {
         input: BulkPhotosInput,
       },
-      description: 'Drag & drop multiple photos from your folder to bulk upload! Use Clear All or Select to Delete if needed.',
+      description: 'Drag & drop multiple photos from your folder to bulk upload! Use Clear All, Select to Delete, or the Feature Photos star button.',
     },
     {
       name: 'image',
