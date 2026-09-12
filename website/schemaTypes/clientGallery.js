@@ -1,3 +1,5 @@
+import { BulkPhotosInput } from '../components/BulkPhotosInput'
+
 export default {
   name: 'clientGallery',
   title: 'Client Gallery',
@@ -51,7 +53,10 @@ export default {
       options: {
         layout: 'grid',
       },
-      description: 'Select multiple photos from your folder and drag & drop them here all at once to bulk upload!',
+      components: {
+        input: BulkPhotosInput,
+      },
+      description: 'Drag & drop photos in bulk to upload. Use the toolbar above to bulk delete or clear all photos.',
     },
     {
       name: 'featured',
