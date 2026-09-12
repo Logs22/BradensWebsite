@@ -1,4 +1,4 @@
-﻿import { useState, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import { createClient } from '@sanity/client'
 import imageUrlBuilder from '@sanity/image-url'
 import { Routes, Route, Link, useLocation } from 'react-router-dom'
@@ -20,7 +20,10 @@ function urlFor(source) {
 // ── GROQ QUERIES ────────────────────────────────────────────────────────
 const HERO_QUERY = `*[_type == "hero"][0]{ heading, highlightWord, subheading, backgroundImage }`
 const ABOUT_QUERY = `*[_type == "about"][0]{ title, tagline, bio, profileImage }`
-const PORTFOLIO_QUERY = `*[_type == "portfolioImage"] | order(_createdAt desc) { _id, title, image, caption, category, featured }`
+const PORTFOLIO_QUERY = `{
+  "singleImages": *[_type == "portfolioImage"] | order(_createdAt desc) { _id, title, image, caption, category, featured, _createdAt },
+  "galleries": *[_type == "gallery"] | order(_createdAt desc) { _id, title, category, featured, images[]{ _key, asset, caption, hotspot, crop }, _createdAt }
+}`
 const SERVICES_QUERY = `*[_type == "service"] | order(order asc, _createdAt asc) { _id, title, description, features, price, image }`
 const CONTACT_QUERY = `*[_type == "contact"][0]{ location, phone, email, instagram, instagramUrl, responseTime, bookingNotice, web3FormsAccessKey }`
 
@@ -113,8 +116,33 @@ function App() {
         }
 
         if (portfolioData) {
-          setPortfolio(portfolioData)
-          setFilteredPortfolio(portfolioData)
+          let combined = []
+          if (portfolioData.singleImages && Array.isArray(portfolioData.singleImages)) {
+            combined = [...portfolioData.singleImages]
+          } else if (Array.isArray(portfolioData)) {
+            combined = [...portfolioData]
+          }
+
+          if (portfolioData.galleries && Array.isArray(portfolioData.galleries)) {
+            portfolioData.galleries.forEach(g => {
+              if (g.images && Array.isArray(g.images)) {
+                g.images.forEach((img, idx) => {
+                  combined.push({
+                    _id: `${g._id}-${img._key || idx}`,
+                    title: img.caption || g.title,
+                    image: img,
+                    category: g.category,
+                    featured: g.featured,
+                    _createdAt: g._createdAt,
+                  })
+                })
+              }
+            })
+          }
+
+          combined.sort((a, b) => new Date(b._createdAt || 0) - new Date(a._createdAt || 0))
+          setPortfolio(combined)
+          setFilteredPortfolio(combined)
         }
 
         if (servicesData) setServices(servicesData)
