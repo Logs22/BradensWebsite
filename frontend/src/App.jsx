@@ -20,7 +20,7 @@ function urlFor(source) {
 // ── GROQ QUERIES ────────────────────────────────────────────────────────
 const HERO_QUERY = `*[_type == "hero"][0]{ heading, heroTitle, subheading, heroSubtitle, backgroundImage, heroImage }`
 const ABOUT_QUERY = `*[_type == "about"][0]{ title, tagline, bio, profileImage }`
-const PORTFOLIO_QUERY = `*[_type == "portfolioImage"] | order(_createdAt desc) { _id, title, image, caption, category, featured, _createdAt }`
+const PORTFOLIO_QUERY = `*[_type == "portfolioImage"] | order(_createdAt desc) { _id, title, image, photos, caption, category, featured, _createdAt }`
 const CLIENT_GALLERIES_QUERY = `*[_type == "clientGallery"] | order(date desc, _createdAt desc) {
   _id,
   title,
@@ -201,8 +201,35 @@ function App() {
 
         if (portfolioData) {
           const list = Array.isArray(portfolioData) ? portfolioData : []
-          setPortfolio(list)
-          setFilteredPortfolio(list)
+          const flattened = []
+          list.forEach((doc) => {
+            if (Array.isArray(doc.photos) && doc.photos.length > 0) {
+              doc.photos.forEach((photo, pIdx) => {
+                flattened.push({
+                  _id: `${doc._id}-${photo._key || pIdx}`,
+                  title: doc.title,
+                  image: photo,
+                  category: doc.category,
+                  featured: doc.featured,
+                  caption: doc.caption,
+                  _createdAt: doc._createdAt,
+                })
+              })
+            }
+            if (doc.image) {
+              flattened.push({
+                _id: doc._id,
+                title: doc.title,
+                image: doc.image,
+                category: doc.category,
+                featured: doc.featured,
+                caption: doc.caption,
+                _createdAt: doc._createdAt,
+              })
+            }
+          })
+          setPortfolio(flattened)
+          setFilteredPortfolio(flattened)
         }
 
         if (clientData) {
@@ -527,7 +554,7 @@ function App() {
               </div>
 
               <div className="flex flex-wrap justify-center gap-4 mb-12">
-                {['all', 'weddings', 'portraits', 'events'].map(category => (
+                {['all', 'weddings', 'portraits', 'events', 'film'].map(category => (
                   <button
                     key={category}
                     onClick={() => filterPortfolio(category)}
@@ -975,6 +1002,7 @@ function App() {
                           <option value="Weddings">Wedding Photography</option>
                           <option value="Portraits">Portrait Session</option>
                           <option value="Events">Event Photography</option>
+                          <option value="Film">Film Photography</option>
                           <option value="Other">Other</option>
                         </select>
                       </div>

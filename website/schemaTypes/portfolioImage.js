@@ -1,34 +1,28 @@
+import { BulkPhotosInput } from '../components/BulkPhotosInput'
+
 export default {
   name: 'portfolioImage',
-  title: 'Portfolio Photo',
+  title: 'Portfolio Photos',
   type: 'document',
   fields: [
     {
       name: 'title',
-      title: 'Title / Alt Text',
+      title: 'Title / Shoot Name',
       type: 'string',
-      description: 'A brief title or description of the photo (e.g., "Sam & Nicole Wedding" or "Senior Portrait").',
-      validation: (Rule) => Rule.required(),
-    },
-    {
-      name: 'image',
-      title: 'Photograph',
-      type: 'image',
-      options: {
-        hotspot: true, // Allows Braden to adjust the focal point/crop inside Sanity
-      },
+      description: 'A brief title or description (e.g., "35mm Film Shoot", "Sam & Nicole Wedding", "Senior Portrait").',
       validation: (Rule) => Rule.required(),
     },
     {
       name: 'category',
       title: 'Category',
       type: 'string',
-      description: 'Choose which portfolio tab this photo will appear under.',
+      description: 'Choose which portfolio tab these photos will appear under.',
       options: {
         list: [
           { title: 'Weddings', value: 'weddings' },
           { title: 'Portraits', value: 'portraits' },
           { title: 'Events', value: 'events' },
+          { title: 'Film', value: 'film' },
         ],
         layout: 'radio',
       },
@@ -38,8 +32,37 @@ export default {
       name: 'featured',
       title: 'Feature on Home Page',
       type: 'boolean',
-      description: 'Turn this on to display this image in the "Featured Work" section on the home page.',
+      description: 'Turn this on to display these photos in the "Featured Work" section on the home page.',
       initialValue: false,
+    },
+    {
+      name: 'photos',
+      title: 'Photos (Bulk Drag & Drop)',
+      type: 'array',
+      of: [
+        {
+          type: 'image',
+          options: {
+            hotspot: true,
+          },
+        },
+      ],
+      options: {
+        layout: 'grid',
+      },
+      components: {
+        input: BulkPhotosInput,
+      },
+      description: 'Drag & drop multiple photos from your folder to bulk upload! Use Clear All or Select to Delete if needed.',
+    },
+    {
+      name: 'image',
+      title: 'Single Photograph (Optional)',
+      type: 'image',
+      options: {
+        hotspot: true,
+      },
+      description: 'Optional: Use this if you are uploading only a single photograph instead of a batch.',
     },
     {
       name: 'caption',
@@ -54,14 +77,18 @@ export default {
       category: 'category',
       featured: 'featured',
       media: 'image',
+      photos: 'photos',
     },
-    prepare({ title, category, featured, media }) {
+    prepare({ title, category, featured, media, photos }) {
       const categoryLabel = category ? category.charAt(0).toUpperCase() + category.slice(1) : 'No category'
       const featuredLabel = featured ? ' ⭐ Featured' : ''
+      const count = photos ? photos.length : 0
+      const countLabel = count > 0 ? ` (${count} photo${count === 1 ? '' : 's'})` : ''
+      const firstMedia = media || (photos && photos[0])
       return {
-        title: title || 'Untitled Photo',
-        subtitle: `${categoryLabel}${featuredLabel}`,
-        media,
+        title: title || 'Untitled Portfolio Photo',
+        subtitle: `${categoryLabel}${countLabel}${featuredLabel}`,
+        media: firstMedia,
       }
     },
   },
