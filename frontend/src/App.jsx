@@ -18,7 +18,7 @@ function urlFor(source) {
 }
 
 // ── GROQ QUERIES ────────────────────────────────────────────────────────
-const HERO_QUERY = `*[_type == "hero"][0]{ heading, heroTitle, subheading, heroSubtitle, backgroundImage, heroImage, photos }`
+const HERO_QUERY = `*[_type == "hero"][0]{ heading, subheading, backgroundImage, photos }`
 const ABOUT_QUERY = `*[_type == "about"][0]{ title, tagline, bio, profileImage, photos }`
 const PORTFOLIO_QUERY = `*[_type == "portfolioImage"] | order(_createdAt desc) { _id, title, image, photos, caption, category, featured, _createdAt }`
 const CLIENT_GALLERIES_QUERY = `*[_type == "clientGallery"] | order(date desc, _createdAt desc) {
@@ -477,14 +477,14 @@ function App() {
               ))}
               <div className="absolute inset-0 bg-black/30" />
               <div className="relative text-center text-white px-6 z-10">
-                {(hero?.heading || hero?.heroTitle) && (
+                {hero?.heading && (
                   <h1 className="text-5xl md:text-7xl lg:text-8xl font-light tracking-wider mb-4">
-                    {hero?.heading || hero?.heroTitle}
+                    {hero.heading}
                   </h1>
                 )}
-                {(hero?.subheading || hero?.heroSubtitle) && (
+                {hero?.subheading && (
                   <p className="text-lg md:text-xl text-gray-200 mb-8 font-light tracking-wide max-w-2xl mx-auto">
-                    {hero?.subheading || hero?.heroSubtitle}
+                    {hero.subheading}
                   </p>
                 )}
                 <div className="flex flex-wrap justify-center gap-4">
