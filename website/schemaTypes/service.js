@@ -1,3 +1,5 @@
+import { BulkPhotosInput } from '../components/BulkPhotosInput'
+
 export default {
   name: 'service',
   title: 'Service Package',
@@ -38,11 +40,31 @@ export default {
     },
     {
       name: 'image',
-      title: 'Cover Image',
+      title: 'Cover Image (Optional)',
       type: 'image',
       options: {
         hotspot: true, // Lets Braden crop the image perfectly inside Sanity
       },
+    },
+    {
+      name: 'photos',
+      title: 'Sample Work / Package Gallery (Bulk Drag & Drop)',
+      type: 'array',
+      of: [
+        {
+          type: 'image',
+          options: {
+            hotspot: true,
+          },
+        },
+      ],
+      options: {
+        layout: 'grid',
+      },
+      components: {
+        input: BulkPhotosInput,
+      },
+      description: 'Drag & drop multiple sample photos to showcase work for this specific service package. Includes Clear All and Select to Delete.',
     },
   ],
   preview: {

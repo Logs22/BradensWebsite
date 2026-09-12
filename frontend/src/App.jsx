@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { createClient } from '@sanity/client'
 import imageUrlBuilder from '@sanity/image-url'
 import { Routes, Route, Link, useLocation } from 'react-router-dom'
@@ -18,8 +18,8 @@ function urlFor(source) {
 }
 
 // ── GROQ QUERIES ────────────────────────────────────────────────────────
-const HERO_QUERY = `*[_type == "hero"][0]{ heading, heroTitle, subheading, heroSubtitle, backgroundImage, heroImage }`
-const ABOUT_QUERY = `*[_type == "about"][0]{ title, tagline, bio, profileImage }`
+const HERO_QUERY = `*[_type == "hero"][0]{ heading, heroTitle, subheading, heroSubtitle, backgroundImage, heroImage, photos }`
+const ABOUT_QUERY = `*[_type == "about"][0]{ title, tagline, bio, profileImage, photos }`
 const PORTFOLIO_QUERY = `*[_type == "portfolioImage"] | order(_createdAt desc) { _id, title, image, photos, caption, category, featured, _createdAt }`
 const CLIENT_GALLERIES_QUERY = `*[_type == "clientGallery"] | order(date desc, _createdAt desc) {
   _id,
@@ -31,7 +31,7 @@ const CLIENT_GALLERIES_QUERY = `*[_type == "clientGallery"] | order(date desc, _
   featured,
   _createdAt
 }`
-const SERVICES_QUERY = `*[_type == "service"] | order(order asc, _createdAt asc) { _id, title, description, features, price, image }`
+const SERVICES_QUERY = `*[_type == "service"] | order(order asc, _createdAt asc) { _id, title, description, features, price, image, photos }`
 const CONTACT_QUERY = `*[_type == "contact"][0]{ location, phone, email, instagram, instagramUrl, responseTime, bookingNotice, web3FormsAccessKey }`
 
 // ── HELPER: FORMAT DISPLAY DATE ─────────────────────────────────────────
@@ -105,6 +105,8 @@ function App() {
   const [activeModalGallery, setActiveModalGallery] = useState(null)
   const [lightboxIndex, setLightboxIndex] = useState(null)
   const [portfolioLightboxIndex, setPortfolioLightboxIndex] = useState(null)
+  const [generalLightbox, setGeneralLightbox] = useState(null)
+  const [heroSlideIndex, setHeroSlideIndex] = useState(0)
 
   const [services, setServices] = useState([])
   const [contact, setContact] = useState(null)
@@ -116,6 +118,26 @@ function App() {
 
   const [formStatus, setFormStatus] = useState({ state: 'idle', message: '' })
 
+  // Hero background slideshow list
+  const heroBackgroundList = useMemo(() => {
+    if (hero?.photos && Array.isArray(hero.photos) && hero.photos.length > 0) {
+      return hero.photos.map((p) => urlFor(p).width(2000).url())
+    }
+    if (heroImageUrl) {
+      return [heroImageUrl]
+    }
+    return ['https://images.unsplash.com/photo-1606216794074-735e91aa2c92?w=2000&h=1200&fit=crop']
+  }, [hero, heroImageUrl])
+
+  // Automatically cycle through hero slides every 6 seconds
+  useEffect(() => {
+    if (heroBackgroundList.length <= 1) return
+    const timer = setInterval(() => {
+      setHeroSlideIndex((prev) => (prev + 1) % heroBackgroundList.length)
+    }, 6000)
+    return () => clearInterval(timer)
+  }, [heroBackgroundList.length])
+
   // Scroll to top on route change
   useEffect(() => {
     window.scrollTo(0, 0)
@@ -124,7 +146,7 @@ function App() {
 
   // Lock body scroll when modal or lightbox is open
   useEffect(() => {
-    if (activeModalGallery || lightboxIndex !== null || portfolioLightboxIndex !== null) {
+    if (activeModalGallery || lightboxIndex !== null || portfolioLightboxIndex !== null || generalLightbox !== null) {
       document.body.style.overflow = 'hidden'
     } else {
       document.body.style.overflow = ''
@@ -132,7 +154,7 @@ function App() {
     return () => {
       document.body.style.overflow = ''
     }
-  }, [activeModalGallery, lightboxIndex, portfolioLightboxIndex])
+  }, [activeModalGallery, lightboxIndex, portfolioLightboxIndex, generalLightbox])
 
   // Keyboard navigation for client gallery lightbox
   useEffect(() => {
@@ -175,6 +197,33 @@ function App() {
     window.addEventListener('keydown', handleKeyDown)
     return () => window.removeEventListener('keydown', handleKeyDown)
   }, [portfolioLightboxIndex, filteredPortfolio])
+
+  // Keyboard navigation for general lightbox (About photos & Service sample work)
+  useEffect(() => {
+    if (!generalLightbox?.photos?.length) return
+
+    const handleKeyDown = (e) => {
+      if (e.key === 'ArrowLeft') {
+        e.preventDefault()
+        setGeneralLightbox((prev) => ({
+          ...prev,
+          index: prev.index > 0 ? prev.index - 1 : prev.photos.length - 1,
+        }))
+      } else if (e.key === 'ArrowRight') {
+        e.preventDefault()
+        setGeneralLightbox((prev) => ({
+          ...prev,
+          index: prev.index < prev.photos.length - 1 ? prev.index + 1 : 0,
+        }))
+      } else if (e.key === 'Escape') {
+        e.preventDefault()
+        setGeneralLightbox(null)
+      }
+    }
+
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [generalLightbox])
 
   useEffect(() => {
     const fetchSanityData = async () => {
@@ -387,18 +436,19 @@ function App() {
         {/* ── HOME PAGE ─────────────────────────────────────────────────── */}
         <Route path="/" element={
           <div>
-            <section
-              className="relative h-screen overflow-hidden flex items-center justify-center"
-              style={{
-                backgroundImage: heroImageUrl
-                  ? `url(${heroImageUrl})`
-                  : 'url(https://images.unsplash.com/photo-1606216794074-735e91aa2c92?w=2000&h=1200&fit=crop)',
-                backgroundSize: 'cover',
-                backgroundPosition: 'center',
-              }}
-            >
+            <section className="relative h-screen overflow-hidden flex items-center justify-center">
+              {/* Multi-photo rotating background slideshow */}
+              {heroBackgroundList.map((bgUrl, sIdx) => (
+                <div
+                  key={sIdx}
+                  className={`absolute inset-0 bg-cover bg-center transition-opacity duration-1000 ${
+                    sIdx === (heroSlideIndex % heroBackgroundList.length) ? 'opacity-100' : 'opacity-0 pointer-events-none'
+                  }`}
+                  style={{ backgroundImage: `url(${bgUrl})` }}
+                />
+              ))}
               <div className="absolute inset-0 bg-black/30" />
-              <div className="relative text-center text-white px-6">
+              <div className="relative text-center text-white px-6 z-10">
                 {(hero?.heading || hero?.heroTitle) && (
                   <h1 className="text-5xl md:text-7xl lg:text-8xl font-light tracking-wider mb-4">
                     {hero?.heading || hero?.heroTitle}
@@ -424,6 +474,24 @@ function App() {
                   </Link>
                 </div>
               </div>
+
+              {/* Slideshow indicator dots if more than 1 background photo */}
+              {heroBackgroundList.length > 1 && (
+                <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex items-center gap-2 z-20">
+                  {heroBackgroundList.map((_, dotIdx) => (
+                    <button
+                      key={dotIdx}
+                      onClick={() => setHeroSlideIndex(dotIdx)}
+                      className={`h-2 rounded-full transition-all cursor-pointer ${
+                        dotIdx === (heroSlideIndex % heroBackgroundList.length)
+                          ? 'w-8 bg-[#CDEDF6]'
+                          : 'w-2 bg-white/50 hover:bg-white/80'
+                      }`}
+                      aria-label={`Go to slide ${dotIdx + 1}`}
+                    />
+                  ))}
+                </div>
+              )}
             </section>
 
             {/* Featured Work */}
@@ -901,6 +969,32 @@ function App() {
                 </div>
               </div>
             </section>
+
+            {/* Behind the Lens Gallery */}
+            {about?.photos && Array.isArray(about.photos) && about.photos.length > 0 && (
+              <section className="max-w-7xl mx-auto px-6 mb-24">
+                <div className="text-center mb-12 border-t border-gray-100 pt-16">
+                  <h2 className="text-3xl md:text-4xl font-light tracking-wide text-slate-900 mb-3">Behind the Lens</h2>
+                  <p className="text-gray-500 font-light text-base">Moments, adventures, and life behind the camera</p>
+                </div>
+                <div className="columns-1 sm:columns-2 lg:columns-3 gap-6 space-y-6">
+                  {about.photos.map((photo, pIdx) => (
+                    <div
+                      key={photo._key || pIdx}
+                      onClick={() => setGeneralLightbox({ photos: about.photos, index: pIdx, title: 'Behind the Lens' })}
+                      className="cursor-pointer break-inside-avoid overflow-hidden rounded group relative shadow-sm hover:shadow-md transition-all bg-gray-50"
+                    >
+                      <img
+                        src={urlFor(photo).width(1000).auto('format').fit('max').url()}
+                        alt="Behind the lens"
+                        className="w-full h-auto object-contain transition-transform duration-500 group-hover:scale-[1.02]"
+                        loading="lazy"
+                      />
+                    </div>
+                  ))}
+                </div>
+              </section>
+            )}
           </div>
         } />
 
@@ -919,12 +1013,49 @@ function App() {
                 {services.map((service, idx) => (
                   <div key={service._id} className="grid md:grid-cols-2 gap-12 items-center">
                     <div className={idx % 2 !== 0 ? 'md:order-2' : ''}>
-                      {service.image && (
-                        <img
-                          src={urlFor(service.image).width(800).height(600).url()}
-                          alt={service.title}
-                          className="w-full h-auto rounded shadow"
-                        />
+                      {(service.image || (service.photos && service.photos[0])) && (
+                        <div
+                          className="cursor-pointer overflow-hidden rounded shadow mb-4 group"
+                          onClick={() => {
+                            const list = service.photos && service.photos.length > 0 ? service.photos : (service.image ? [service.image] : [])
+                            if (list.length > 0) {
+                              setGeneralLightbox({ photos: list, index: 0, title: service.title })
+                            }
+                          }}
+                        >
+                          <img
+                            src={urlFor(service.image || service.photos[0]).width(800).height(600).fit('crop').url()}
+                            alt={service.title}
+                            className="w-full h-auto object-cover transition-transform duration-500 group-hover:scale-105"
+                          />
+                        </div>
+                      )}
+                      {service.photos && service.photos.length > 0 && (
+                        <div>
+                          <p className="text-xs uppercase tracking-widest text-gray-500 font-medium mb-2">
+                            Sample Work ({service.photos.length} photo{service.photos.length === 1 ? '' : 's'})
+                          </p>
+                          <div className="grid grid-cols-4 gap-2">
+                            {service.photos.slice(0, 4).map((photo, pIdx) => (
+                              <div
+                                key={photo._key || pIdx}
+                                onClick={() => setGeneralLightbox({ photos: service.photos, index: pIdx, title: `${service.title} - Sample Work` })}
+                                className="relative aspect-square overflow-hidden rounded cursor-pointer group bg-gray-100 shadow-sm hover:shadow"
+                              >
+                                <img
+                                  src={urlFor(photo).width(300).height(300).fit('crop').url()}
+                                  alt=""
+                                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                                />
+                                {pIdx === 3 && service.photos.length > 4 && (
+                                  <div className="absolute inset-0 bg-black/60 flex items-center justify-center text-white text-xs font-medium">
+                                    +{service.photos.length - 4}
+                                  </div>
+                                )}
+                              </div>
+                            ))}
+                          </div>
+                        </div>
                       )}
                     </div>
                     <div className={idx % 2 !== 0 ? 'md:order-1' : ''}>
@@ -1063,6 +1194,89 @@ function App() {
           </div>
         } />
       </Routes>
+
+      {/* ── GENERAL FULLSCREEN LIGHTBOX (For About & Services galleries) ────── */}
+      {generalLightbox?.photos && generalLightbox.index !== null && generalLightbox.photos[generalLightbox.index] && (
+        <div
+          style={{ zIndex: 9999 }}
+          className="fixed inset-0 bg-black/95 flex items-center justify-center p-2 md:p-4 select-none cursor-pointer"
+          onClick={() => setGeneralLightbox(null)}
+        >
+          {/* Close Button */}
+          <button
+            onClick={() => setGeneralLightbox(null)}
+            className="absolute top-4 right-4 z-30 bg-white/10 hover:bg-white/25 text-white w-11 h-11 flex items-center justify-center rounded-full backdrop-blur-md transition-all text-xl cursor-pointer"
+            title="Close (Esc)"
+            aria-label="Close fullscreen"
+          >
+            ✕
+          </button>
+
+          {/* Left / Prev Arrow */}
+          {generalLightbox.photos.length > 1 && (
+            <button
+              onClick={(e) => {
+                e.stopPropagation()
+                setGeneralLightbox((prev) => ({
+                  ...prev,
+                  index: prev.index > 0 ? prev.index - 1 : prev.photos.length - 1,
+                }))
+              }}
+              className="absolute left-2 md:left-6 top-1/2 -translate-y-1/2 z-30 bg-white/10 hover:bg-white/30 text-white w-12 h-12 md:w-14 md:h-14 flex items-center justify-center rounded-full backdrop-blur-md transition-all text-2xl md:text-3xl cursor-pointer"
+              title="Previous photo (Left Arrow)"
+              aria-label="Previous photo"
+            >
+              ‹
+            </button>
+          )}
+
+          {/* Right / Next Arrow */}
+          {generalLightbox.photos.length > 1 && (
+            <button
+              onClick={(e) => {
+                e.stopPropagation()
+                setGeneralLightbox((prev) => ({
+                  ...prev,
+                  index: prev.index < prev.photos.length - 1 ? prev.index + 1 : 0,
+                }))
+              }}
+              className="absolute right-2 md:right-6 top-1/2 -translate-y-1/2 z-30 bg-white/10 hover:bg-white/30 text-white w-12 h-12 md:w-14 md:h-14 flex items-center justify-center rounded-full backdrop-blur-md transition-all text-2xl md:text-3xl cursor-pointer"
+              title="Next photo (Right Arrow)"
+              aria-label="Next photo"
+            >
+              ›
+            </button>
+          )}
+
+          {/* The Fullscreen Image */}
+          <div
+            className="relative flex flex-col items-center justify-center max-w-full max-h-full"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <img
+              key={generalLightbox.index}
+              src={urlFor(generalLightbox.photos[generalLightbox.index]).width(2400).auto('format').fit('max').url()}
+              alt=""
+              className="max-h-[94vh] max-w-[96vw] w-auto h-auto object-contain rounded-sm shadow-2xl transition-opacity duration-200"
+            />
+            {generalLightbox.title && (
+              <p className="text-white/80 text-sm font-light mt-2 tracking-wide text-center">
+                {generalLightbox.title}
+              </p>
+            )}
+          </div>
+
+          {/* Photo Counter */}
+          {generalLightbox.photos.length > 1 && (
+            <div
+              className="absolute bottom-4 left-1/2 -translate-x-1/2 z-30 bg-black/60 backdrop-blur-md px-4 py-1.5 rounded-full text-white/90 text-xs font-light tracking-widest uppercase"
+              onClick={(e) => e.stopPropagation()}
+            >
+              {generalLightbox.index + 1} / {generalLightbox.photos.length}
+            </div>
+          )}
+        </div>
+      )}
 
       {/* ── FOOTER ────────────────────────────────────────────────────── */}
       <footer className="text-white py-16 px-6" style={{ backgroundColor: '#042A2B' }}>

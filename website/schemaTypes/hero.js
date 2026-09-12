@@ -1,3 +1,5 @@
+import { BulkPhotosInput } from '../components/BulkPhotosInput'
+
 export default {
   name: 'hero',
   title: 'Hero Banner',
@@ -16,10 +18,30 @@ export default {
       description: 'An optional tagline or subtitle below the heading. Leave blank if you do not want a subheading.',
     },
     {
+      name: 'photos',
+      title: 'Background Images (Slideshow / Bulk Drag & Drop)',
+      type: 'array',
+      of: [
+        {
+          type: 'image',
+          options: {
+            hotspot: true,
+          },
+        },
+      ],
+      options: {
+        layout: 'grid',
+      },
+      components: {
+        input: BulkPhotosInput,
+      },
+      description: 'Upload multiple photos to create a rotating full-screen background slideshow on the home page! Includes Clear All and Select to Delete.',
+    },
+    {
       name: 'backgroundImage',
-      title: 'Background Image',
+      title: 'Single Background Image (Optional)',
       type: 'image',
-      description: 'The full-screen background image displayed behind the title.',
+      description: 'Optional: Use this if you only want a single static background photo instead of a slideshow.',
       options: {
         hotspot: true,
       },
