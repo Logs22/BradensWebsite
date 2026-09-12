@@ -103,7 +103,8 @@ function App() {
 
   const [clientGalleries, setClientGalleries] = useState([])
   const [activeModalGallery, setActiveModalGallery] = useState(null)
-  const [lightboxImage, setLightboxImage] = useState(null)
+  const [lightboxIndex, setLightboxIndex] = useState(null)
+  const [portfolioLightboxIndex, setPortfolioLightboxIndex] = useState(null)
 
   const [services, setServices] = useState([])
   const [contact, setContact] = useState(null)
@@ -120,6 +121,60 @@ function App() {
     window.scrollTo(0, 0)
     setMobileMenuOpen(false)
   }, [location.pathname])
+
+  // Lock body scroll when modal or lightbox is open
+  useEffect(() => {
+    if (activeModalGallery || lightboxIndex !== null || portfolioLightboxIndex !== null) {
+      document.body.style.overflow = 'hidden'
+    } else {
+      document.body.style.overflow = ''
+    }
+    return () => {
+      document.body.style.overflow = ''
+    }
+  }, [activeModalGallery, lightboxIndex, portfolioLightboxIndex])
+
+  // Keyboard navigation for client gallery lightbox
+  useEffect(() => {
+    if (lightboxIndex === null || !activeModalGallery?.photos?.length) return
+
+    const handleKeyDown = (e) => {
+      if (e.key === 'ArrowLeft') {
+        e.preventDefault()
+        setLightboxIndex((prev) => (prev > 0 ? prev - 1 : activeModalGallery.photos.length - 1))
+      } else if (e.key === 'ArrowRight') {
+        e.preventDefault()
+        setLightboxIndex((prev) => (prev < activeModalGallery.photos.length - 1 ? prev + 1 : 0))
+      } else if (e.key === 'Escape') {
+        e.preventDefault()
+        setLightboxIndex(null)
+      }
+    }
+
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [lightboxIndex, activeModalGallery])
+
+  // Keyboard navigation for portfolio lightbox
+  useEffect(() => {
+    if (portfolioLightboxIndex === null || !filteredPortfolio?.length) return
+
+    const handleKeyDown = (e) => {
+      if (e.key === 'ArrowLeft') {
+        e.preventDefault()
+        setPortfolioLightboxIndex((prev) => (prev > 0 ? prev - 1 : filteredPortfolio.length - 1))
+      } else if (e.key === 'ArrowRight') {
+        e.preventDefault()
+        setPortfolioLightboxIndex((prev) => (prev < filteredPortfolio.length - 1 ? prev + 1 : 0))
+      } else if (e.key === 'Escape') {
+        e.preventDefault()
+        setPortfolioLightboxIndex(null)
+      }
+    }
+
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [portfolioLightboxIndex, filteredPortfolio])
 
   useEffect(() => {
     const fetchSanityData = async () => {
@@ -492,13 +547,17 @@ function App() {
                 <p className="text-center text-gray-500 py-20">No images in this category yet.</p>
               ) : (
                 <div className="grid md:grid-cols-3 gap-6">
-                  {filteredPortfolio.map((item) => (
-                    <div key={item._id} className="group cursor-pointer overflow-hidden">
+                  {filteredPortfolio.map((item, idx) => (
+                    <div
+                      key={item._id}
+                      onClick={() => setPortfolioLightboxIndex(idx)}
+                      className="group cursor-pointer overflow-hidden rounded shadow-sm hover:shadow-md transition-shadow"
+                    >
                       {item.image && (
                         <img
-                          src={urlFor(item.image).width(800).url()}
+                          src={urlFor(item.image).width(1000).auto('format').fit('max').url()}
                           alt={item.title || 'Portfolio image'}
-                          className="w-full h-auto transition-transform duration-700 group-hover:scale-105"
+                          className="w-full h-auto object-contain transition-transform duration-700 group-hover:scale-105"
                           loading="lazy"
                         />
                       )}
@@ -510,6 +569,74 @@ function App() {
                 </div>
               )}
             </div>
+
+            {/* Portfolio Fullscreen Lightbox */}
+            {portfolioLightboxIndex !== null && filteredPortfolio[portfolioLightboxIndex] && (
+              <div
+                style={{ zIndex: 9999 }}
+                className="fixed inset-0 bg-black/95 flex items-center justify-center p-2 md:p-4 select-none cursor-pointer"
+                onClick={() => setPortfolioLightboxIndex(null)}
+              >
+                <button
+                  onClick={() => setPortfolioLightboxIndex(null)}
+                  className="absolute top-4 right-4 z-30 bg-white/10 hover:bg-white/25 text-white w-11 h-11 flex items-center justify-center rounded-full backdrop-blur-md transition-all text-xl cursor-pointer"
+                  title="Close (Esc)"
+                >
+                  ✕
+                </button>
+
+                {filteredPortfolio.length > 1 && (
+                  <>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        setPortfolioLightboxIndex((prev) => (prev > 0 ? prev - 1 : filteredPortfolio.length - 1))
+                      }}
+                      className="absolute left-2 md:left-6 top-1/2 -translate-y-1/2 z-30 bg-white/10 hover:bg-white/30 text-white w-12 h-12 md:w-14 md:h-14 flex items-center justify-center rounded-full backdrop-blur-md transition-all text-2xl md:text-3xl cursor-pointer"
+                      title="Previous"
+                    >
+                      ‹
+                    </button>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        setPortfolioLightboxIndex((prev) => (prev < filteredPortfolio.length - 1 ? prev + 1 : 0))
+                      }}
+                      className="absolute right-2 md:right-6 top-1/2 -translate-y-1/2 z-30 bg-white/10 hover:bg-white/30 text-white w-12 h-12 md:w-14 md:h-14 flex items-center justify-center rounded-full backdrop-blur-md transition-all text-2xl md:text-3xl cursor-pointer"
+                      title="Next"
+                    >
+                      ›
+                    </button>
+                  </>
+                )}
+
+                <div
+                  className="relative flex flex-col items-center justify-center max-w-full max-h-full"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <img
+                    key={portfolioLightboxIndex}
+                    src={urlFor(filteredPortfolio[portfolioLightboxIndex].image).width(2400).auto('format').fit('max').url()}
+                    alt=""
+                    className="max-h-[94vh] max-w-[96vw] w-auto h-auto object-contain rounded-sm shadow-2xl"
+                  />
+                  {filteredPortfolio[portfolioLightboxIndex].title && (
+                    <p className="text-white/80 text-sm font-light mt-2 tracking-wide text-center">
+                      {filteredPortfolio[portfolioLightboxIndex].title}
+                    </p>
+                  )}
+                </div>
+
+                {filteredPortfolio.length > 1 && (
+                  <div
+                    className="absolute bottom-4 left-1/2 -translate-x-1/2 z-30 bg-black/60 backdrop-blur-md px-4 py-1.5 rounded-full text-white/90 text-xs font-light tracking-widest uppercase"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    {portfolioLightboxIndex + 1} / {filteredPortfolio.length}
+                  </div>
+                )}
+              </div>
+            )}
           </div>
         } />
 
@@ -598,7 +725,10 @@ function App() {
                         </a>
                       )}
                       <button
-                        onClick={() => setActiveModalGallery(null)}
+                        onClick={() => {
+                          setActiveModalGallery(null)
+                          setLightboxIndex(null)
+                        }}
                         className="text-white hover:text-gray-300 text-3xl cursor-pointer p-2"
                         title="Close Gallery"
                       >
@@ -608,17 +738,17 @@ function App() {
                   </div>
 
                   {activeModalGallery.photos && activeModalGallery.photos.length > 0 ? (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 pb-20">
+                    <div className="columns-1 sm:columns-2 lg:columns-3 gap-4 space-y-4 pb-24">
                       {activeModalGallery.photos.map((photo, pIdx) => (
                         <div
                           key={photo._key || pIdx}
-                          onClick={() => setLightboxImage(urlFor(photo).width(1600).url())}
-                          className="cursor-pointer overflow-hidden rounded group aspect-[3/2] bg-black/30 shadow"
+                          onClick={() => setLightboxIndex(pIdx)}
+                          className="cursor-pointer break-inside-avoid overflow-hidden rounded group relative shadow hover:opacity-95 transition-all bg-black/20"
                         >
                           <img
-                            src={urlFor(photo).width(800).height(533).url()}
+                            src={urlFor(photo).width(1200).auto('format').fit('max').url()}
                             alt=""
-                            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                            className="w-full h-auto object-contain transition-transform duration-500 group-hover:scale-[1.02]"
                             loading="lazy"
                           />
                         </div>
@@ -643,14 +773,75 @@ function App() {
               </div>
             )}
 
-            {/* Lightbox Single Photo Fullscreen View */}
-            {lightboxImage && (
+            {/* ── CLIENT GALLERY FULLSCREEN LIGHTBOX (OPENS ON TOP) ────── */}
+            {activeModalGallery?.photos && lightboxIndex !== null && activeModalGallery.photos[lightboxIndex] && (
               <div
-                onClick={() => setLightboxImage(null)}
-                className="fixed inset-0 z-60 bg-black/95 flex items-center justify-center p-4 cursor-zoom-out"
+                style={{ zIndex: 9999 }}
+                className="fixed inset-0 bg-black/95 flex items-center justify-center p-2 md:p-4 select-none cursor-pointer"
+                onClick={() => setLightboxIndex(null)}
               >
-                <img src={lightboxImage} alt="" className="max-h-[92vh] max-w-[92vw] object-contain rounded shadow-2xl" />
-                <button onClick={() => setLightboxImage(null)} className="absolute top-6 right-6 text-white text-4xl hover:text-gray-300">✕</button>
+                {/* Close Button */}
+                <button
+                  onClick={() => setLightboxIndex(null)}
+                  className="absolute top-4 right-4 z-30 bg-white/10 hover:bg-white/25 text-white w-11 h-11 flex items-center justify-center rounded-full backdrop-blur-md transition-all text-xl cursor-pointer"
+                  title="Close (Esc)"
+                  aria-label="Close fullscreen"
+                >
+                  ✕
+                </button>
+
+                {/* Left / Prev Arrow */}
+                {activeModalGallery.photos.length > 1 && (
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      setLightboxIndex((prev) => (prev > 0 ? prev - 1 : activeModalGallery.photos.length - 1))
+                    }}
+                    className="absolute left-2 md:left-6 top-1/2 -translate-y-1/2 z-30 bg-white/10 hover:bg-white/30 text-white w-12 h-12 md:w-14 md:h-14 flex items-center justify-center rounded-full backdrop-blur-md transition-all text-2xl md:text-3xl cursor-pointer"
+                    title="Previous photo (Left Arrow)"
+                    aria-label="Previous photo"
+                  >
+                    ‹
+                  </button>
+                )}
+
+                {/* Right / Next Arrow */}
+                {activeModalGallery.photos.length > 1 && (
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      setLightboxIndex((prev) => (prev < activeModalGallery.photos.length - 1 ? prev + 1 : 0))
+                    }}
+                    className="absolute right-2 md:right-6 top-1/2 -translate-y-1/2 z-30 bg-white/10 hover:bg-white/30 text-white w-12 h-12 md:w-14 md:h-14 flex items-center justify-center rounded-full backdrop-blur-md transition-all text-2xl md:text-3xl cursor-pointer"
+                    title="Next photo (Right Arrow)"
+                    aria-label="Next photo"
+                  >
+                    ›
+                  </button>
+                )}
+
+                {/* The Fullscreen Image - Natural Uploaded Aspect Ratio with Minimal Padding */}
+                <div
+                  className="relative flex items-center justify-center max-w-full max-h-full"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <img
+                    key={lightboxIndex}
+                    src={urlFor(activeModalGallery.photos[lightboxIndex]).width(2400).auto('format').fit('max').url()}
+                    alt=""
+                    className="max-h-[96vh] max-w-[96vw] w-auto h-auto object-contain rounded-sm shadow-2xl transition-opacity duration-200"
+                  />
+                </div>
+
+                {/* Photo Counter */}
+                {activeModalGallery.photos.length > 1 && (
+                  <div
+                    className="absolute bottom-4 left-1/2 -translate-x-1/2 z-30 bg-black/60 backdrop-blur-md px-4 py-1.5 rounded-full text-white/90 text-xs font-light tracking-widest uppercase"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    {lightboxIndex + 1} / {activeModalGallery.photos.length}
+                  </div>
+                )}
               </div>
             )}
           </div>
