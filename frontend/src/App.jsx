@@ -767,23 +767,20 @@ function App() {
               {filteredPortfolio.length === 0 ? (
                 <p className="text-center text-gray-500 py-20">No images in this category yet.</p>
               ) : (
-                <div className="grid md:grid-cols-3 gap-6">
+                <div className="columns-1 sm:columns-2 lg:columns-3 gap-6">
                   {filteredPortfolio.map((item, idx) => (
                     <div
                       key={item._id}
                       onClick={() => setPortfolioLightboxIndex(idx)}
-                      className="group cursor-pointer overflow-hidden rounded shadow-sm hover:shadow-md transition-shadow"
+                      className="break-inside-avoid mb-6 group cursor-pointer overflow-hidden rounded shadow-sm hover:shadow-md transition-all bg-black/5"
                     >
                       {item.image && (
                         <img
-                          src={urlFor(item.image).width(1000).auto('format').fit('max').url()}
+                          src={urlFor(item.image).width(1200).auto('format').fit('max').url()}
                           alt={item.title || 'Portfolio image'}
-                          className="w-full h-auto object-contain transition-transform duration-700 group-hover:scale-105"
+                          className="w-full h-auto object-contain block transition-transform duration-700 group-hover:scale-[1.02]"
                           loading="lazy"
                         />
-                      )}
-                      {item.title && (
-                        <p className="text-sm text-gray-600 mt-2 text-center font-light">{item.title}</p>
                       )}
                     </div>
                   ))}
@@ -841,10 +838,19 @@ function App() {
                     alt=""
                     className="max-h-[94vh] max-w-[96vw] w-auto h-auto object-contain rounded-sm shadow-2xl"
                   />
-                  {filteredPortfolio[portfolioLightboxIndex].title && (
-                    <p className="text-white/80 text-sm font-light mt-2 tracking-wide text-center">
-                      {filteredPortfolio[portfolioLightboxIndex].title}
-                    </p>
+                  {(filteredPortfolio[portfolioLightboxIndex].title || filteredPortfolio[portfolioLightboxIndex].caption) && (
+                    <div className="text-center mt-3 space-y-1">
+                      {filteredPortfolio[portfolioLightboxIndex].title && (
+                        <p className="text-white/90 text-sm font-light tracking-wide">
+                          {filteredPortfolio[portfolioLightboxIndex].title}
+                        </p>
+                      )}
+                      {filteredPortfolio[portfolioLightboxIndex].caption && (
+                        <p className="text-white/70 text-xs font-light">
+                          {filteredPortfolio[portfolioLightboxIndex].caption}
+                        </p>
+                      )}
+                    </div>
                   )}
                 </div>
 
