@@ -32,6 +32,7 @@ const CLIENT_GALLERIES_QUERY = `*[_type == "clientGallery"] | order(date desc, _
   _createdAt
 }`
 const SERVICES_QUERY = `*[_type == "service"] | order(order asc, _createdAt asc) { _id, title, description, features, price, image, photos }`
+const SERVICES_PAGE_QUERY = `*[_type == "servicesPage"][0]{ title, subtitle }`
 const CONTACT_QUERY = `*[_type == "contact"][0]{ location, phone, email, instagram, instagramUrl, responseTime, bookingNotice, web3FormsAccessKey }`
 
 // ── HELPER: FORMAT DISPLAY DATE ─────────────────────────────────────────
@@ -110,6 +111,7 @@ function App() {
   const [featuredLightboxIndex, setFeaturedLightboxIndex] = useState(null)
 
   const [services, setServices] = useState([])
+  const [servicesPage, setServicesPage] = useState(null)
   const [contact, setContact] = useState(null)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [loading, setLoading] = useState(true)
@@ -229,13 +231,14 @@ function App() {
   useEffect(() => {
     const fetchSanityData = async () => {
       try {
-        const [heroData, aboutData, portfolioData, clientData, servicesData, contactData] = await Promise.all([
+        const [heroData, aboutData, portfolioData, clientData, servicesData, contactData, servicesPageData] = await Promise.all([
           client.fetch(HERO_QUERY),
           client.fetch(ABOUT_QUERY),
           client.fetch(PORTFOLIO_QUERY),
           client.fetch(CLIENT_GALLERIES_QUERY),
           client.fetch(SERVICES_QUERY),
           client.fetch(CONTACT_QUERY),
+          client.fetch(SERVICES_PAGE_QUERY),
         ])
 
         if (heroData) {
@@ -294,6 +297,7 @@ function App() {
         }
 
         if (servicesData) setServices(servicesData)
+        if (servicesPageData) setServicesPage(servicesPageData)
         if (contactData) setContact(contactData)
 
       } catch (error) {
@@ -1136,9 +1140,11 @@ function App() {
         <Route path="/services" element={
           <div className="pt-24 pb-16 bg-white min-h-screen">
             <section className="max-w-5xl mx-auto px-6 mb-20 text-center">
-              <h1 className="text-5xl md:text-6xl font-light mb-6 tracking-wide">Services & Investment</h1>
-              <p className="text-gray-600 text-lg font-light max-w-2xl mx-auto leading-relaxed">
-                Quality photography is an investment in memories that last a lifetime. I offer flexible packages to suit your needs and budget.
+              <h1 className="text-5xl md:text-6xl font-light mb-6 tracking-wide">
+                {servicesPage?.title || 'Services & Investment'}
+              </h1>
+              <p className="text-gray-600 text-lg font-light max-w-2xl mx-auto leading-relaxed whitespace-pre-line">
+                {servicesPage?.subtitle || 'Quality photography is an investment in memories that last a lifetime. I offer flexible packages to suit your needs and budget.'}
               </p>
             </section>
 
@@ -1149,7 +1155,7 @@ function App() {
                     <div className={idx % 2 !== 0 ? 'md:order-2' : ''}>
                       {(service.image || (service.photos && service.photos[0])) && (
                         <div
-                          className="cursor-pointer overflow-hidden rounded shadow mb-4 group"
+                          className="cursor-pointer overflow-hidden rounded shadow-sm hover:shadow-md transition-shadow mb-4 group bg-gray-100 flex items-center justify-center"
                           onClick={() => {
                             const list = service.photos && service.photos.length > 0 ? service.photos : (service.image ? [service.image] : [])
                             if (list.length > 0) {
@@ -1158,9 +1164,10 @@ function App() {
                           }}
                         >
                           <img
-                            src={urlFor(service.image || service.photos[0]).width(800).height(600).fit('crop').url()}
+                            src={urlFor(service.image || service.photos[0]).width(1200).auto('format').fit('max').url()}
                             alt={service.title}
-                            className="w-full h-auto object-cover transition-transform duration-500 group-hover:scale-105"
+                            className="w-full h-auto object-contain transition-transform duration-500 group-hover:scale-105"
+                            loading="lazy"
                           />
                         </div>
                       )}
@@ -1169,17 +1176,18 @@ function App() {
                           <p className="text-xs uppercase tracking-widest text-gray-500 font-medium mb-2">
                             Sample Work ({service.photos.length} photo{service.photos.length === 1 ? '' : 's'})
                           </p>
-                          <div className="grid grid-cols-4 gap-2">
+                          <div className="flex flex-wrap gap-2.5 items-center">
                             {service.photos.slice(0, 4).map((photo, pIdx) => (
                               <div
                                 key={photo._key || pIdx}
                                 onClick={() => setGeneralLightbox({ photos: service.photos, index: pIdx, title: `${service.title} - Sample Work` })}
-                                className="relative aspect-square overflow-hidden rounded cursor-pointer group bg-gray-100 shadow-sm hover:shadow"
+                                className="relative h-20 sm:h-24 overflow-hidden rounded cursor-pointer group bg-gray-100 shadow-sm hover:shadow transition-shadow flex items-center justify-center"
                               >
                                 <img
-                                  src={urlFor(photo).width(300).height(300).fit('crop').url()}
+                                  src={urlFor(photo).height(240).auto('format').fit('max').url()}
                                   alt=""
-                                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                                  className="h-full w-auto object-contain transition-transform duration-500 group-hover:scale-105"
+                                  loading="lazy"
                                 />
                                 {pIdx === 3 && service.photos.length > 4 && (
                                   <div className="absolute inset-0 bg-black/60 flex items-center justify-center text-white text-xs font-medium">

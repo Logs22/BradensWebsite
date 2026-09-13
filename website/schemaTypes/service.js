@@ -42,8 +42,9 @@ export default {
       name: 'image',
       title: 'Cover Image (Optional)',
       type: 'image',
+      description: 'Main cover image for this service package. Preserves its original uploaded aspect ratio on the website.',
       options: {
-        hotspot: true, // Lets Braden crop the image perfectly inside Sanity
+        hotspot: true,
       },
     },
     {
