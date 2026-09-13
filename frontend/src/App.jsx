@@ -33,6 +33,8 @@ const CLIENT_GALLERIES_QUERY = `*[_type == "clientGallery"] | order(date desc, _
 }`
 const SERVICES_QUERY = `*[_type == "service"] | order(order asc, _createdAt asc) { _id, title, description, features, price, image, photos }`
 const SERVICES_PAGE_QUERY = `*[_type == "servicesPage"][0]{ title, subtitle }`
+const PORTFOLIO_PAGE_QUERY = `*[_type == "portfolioPage"][0]{ title, subtitle, homeHeading, homeSubtitle }`
+const CLIENTS_PAGE_QUERY = `*[_type == "clientsPage"][0]{ title, subtitle, homeHeading, homeSubtitle }`
 const CONTACT_QUERY = `*[_type == "contact"][0]{ location, phone, email, instagram, instagramUrl, responseTime, bookingNotice, web3FormsAccessKey }`
 
 // ── HELPER: FORMAT DISPLAY DATE ─────────────────────────────────────────
@@ -112,6 +114,8 @@ function App() {
 
   const [services, setServices] = useState([])
   const [servicesPage, setServicesPage] = useState(null)
+  const [portfolioPage, setPortfolioPage] = useState(null)
+  const [clientsPage, setClientsPage] = useState(null)
   const [contact, setContact] = useState(null)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [loading, setLoading] = useState(true)
@@ -231,7 +235,7 @@ function App() {
   useEffect(() => {
     const fetchSanityData = async () => {
       try {
-        const [heroData, aboutData, portfolioData, clientData, servicesData, contactData, servicesPageData] = await Promise.all([
+        const [heroData, aboutData, portfolioData, clientData, servicesData, contactData, servicesPageData, portfolioPageData, clientsPageData] = await Promise.all([
           client.fetch(HERO_QUERY),
           client.fetch(ABOUT_QUERY),
           client.fetch(PORTFOLIO_QUERY),
@@ -239,6 +243,8 @@ function App() {
           client.fetch(SERVICES_QUERY),
           client.fetch(CONTACT_QUERY),
           client.fetch(SERVICES_PAGE_QUERY),
+          client.fetch(PORTFOLIO_PAGE_QUERY),
+          client.fetch(CLIENTS_PAGE_QUERY),
         ])
 
         if (heroData) {
@@ -298,6 +304,8 @@ function App() {
 
         if (servicesData) setServices(servicesData)
         if (servicesPageData) setServicesPage(servicesPageData)
+        if (portfolioPageData) setPortfolioPage(portfolioPageData)
+        if (clientsPageData) setClientsPage(clientsPageData)
         if (contactData) setContact(contactData)
 
       } catch (error) {
@@ -314,6 +322,13 @@ function App() {
     setActiveFilter(category)
     if (category === 'all') {
       setFilteredPortfolio(portfolio)
+    } else if (category === 'sporting events' || category === 'sporting-events') {
+      setFilteredPortfolio(
+        portfolio.filter(item => {
+          const cat = item.category?.toLowerCase() || ''
+          return cat === 'sporting events' || cat === 'sporting-events' || cat === 'events'
+        })
+      )
     } else {
       setFilteredPortfolio(
         portfolio.filter(item => item.category && item.category.toLowerCase() === category.toLowerCase())
@@ -529,9 +544,11 @@ function App() {
             {/* Featured Work */}
             <section className="py-24 px-6 bg-gray-50">
               <div className="max-w-7xl mx-auto text-center mb-16">
-                <h2 className="text-4xl md:text-5xl font-light mb-4 tracking-wide">Featured Work</h2>
-                <p className="text-gray-500 font-light text-base max-w-xl mx-auto">
-                  A curated selection of highlighted moments and signature captures
+                <h2 className="text-4xl md:text-5xl font-light mb-4 tracking-wide">
+                  {portfolioPage?.homeHeading || 'Featured Work'}
+                </h2>
+                <p className="text-gray-500 font-light text-base max-w-xl mx-auto whitespace-pre-line">
+                  {portfolioPage?.homeSubtitle || 'A curated selection of highlighted moments and signature captures'}
                 </p>
 
                 {/* Natural uploaded aspect ratio photo columns */}
@@ -658,8 +675,12 @@ function App() {
             {clientGalleries.length > 0 && (
               <section className="py-24 px-6 bg-white">
                 <div className="max-w-7xl mx-auto text-center">
-                  <h2 className="text-4xl md:text-5xl font-light mb-4 tracking-wide">Client Stories</h2>
-                  <p className="text-gray-500 font-light mb-12">Discover recent client sessions and featured stories</p>
+                  <h2 className="text-4xl md:text-5xl font-light mb-4 tracking-wide">
+                    {clientsPage?.homeHeading || 'Client Stories'}
+                  </h2>
+                  <p className="text-gray-500 font-light mb-12 whitespace-pre-line">
+                    {clientsPage?.homeSubtitle || 'Discover recent client sessions and featured stories'}
+                  </p>
                   <div className="columns-1 md:columns-3 gap-8 text-center">
                     {clientGalleries.slice(0, 3).map(cg => (
                       <Link
@@ -748,22 +769,32 @@ function App() {
           <div className="pt-24 pb-16 bg-white min-h-screen">
             <div className="max-w-7xl mx-auto px-6">
               <div className="text-center mb-16">
-                <h1 className="text-5xl md:text-6xl font-light mb-4 tracking-wide">Portfolio</h1>
-                <p className="text-gray-600 text-lg font-light">A collection of my favorite moments</p>
+                <h1 className="text-5xl md:text-6xl font-light mb-4 tracking-wide">
+                  {portfolioPage?.title || 'Portfolio'}
+                </h1>
+                <p className="text-gray-600 text-lg font-light whitespace-pre-line">
+                  {portfolioPage?.subtitle || 'A collection of my favorite moments'}
+                </p>
               </div>
 
               <div className="flex flex-wrap justify-center gap-4 mb-12">
-                {['all', 'weddings', 'portraits', 'events', 'film'].map(category => (
+                {[
+                  { id: 'all', label: 'All' },
+                  { id: 'weddings', label: 'Weddings' },
+                  { id: 'portraits', label: 'Portraits' },
+                  { id: 'sporting events', label: 'Sporting Events' },
+                  { id: 'film', label: 'Film' },
+                ].map(({ id, label }) => (
                   <button
-                    key={category}
-                    onClick={() => filterPortfolio(category)}
+                    key={id}
+                    onClick={() => filterPortfolio(id)}
                     className={`px-6 py-2 rounded-full text-sm tracking-wide transition-colors cursor-pointer ${
-                      activeFilter === category
+                      activeFilter === id
                         ? 'bg-[#CDEDF6] text-slate-900'
                         : 'bg-gray-100 text-gray-700 hover:bg-[#CDEDF6] hover:text-slate-900'
                     }`}
                   >
-                    {category.charAt(0).toUpperCase() + category.slice(1)}
+                    {label}
                   </button>
                 ))}
               </div>
@@ -876,8 +907,12 @@ function App() {
           <div className="pt-24 pb-16 bg-white min-h-screen">
             <div className="max-w-7xl mx-auto px-6">
               <div className="text-center mb-16">
-                <h1 className="text-5xl md:text-6xl font-light mb-4 tracking-wide">Client Galleries</h1>
-                <p className="text-gray-600 text-lg font-light">Client stories, weddings, and featured collections</p>
+                <h1 className="text-5xl md:text-6xl font-light mb-4 tracking-wide">
+                  {clientsPage?.title || 'Client Galleries'}
+                </h1>
+                <p className="text-gray-600 text-lg font-light whitespace-pre-line">
+                  {clientsPage?.subtitle || 'Client stories, weddings, and featured collections'}
+                </p>
               </div>
 
               {clientGalleries.length === 0 ? (
@@ -1274,7 +1309,7 @@ function App() {
                           <option value="">Select a service</option>
                           <option value="Weddings">Wedding Photography</option>
                           <option value="Portraits">Portrait Session</option>
-                          <option value="Events">Event Photography</option>
+                          <option value="Sporting Events">Sporting Events Photography</option>
                           <option value="Film">Film Photography</option>
                           <option value="Other">Other</option>
                         </select>

@@ -21,7 +21,7 @@ export default {
         list: [
           { title: 'Weddings', value: 'weddings' },
           { title: 'Portraits', value: 'portraits' },
-          { title: 'Events', value: 'events' },
+          { title: 'Sporting Events', value: 'sporting events' },
           { title: 'Film', value: 'film' },
         ],
         layout: 'radio',
@@ -95,7 +95,14 @@ export default {
       photos: 'photos',
     },
     prepare({ title, category, featured, media, photos }) {
-      const categoryLabel = category ? category.charAt(0).toUpperCase() + category.slice(1) : 'No category'
+      const categoryMap = {
+        'weddings': 'Weddings',
+        'portraits': 'Portraits',
+        'sporting events': 'Sporting Events',
+        'events': 'Sporting Events',
+        'film': 'Film',
+      }
+      const categoryLabel = (category && categoryMap[category.toLowerCase()]) || (category ? category.charAt(0).toUpperCase() + category.slice(1) : 'No category')
       const featuredLabel = featured ? ' ⭐ Featured' : ''
       const count = photos ? photos.length : 0
       const countLabel = count > 0 ? ` (${count} photo${count === 1 ? '' : 's'})` : ''
