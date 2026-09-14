@@ -340,6 +340,57 @@ function App() {
   const featuredOnly = portfolio.filter((i) => i.featured)
   const displayFeatured = featuredOnly.length > 0 ? featuredOnly : portfolio.slice(0, 4)
 
+  // Balanced 2-column distribution for featured work
+  const { leftFeatured, rightFeatured } = useMemo(() => {
+    if (!displayFeatured || displayFeatured.length === 0) {
+      return { leftFeatured: [], rightFeatured: [] }
+    }
+
+    // If exactly 4 items (common featured showcase):
+    // Put item 0 & item 3 in left column, item 1 & item 2 in right column.
+    // This perfectly pairs tall portrait + landscape on both left and right columns!
+    if (displayFeatured.length === 4) {
+      return {
+        leftFeatured: [
+          { item: displayFeatured[0], originalIdx: 0 },
+          { item: displayFeatured[3], originalIdx: 3 },
+        ],
+        rightFeatured: [
+          { item: displayFeatured[1], originalIdx: 1 },
+          { item: displayFeatured[2], originalIdx: 2 },
+        ],
+      }
+    }
+
+    // Dynamic greedy height-balancing for any N items based on aspect ratio
+    const left = []
+    const right = []
+    let leftH = 0
+    let rightH = 0
+
+    const getAspect = (it) => {
+      try {
+        const ref = it?.image?.asset?._ref || ''
+        const m = ref.match(/-(\d+)x(\d+)-/)
+        if (m) return parseInt(m[2], 10) / parseInt(m[1], 10)
+      } catch (e) {}
+      return 1
+    }
+
+    displayFeatured.forEach((item, idx) => {
+      const aspect = getAspect(item)
+      if (leftH <= rightH) {
+        left.push({ item, originalIdx: idx })
+        leftH += aspect
+      } else {
+        right.push({ item, originalIdx: idx })
+        rightH += aspect
+      }
+    })
+
+    return { leftFeatured: left, rightFeatured: right }
+  }, [displayFeatured])
+
   // Keyboard navigation for featured work fullscreen lightbox
   useEffect(() => {
     if (featuredLightboxIndex === null || !displayFeatured?.length) return
@@ -551,40 +602,104 @@ function App() {
                   {portfolioPage?.homeSubtitle || 'A curated selection of highlighted moments and signature captures'}
                 </p>
 
-                {/* Natural uploaded aspect ratio photo columns */}
-                <div className="columns-1 md:columns-2 gap-8 mt-16 text-left">
-                  {displayFeatured.length > 0 ? (
-                    displayFeatured.map((item, idx) => (
-                      <div
-                        key={item._id}
-                        onClick={() => setFeaturedLightboxIndex(idx)}
-                        className="break-inside-avoid mb-8 group relative overflow-hidden rounded cursor-pointer shadow-sm hover:shadow-xl transition-all duration-300 bg-white"
-                      >
-                        {item.image && (
-                          <img
-                            src={urlFor(item.image).width(1400).auto('format').fit('max').url()}
-                            alt={item.title || 'Featured Work'}
-                            className="w-full h-auto object-contain transition-transform duration-700 group-hover:scale-[1.02]"
-                            loading="lazy"
-                          />
-                        )}
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/20 to-transparent p-6 text-white text-left opacity-0 group-hover:opacity-100 transition-opacity flex items-end justify-between">
-                          <div>
-                            {item.title && <p className="text-lg font-light tracking-wide">{item.title}</p>}
-                            {item.caption && <p className="text-xs text-gray-300 font-light mt-1">{item.caption}</p>}
+                {/* Natural uploaded aspect ratio photo columns with balanced layout */}
+                {displayFeatured.length > 0 ? (
+                  <>
+                    {/* Mobile single column */}
+                    <div className="md:hidden mt-16 text-left space-y-8">
+                      {displayFeatured.map((item, idx) => (
+                        <div
+                          key={item._id}
+                          onClick={() => setFeaturedLightboxIndex(idx)}
+                          className="group relative overflow-hidden rounded cursor-pointer shadow-sm hover:shadow-xl transition-all duration-300 bg-white"
+                        >
+                          {item.image && (
+                            <img
+                              src={urlFor(item.image).width(1400).auto('format').fit('max').url()}
+                              alt={item.title || 'Featured Work'}
+                              className="w-full h-auto object-contain transition-transform duration-700 group-hover:scale-[1.02]"
+                              loading="lazy"
+                            />
+                          )}
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/20 to-transparent p-6 text-white text-left opacity-0 group-hover:opacity-100 transition-opacity flex items-end justify-between">
+                            <div>
+                              {item.title && <p className="text-lg font-light tracking-wide">{item.title}</p>}
+                              {item.caption && <p className="text-xs text-gray-300 font-light mt-1">{item.caption}</p>}
+                            </div>
+                            <span className="text-xs uppercase tracking-widest bg-white/20 backdrop-blur-sm px-3 py-1.5 rounded-full text-white/90">
+                              Expand ↗
+                            </span>
                           </div>
-                          <span className="text-xs uppercase tracking-widest bg-white/20 backdrop-blur-sm px-3 py-1.5 rounded-full text-white/90">
-                            Expand ↗
-                          </span>
                         </div>
+                      ))}
+                    </div>
+
+                    {/* Desktop balanced two-column masonry */}
+                    <div className="hidden md:grid md:grid-cols-2 gap-8 mt-16 text-left items-start">
+                      <div className="space-y-8">
+                        {leftFeatured.map(({ item, originalIdx }) => (
+                          <div
+                            key={item._id}
+                            onClick={() => setFeaturedLightboxIndex(originalIdx)}
+                            className="group relative overflow-hidden rounded cursor-pointer shadow-sm hover:shadow-xl transition-all duration-300 bg-white"
+                          >
+                            {item.image && (
+                              <img
+                                src={urlFor(item.image).width(1400).auto('format').fit('max').url()}
+                                alt={item.title || 'Featured Work'}
+                                className="w-full h-auto object-contain transition-transform duration-700 group-hover:scale-[1.02]"
+                                loading="lazy"
+                              />
+                            )}
+                            <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/20 to-transparent p-6 text-white text-left opacity-0 group-hover:opacity-100 transition-opacity flex items-end justify-between">
+                              <div>
+                                {item.title && <p className="text-lg font-light tracking-wide">{item.title}</p>}
+                                {item.caption && <p className="text-xs text-gray-300 font-light mt-1">{item.caption}</p>}
+                              </div>
+                              <span className="text-xs uppercase tracking-widest bg-white/20 backdrop-blur-sm px-3 py-1.5 rounded-full text-white/90">
+                                Expand ↗
+                              </span>
+                            </div>
+                          </div>
+                        ))}
                       </div>
-                    ))
-                  ) : (
-                    [1, 2, 3, 4].map((i) => (
-                      <div key={i} className="break-inside-avoid mb-8 aspect-[4/3] bg-gray-200 animate-pulse rounded" />
-                    ))
-                  )}
-                </div>
+
+                      <div className="space-y-8">
+                        {rightFeatured.map(({ item, originalIdx }) => (
+                          <div
+                            key={item._id}
+                            onClick={() => setFeaturedLightboxIndex(originalIdx)}
+                            className="group relative overflow-hidden rounded cursor-pointer shadow-sm hover:shadow-xl transition-all duration-300 bg-white"
+                          >
+                            {item.image && (
+                              <img
+                                src={urlFor(item.image).width(1400).auto('format').fit('max').url()}
+                                alt={item.title || 'Featured Work'}
+                                className="w-full h-auto object-contain transition-transform duration-700 group-hover:scale-[1.02]"
+                                loading="lazy"
+                              />
+                            )}
+                            <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/20 to-transparent p-6 text-white text-left opacity-0 group-hover:opacity-100 transition-opacity flex items-end justify-between">
+                              <div>
+                                {item.title && <p className="text-lg font-light tracking-wide">{item.title}</p>}
+                                {item.caption && <p className="text-xs text-gray-300 font-light mt-1">{item.caption}</p>}
+                              </div>
+                              <span className="text-xs uppercase tracking-widest bg-white/20 backdrop-blur-sm px-3 py-1.5 rounded-full text-white/90">
+                                Expand ↗
+                              </span>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </>
+                ) : (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mt-16">
+                    {[1, 2, 3, 4].map((i) => (
+                      <div key={i} className="aspect-[4/3] bg-gray-200 animate-pulse rounded" />
+                    ))}
+                  </div>
+                )}
                 <Link
                   to="/portfolio"
                   className="inline-block mt-8 bg-[#CDEDF6] text-slate-900 hover:bg-white rounded-full px-8 py-3 border border-gray-300 transition-all duration-300 cursor-pointer"
@@ -683,9 +798,17 @@ function App() {
                   </p>
                   <div className="columns-1 md:columns-3 gap-8 text-center">
                     {clientGalleries.slice(0, 3).map(cg => (
-                      <Link
+                      <div
                         key={cg._id}
-                        to="/clients"
+                        onClick={() => {
+                          if (cg.photos && cg.photos.length > 0) {
+                            setActiveModalGallery(cg)
+                          } else if (cg.externalUrl) {
+                            window.open(cg.externalUrl, '_blank', 'noopener,noreferrer')
+                          } else {
+                            setActiveModalGallery(cg)
+                          }
+                        }}
                         className="break-inside-avoid mb-8 group flex flex-col text-center cursor-pointer"
                       >
                         <div className="relative overflow-hidden rounded bg-gray-100 mb-4 shadow-sm group-hover:shadow-md transition-shadow">
@@ -713,7 +836,7 @@ function App() {
                             </p>
                           )}
                         </div>
-                      </Link>
+                      </div>
                     ))}
                   </div>
                   <Link to="/clients" className="inline-block mt-12 bg-[#CDEDF6] text-slate-900 hover:bg-white rounded-full px-8 py-3 border border-gray-300 transition-all duration-300 cursor-pointer">
@@ -966,151 +1089,6 @@ function App() {
                 </div>
               )}
             </div>
-
-            {/* ── CLIENT GALLERY LIGHTBOX MODAL ───────────────────────── */}
-            {activeModalGallery && (
-              <div className="fixed inset-0 z-50 bg-black/90 backdrop-blur-sm overflow-y-auto p-4 md:p-10 flex flex-col items-center">
-                <div className="w-full max-w-6xl relative">
-                  <div className="flex flex-wrap items-center justify-between py-6 border-b border-white/20 mb-8 text-white gap-4">
-                    <div>
-                      <h2 className="text-3xl md:text-4xl font-light">{activeModalGallery.title}</h2>
-                      {activeModalGallery.date && (
-                        <p className="text-sm text-gray-300 font-light mt-1">
-                          {formatDisplayDate(activeModalGallery.date)}
-                        </p>
-                      )}
-                    </div>
-                    <div className="flex items-center gap-4">
-                      {activeModalGallery.externalUrl && (
-                        <a
-                          href={activeModalGallery.externalUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="bg-[#CDEDF6] text-slate-900 hover:bg-white px-5 py-2 rounded-full text-sm font-light transition-colors"
-                        >
-                          Open Pixieset Collection ↗
-                        </a>
-                      )}
-                      <button
-                        onClick={() => {
-                          setActiveModalGallery(null)
-                          setLightboxIndex(null)
-                        }}
-                        className="text-white hover:text-gray-300 text-3xl cursor-pointer p-2"
-                        title="Close Gallery"
-                      >
-                        ✕
-                      </button>
-                    </div>
-                  </div>
-
-                  {activeModalGallery.photos && activeModalGallery.photos.length > 0 ? (
-                    <div className="columns-1 sm:columns-2 lg:columns-3 gap-4 space-y-4 pb-24">
-                      {activeModalGallery.photos.map((photo, pIdx) => (
-                        <div
-                          key={photo._key || pIdx}
-                          onClick={() => setLightboxIndex(pIdx)}
-                          className="cursor-pointer break-inside-avoid overflow-hidden rounded group relative shadow hover:opacity-95 transition-all bg-black/20"
-                        >
-                          <img
-                            src={urlFor(photo).width(1200).auto('format').fit('max').url()}
-                            alt=""
-                            className="w-full h-auto object-contain transition-transform duration-500 group-hover:scale-[1.02]"
-                            loading="lazy"
-                          />
-                        </div>
-                      ))}
-                    </div>
-                  ) : (
-                    <div className="text-center text-gray-300 py-24">
-                      <p className="text-lg mb-6">No additional photos uploaded in this collection yet.</p>
-                      {activeModalGallery.externalUrl && (
-                        <a
-                          href={activeModalGallery.externalUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="inline-block bg-[#CDEDF6] text-slate-900 hover:bg-white px-8 py-3 rounded-full text-base transition-colors"
-                        >
-                          View Full Gallery on Pixieset ↗
-                        </a>
-                      )}
-                    </div>
-                  )}
-                </div>
-              </div>
-            )}
-
-            {/* ── CLIENT GALLERY FULLSCREEN LIGHTBOX (OPENS ON TOP) ────── */}
-            {activeModalGallery?.photos && lightboxIndex !== null && activeModalGallery.photos[lightboxIndex] && (
-              <div
-                style={{ zIndex: 9999 }}
-                className="fixed inset-0 bg-black/95 flex items-center justify-center p-2 md:p-4 select-none cursor-pointer"
-                onClick={() => setLightboxIndex(null)}
-              >
-                {/* Close Button */}
-                <button
-                  onClick={() => setLightboxIndex(null)}
-                  className="absolute top-4 right-4 z-30 bg-white/10 hover:bg-white/25 text-white w-11 h-11 flex items-center justify-center rounded-full backdrop-blur-md transition-all text-xl cursor-pointer"
-                  title="Close (Esc)"
-                  aria-label="Close fullscreen"
-                >
-                  ✕
-                </button>
-
-                {/* Left / Prev Arrow */}
-                {activeModalGallery.photos.length > 1 && (
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation()
-                      setLightboxIndex((prev) => (prev > 0 ? prev - 1 : activeModalGallery.photos.length - 1))
-                    }}
-                    className="absolute left-2 md:left-6 top-1/2 -translate-y-1/2 z-30 bg-white/10 hover:bg-white/30 text-white w-12 h-12 md:w-14 md:h-14 flex items-center justify-center rounded-full backdrop-blur-md transition-all text-2xl md:text-3xl cursor-pointer"
-                    title="Previous photo (Left Arrow)"
-                    aria-label="Previous photo"
-                  >
-                    ‹
-                  </button>
-                )}
-
-                {/* Right / Next Arrow */}
-                {activeModalGallery.photos.length > 1 && (
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation()
-                      setLightboxIndex((prev) => (prev < activeModalGallery.photos.length - 1 ? prev + 1 : 0))
-                    }}
-                    className="absolute right-2 md:right-6 top-1/2 -translate-y-1/2 z-30 bg-white/10 hover:bg-white/30 text-white w-12 h-12 md:w-14 md:h-14 flex items-center justify-center rounded-full backdrop-blur-md transition-all text-2xl md:text-3xl cursor-pointer"
-                    title="Next photo (Right Arrow)"
-                    aria-label="Next photo"
-                  >
-                    ›
-                  </button>
-                )}
-
-                {/* The Fullscreen Image - Natural Uploaded Aspect Ratio with Minimal Padding */}
-                <div
-                  className="relative flex items-center justify-center max-w-full max-h-full"
-                  onClick={(e) => e.stopPropagation()}
-                >
-                  <img
-                    key={lightboxIndex}
-                    src={urlFor(activeModalGallery.photos[lightboxIndex]).width(2400).auto('format').fit('max').url()}
-                    alt=""
-                    className="max-h-[96vh] max-w-[96vw] w-auto h-auto object-contain rounded-sm shadow-2xl transition-opacity duration-200"
-                  />
-                </div>
-
-                {/* Photo Counter */}
-                {activeModalGallery.photos.length > 1 && (
-                  <div
-                    className="absolute bottom-4 left-1/2 -translate-x-1/2 z-30 bg-black/60 backdrop-blur-md px-4 py-1.5 rounded-full text-white/90 text-xs font-light tracking-widest uppercase"
-                    onClick={(e) => e.stopPropagation()}
-                  >
-                    {lightboxIndex + 1} / {activeModalGallery.photos.length}
-                  </div>
-                )}
-              </div>
-            )}
           </div>
         } />
 
@@ -1379,6 +1357,151 @@ function App() {
           </div>
         } />
       </Routes>
+
+      {/* ── CLIENT GALLERY LIGHTBOX MODAL (GLOBAL: ACCESSIBLE FROM HOME & CLIENTS) ── */}
+      {activeModalGallery && (
+        <div className="fixed inset-0 z-50 bg-black/90 backdrop-blur-sm overflow-y-auto p-4 md:p-10 flex flex-col items-center">
+          <div className="w-full max-w-6xl relative">
+            <div className="flex flex-wrap items-center justify-between py-6 border-b border-white/20 mb-8 text-white gap-4">
+              <div>
+                <h2 className="text-3xl md:text-4xl font-light">{activeModalGallery.title}</h2>
+                {activeModalGallery.date && (
+                  <p className="text-sm text-gray-300 font-light mt-1">
+                    {formatDisplayDate(activeModalGallery.date)}
+                  </p>
+                )}
+              </div>
+              <div className="flex items-center gap-4">
+                {activeModalGallery.externalUrl && (
+                  <a
+                    href={activeModalGallery.externalUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="bg-[#CDEDF6] text-slate-900 hover:bg-white px-5 py-2 rounded-full text-sm font-light transition-colors"
+                  >
+                    Open Pixieset Collection ↗
+                  </a>
+                )}
+                <button
+                  onClick={() => {
+                    setActiveModalGallery(null)
+                    setLightboxIndex(null)
+                  }}
+                  className="text-white hover:text-gray-300 text-3xl cursor-pointer p-2"
+                  title="Close Gallery"
+                >
+                  ✕
+                </button>
+              </div>
+            </div>
+
+            {activeModalGallery.photos && activeModalGallery.photos.length > 0 ? (
+              <div className="columns-1 sm:columns-2 lg:columns-3 gap-4 space-y-4 pb-24">
+                {activeModalGallery.photos.map((photo, pIdx) => (
+                  <div
+                    key={photo._key || pIdx}
+                    onClick={() => setLightboxIndex(pIdx)}
+                    className="cursor-pointer break-inside-avoid overflow-hidden rounded group relative shadow hover:opacity-95 transition-all bg-black/20"
+                  >
+                    <img
+                      src={urlFor(photo).width(1200).auto('format').fit('max').url()}
+                      alt=""
+                      className="w-full h-auto object-contain transition-transform duration-500 group-hover:scale-[1.02]"
+                      loading="lazy"
+                    />
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="text-center text-gray-300 py-24">
+                <p className="text-lg mb-6">No additional photos uploaded in this collection yet.</p>
+                {activeModalGallery.externalUrl && (
+                  <a
+                    href={activeModalGallery.externalUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-block bg-[#CDEDF6] text-slate-900 hover:bg-white px-8 py-3 rounded-full text-base transition-colors"
+                  >
+                    View Full Gallery on Pixieset ↗
+                  </a>
+                )}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* ── CLIENT GALLERY FULLSCREEN LIGHTBOX (OPENS ON TOP) ────── */}
+      {activeModalGallery?.photos && lightboxIndex !== null && activeModalGallery.photos[lightboxIndex] && (
+        <div
+          style={{ zIndex: 9999 }}
+          className="fixed inset-0 bg-black/95 flex items-center justify-center p-2 md:p-4 select-none cursor-pointer"
+          onClick={() => setLightboxIndex(null)}
+        >
+          {/* Close Button */}
+          <button
+            onClick={() => setLightboxIndex(null)}
+            className="absolute top-4 right-4 z-30 bg-white/10 hover:bg-white/25 text-white w-11 h-11 flex items-center justify-center rounded-full backdrop-blur-md transition-all text-xl cursor-pointer"
+            title="Close (Esc)"
+            aria-label="Close fullscreen"
+          >
+            ✕
+          </button>
+
+          {/* Left / Prev Arrow */}
+          {activeModalGallery.photos.length > 1 && (
+            <button
+              onClick={(e) => {
+                e.stopPropagation()
+                setLightboxIndex((prev) => (prev > 0 ? prev - 1 : activeModalGallery.photos.length - 1))
+              }}
+              className="absolute left-2 md:left-6 top-1/2 -translate-y-1/2 z-30 bg-white/10 hover:bg-white/30 text-white w-12 h-12 md:w-14 md:h-14 flex items-center justify-center rounded-full backdrop-blur-md transition-all text-2xl md:text-3xl cursor-pointer"
+              title="Previous photo (Left Arrow)"
+              aria-label="Previous photo"
+            >
+              ‹
+            </button>
+          )}
+
+          {/* Right / Next Arrow */}
+          {activeModalGallery.photos.length > 1 && (
+            <button
+              onClick={(e) => {
+                e.stopPropagation()
+                setLightboxIndex((prev) => (prev < activeModalGallery.photos.length - 1 ? prev + 1 : 0))
+              }}
+              className="absolute right-2 md:right-6 top-1/2 -translate-y-1/2 z-30 bg-white/10 hover:bg-white/30 text-white w-12 h-12 md:w-14 md:h-14 flex items-center justify-center rounded-full backdrop-blur-md transition-all text-2xl md:text-3xl cursor-pointer"
+              title="Next photo (Right Arrow)"
+              aria-label="Next photo"
+            >
+              ›
+            </button>
+          )}
+
+          {/* The Fullscreen Image - Natural Uploaded Aspect Ratio with Minimal Padding */}
+          <div
+            className="relative flex items-center justify-center max-w-full max-h-full"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <img
+              key={lightboxIndex}
+              src={urlFor(activeModalGallery.photos[lightboxIndex]).width(2400).auto('format').fit('max').url()}
+              alt=""
+              className="max-h-[96vh] max-w-[96vw] w-auto h-auto object-contain rounded-sm shadow-2xl transition-opacity duration-200"
+            />
+          </div>
+
+          {/* Photo Counter */}
+          {activeModalGallery.photos.length > 1 && (
+            <div
+              className="absolute bottom-4 left-1/2 -translate-x-1/2 z-30 bg-black/60 backdrop-blur-md px-4 py-1.5 rounded-full text-white/90 text-xs font-light tracking-widest uppercase"
+              onClick={(e) => e.stopPropagation()}
+            >
+              {lightboxIndex + 1} / {activeModalGallery.photos.length}
+            </div>
+          )}
+        </div>
+      )}
 
       {/* ── GENERAL FULLSCREEN LIGHTBOX (For About & Services galleries) ────── */}
       {generalLightbox?.photos && generalLightbox.index !== null && generalLightbox.photos[generalLightbox.index] && (
