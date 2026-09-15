@@ -494,7 +494,7 @@ function App() {
   const navPages = ['home', 'film', 'clients', 'about', 'services', 'contact']
 
   return (
-    <div className="bg-white">
+    <div className="bg-white min-h-screen w-full overflow-x-hidden">
       {/* ── Navigation ───────────────────────────────────────────────── */}
       <nav className="absolute top-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md shadow-sm py-4">
         <div className="max-w-7xl mx-auto px-6 flex items-center justify-between">
@@ -861,16 +861,18 @@ function App() {
             )}
 
             {/* About Preview */}
-            <section className="py-24 px-6 bg-gray-50">
-              <div className="max-w-6xl mx-auto grid md:grid-cols-2 gap-16 items-center">
-                <img
-                  src={aboutImageUrl || 'https://images.unsplash.com/photo-1554048612-b6a482bc67e5?w=800&h=1000&fit=crop'}
-                  alt="Braden"
-                  className="w-full h-[600px] object-cover"
-                />
-                <div>
-                  <h2 className="text-4xl md:text-5xl font-light mb-6 tracking-wide">{about?.title || 'Meet Braden'}</h2>
-                  <div className="space-y-4 text-gray-600 leading-relaxed">
+            <section className="py-24 px-6 bg-gray-50 overflow-hidden">
+              <div className="max-w-6xl mx-auto grid md:grid-cols-2 gap-12 md:gap-16 items-center min-w-0 w-full">
+                <div className="w-full min-w-0 flex justify-center">
+                  <img
+                    src={aboutImageUrl || 'https://images.unsplash.com/photo-1554048612-b6a482bc67e5?w=800&h=1000&fit=crop'}
+                    alt="Braden"
+                    className="w-full max-w-md md:max-w-none h-[420px] sm:h-[500px] md:h-[600px] object-cover rounded-sm shadow-md"
+                  />
+                </div>
+                <div className="min-w-0 w-full">
+                  <h2 className="text-3xl sm:text-4xl md:text-5xl font-light mb-6 tracking-wide break-words">{about?.title || 'Meet Braden'}</h2>
+                  <div className="space-y-4 text-gray-600 leading-relaxed break-words">
                     {renderBioText(about?.bio)}
                   </div>
                   <Link to="/about" className="mt-6 text-slate-900 hover:underline cursor-pointer inline-block">Learn More About Me →</Link>
@@ -881,13 +883,17 @@ function App() {
             {/* Services Preview - Using Green BG */}
             <section className="py-24 px-6 text-white text-center" style={{ backgroundColor: '#042A2B' }}>
               <h2 className="text-4xl md:text-5xl font-light mb-4 tracking-wide">Services</h2>
-              <div className="grid md:grid-cols-3 gap-8 max-w-7xl mx-auto mt-16">
+              <div className="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto mt-16">
                 {services.map((s) => (
-                  <div key={s._id} className="border border-white/20 p-8 hover:border-white/50 transition-colors bg-white/5 backdrop-blur-sm text-left">
-                    <h3 className="text-2xl font-light mb-3 tracking-wide">{s.title}</h3>
-                    {s.price && <div className="text-lg text-[#CDEDF6] font-light mb-4">{s.price}</div>}
-                    <p className="text-white/80 mb-6 leading-relaxed">{s.description || s.desc}</p>
-                    <Link to="/services" className="text-white hover:underline cursor-pointer font-light">View Details →</Link>
+                  <div key={s._id} className="border border-white/20 p-8 hover:border-white/50 transition-colors bg-white/5 backdrop-blur-sm text-left flex flex-col justify-between">
+                    <div>
+                      <h3 className="text-2xl font-light mb-3 tracking-wide">{s.title}</h3>
+                      {s.price && <div className="text-lg text-[#CDEDF6] font-light mb-4">{s.price}</div>}
+                      <p className="text-white/80 mb-6 leading-relaxed">{s.description || s.desc}</p>
+                    </div>
+                    <div className="mt-6">
+                      <Link to="/services" className="text-white hover:underline cursor-pointer font-light inline-block">View Details →</Link>
+                    </div>
                   </div>
                 ))}
               </div>
@@ -1118,14 +1124,16 @@ function App() {
 
         {/* ── ABOUT PAGE ────────────────────────────────────────────────── */}
         <Route path="/about" element={
-          <div className="pt-24 pb-16 bg-white min-h-screen">
-            <section className="max-w-7xl mx-auto px-6 mb-24">
-              <div className="grid lg:grid-cols-2 gap-16 items-center">
+          <div className="pt-24 pb-16 bg-white min-h-screen w-full overflow-x-hidden">
+            <section className="max-w-7xl mx-auto px-4 sm:px-6 mb-24 w-full min-w-0">
+              <div className="grid lg:grid-cols-2 gap-10 lg:gap-16 items-center min-w-0 w-full">
                 {/* Text Content (Left) */}
-                <div className="order-2 lg:order-1">
-                  <h1 className="text-5xl md:text-6xl font-light mb-8 tracking-wide">{about?.title || 'About Me'}</h1>
-                  <div className="space-y-6 text-gray-700 leading-relaxed text-lg">
-                    <p className="text-2xl font-light text-[#042A2B] mb-8">
+                <div className="order-2 lg:order-1 min-w-0 w-full">
+                  <h1 className="text-4xl sm:text-5xl lg:text-6xl font-light mb-6 sm:mb-8 tracking-wide break-words text-slate-900">
+                    {about?.title || 'About Me'}
+                  </h1>
+                  <div className="space-y-6 text-gray-700 leading-relaxed text-base sm:text-lg break-words">
+                    <p className="text-xl sm:text-2xl font-light text-[#042A2B] mb-6 sm:mb-8 leading-snug break-words">
                       {about?.tagline || "Hi, I'm Braden Blackburn — a photographer passionate about capturing the beauty in everyday moments."}
                     </p>
                     {renderBioText(about?.bio)}
@@ -1133,8 +1141,8 @@ function App() {
                 </div>
 
                 {/* Portrait Image (Right) */}
-                <div className="order-1 lg:order-2">
-                  <div className="relative aspect-[3/4] overflow-hidden rounded-sm shadow-xl">
+                <div className="order-1 lg:order-2 min-w-0 w-full flex justify-center">
+                  <div className="relative w-full max-w-md lg:max-w-lg aspect-[3/4] overflow-hidden rounded shadow-xl">
                     <img
                       src={aboutImageUrl || 'https://images.unsplash.com/photo-1554048612-b6a482bc67e5?w=1200&h=1600&fit=crop'}
                       alt="Braden Blackburn"
@@ -1147,17 +1155,17 @@ function App() {
 
             {/* Behind the Lens Gallery */}
             {about?.photos && Array.isArray(about.photos) && about.photos.length > 0 && (
-              <section className="max-w-7xl mx-auto px-6 mb-24">
+              <section className="max-w-7xl mx-auto px-4 sm:px-6 mb-24 w-full min-w-0">
                 <div className="text-center mb-12 border-t border-gray-100 pt-16">
                   <h2 className="text-3xl md:text-4xl font-light tracking-wide text-slate-900 mb-3">Behind the Lens</h2>
                   <p className="text-gray-500 font-light text-base">Moments, adventures, and life behind the camera</p>
                 </div>
-                <div className="columns-1 sm:columns-2 lg:columns-3 gap-6 space-y-6">
+                <div className="columns-1 sm:columns-2 lg:columns-3 gap-6">
                   {about.photos.map((photo, pIdx) => (
                     <div
                       key={photo._key || pIdx}
                       onClick={() => setGeneralLightbox({ photos: about.photos, index: pIdx, title: 'Behind the Lens' })}
-                      className="cursor-pointer break-inside-avoid overflow-hidden rounded group relative shadow-sm hover:shadow-md transition-all bg-gray-50"
+                      className="cursor-pointer break-inside-avoid mb-6 overflow-hidden rounded group relative shadow-sm hover:shadow-md transition-all bg-gray-50"
                     >
                       <img
                         src={urlFor(photo).width(1000).auto('format').fit('max').url()}
