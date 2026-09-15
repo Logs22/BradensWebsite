@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo } from 'react'
 import { createClient } from '@sanity/client'
 import imageUrlBuilder from '@sanity/image-url'
-import { Routes, Route, Link, useLocation } from 'react-router-dom'
+import { Routes, Route, Link, useLocation, Navigate } from 'react-router-dom'
 import './App.css'
 
 // ── SANITY SETUP ────────────────────────────────────────────────────────
@@ -21,6 +21,7 @@ function urlFor(source) {
 const HERO_QUERY = `*[_type == "hero"][0]{ heading, subheading, backgroundImage, photos }`
 const ABOUT_QUERY = `*[_type == "about"][0]{ title, tagline, bio, profileImage, photos }`
 const PORTFOLIO_QUERY = `*[_type == "portfolioImage"] | order(_createdAt desc) { _id, title, image, photos, caption, category, featured, _createdAt }`
+const CLIENTS_PAGE_QUERY = `*[_type == "clientsPage"][0]{ title, subtitle, homeHeading, homeSubtitle }`
 const CLIENT_GALLERIES_QUERY = `*[_type == "clientGallery"] | order(date desc, _createdAt desc) {
   _id,
   title,
@@ -33,8 +34,7 @@ const CLIENT_GALLERIES_QUERY = `*[_type == "clientGallery"] | order(date desc, _
 }`
 const SERVICES_QUERY = `*[_type == "service"] | order(order asc, _createdAt asc) { _id, title, description, features, price, image, photos }`
 const SERVICES_PAGE_QUERY = `*[_type == "servicesPage"][0]{ title, subtitle }`
-const PORTFOLIO_PAGE_QUERY = `*[_type == "portfolioPage"][0]{ title, subtitle, homeHeading, homeSubtitle }`
-const CLIENTS_PAGE_QUERY = `*[_type == "clientsPage"][0]{ title, subtitle, homeHeading, homeSubtitle }`
+const FILM_PAGE_QUERY = `*[_type in ["filmPage", "portfolioPage"]][0]{ title, subtitle, homeHeading, homeSubtitle }`
 const CONTACT_QUERY = `*[_type == "contact"][0]{ location, phone, email, instagram, instagramUrl, responseTime, bookingNotice, web3FormsAccessKey }`
 
 // ── HELPER: FORMAT DISPLAY DATE ─────────────────────────────────────────
@@ -114,7 +114,7 @@ function App() {
 
   const [services, setServices] = useState([])
   const [servicesPage, setServicesPage] = useState(null)
-  const [portfolioPage, setPortfolioPage] = useState(null)
+  const [filmPage, setFilmPage] = useState(null)
   const [clientsPage, setClientsPage] = useState(null)
   const [contact, setContact] = useState(null)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
@@ -235,7 +235,7 @@ function App() {
   useEffect(() => {
     const fetchSanityData = async () => {
       try {
-        const [heroData, aboutData, portfolioData, clientData, servicesData, contactData, servicesPageData, portfolioPageData, clientsPageData] = await Promise.all([
+        const [heroData, aboutData, portfolioData, clientData, servicesData, contactData, servicesPageData, filmPageData, clientsPageData] = await Promise.all([
           client.fetch(HERO_QUERY),
           client.fetch(ABOUT_QUERY),
           client.fetch(PORTFOLIO_QUERY),
@@ -243,7 +243,7 @@ function App() {
           client.fetch(SERVICES_QUERY),
           client.fetch(CONTACT_QUERY),
           client.fetch(SERVICES_PAGE_QUERY),
-          client.fetch(PORTFOLIO_PAGE_QUERY),
+          client.fetch(FILM_PAGE_QUERY),
           client.fetch(CLIENTS_PAGE_QUERY),
         ])
 
@@ -304,7 +304,7 @@ function App() {
 
         if (servicesData) setServices(servicesData)
         if (servicesPageData) setServicesPage(servicesPageData)
-        if (portfolioPageData) setPortfolioPage(portfolioPageData)
+        if (filmPageData) setFilmPage(filmPageData)
         if (clientsPageData) setClientsPage(clientsPageData)
         if (contactData) setContact(contactData)
 
@@ -322,6 +322,20 @@ function App() {
     setActiveFilter(category)
     if (category === 'all') {
       setFilteredPortfolio(portfolio)
+    } else if (category === '35mm') {
+      setFilteredPortfolio(
+        portfolio.filter(item => {
+          const cat = item.category?.toLowerCase() || ''
+          return cat === '35mm' || cat.includes('35mm')
+        })
+      )
+    } else if (category === '120') {
+      setFilteredPortfolio(
+        portfolio.filter(item => {
+          const cat = item.category?.toLowerCase() || ''
+          return cat === '120' || cat.includes('120') || cat.includes('medium')
+        })
+      )
     } else if (category === 'sporting events' || category === 'sporting-events') {
       setFilteredPortfolio(
         portfolio.filter(item => {
@@ -477,7 +491,7 @@ function App() {
     return location.pathname === `/${path}`
   }
 
-  const navPages = ['home', 'portfolio', 'clients', 'about', 'services', 'contact']
+  const navPages = ['home', 'film', 'clients', 'about', 'services', 'contact']
 
   return (
     <div className="bg-white">
@@ -559,10 +573,10 @@ function App() {
                 )}
                 <div className="flex flex-wrap justify-center gap-4">
                   <Link
-                    to="/portfolio"
+                    to="/film"
                     className="bg-[#CDEDF6] text-slate-900 hover:bg-white rounded-full px-8 py-4 text-base tracking-wide transition-colors cursor-pointer inline-block"
                   >
-                    View Portfolio →
+                    Explore Film →
                   </Link>
                   <Link
                     to="/clients"
@@ -596,10 +610,10 @@ function App() {
             <section className="py-24 px-6 bg-gray-50">
               <div className="max-w-7xl mx-auto text-center mb-16">
                 <h2 className="text-4xl md:text-5xl font-light mb-4 tracking-wide">
-                  {portfolioPage?.homeHeading || 'Featured Work'}
+                  {filmPage?.homeHeading || 'Film Photography'}
                 </h2>
                 <p className="text-gray-500 font-light text-base max-w-xl mx-auto whitespace-pre-line">
-                  {portfolioPage?.homeSubtitle || 'A curated selection of highlighted moments and signature captures'}
+                  {filmPage?.homeSubtitle || 'A curated selection of analog moments captured on 35mm and medium format film.'}
                 </p>
 
                 {/* Natural uploaded aspect ratio photo columns with balanced layout */}
@@ -701,10 +715,10 @@ function App() {
                   </div>
                 )}
                 <Link
-                  to="/portfolio"
+                  to="/film"
                   className="inline-block mt-8 bg-[#CDEDF6] text-slate-900 hover:bg-white rounded-full px-8 py-3 border border-gray-300 transition-all duration-300 cursor-pointer"
                 >
-                  Explore Full Portfolio →
+                  Explore Film Gallery →
                 </Link>
               </div>
             </section>
@@ -887,30 +901,40 @@ function App() {
           </div>
         } />
 
-        {/* ── PORTFOLIO PAGE ────────────────────────────────────────────── */}
-        <Route path="/portfolio" element={
+        {/* ── REDIRECT /PORTFOLIO TO /FILM ─────────────────────────────── */}
+        <Route path="/portfolio" element={<Navigate to="/film" replace />} />
+
+        {/* ── FILM PAGE ─────────────────────────────────────────────────── */}
+        <Route path="/film" element={
           <div className="pt-24 pb-16 bg-white min-h-screen">
             <div className="max-w-7xl mx-auto px-6">
               <div className="text-center mb-16">
                 <h1 className="text-5xl md:text-6xl font-light mb-4 tracking-wide">
-                  {portfolioPage?.title || 'Portfolio'}
+                  {filmPage?.title || 'Film Photography'}
                 </h1>
                 <p className="text-gray-600 text-lg font-light whitespace-pre-line">
-                  {portfolioPage?.subtitle || 'A collection of my favorite moments'}
+                  {filmPage?.subtitle || 'A curated collection of analog moments captured on 35mm and medium format film.'}
                 </p>
               </div>
 
               <div className="flex flex-wrap justify-center gap-4 mb-12">
                 {[
-                  { id: 'all', label: 'All' },
-                  { id: 'weddings', label: 'Weddings' },
-                  { id: 'portraits', label: 'Portraits' },
-                  { id: 'sporting events', label: 'Sporting Events' },
-                  { id: 'film', label: 'Film' },
+                  { id: 'all', label: 'All Film' },
+                  { id: '35mm', label: '35mm Film' },
+                  { id: '120', label: '120 Medium Format' },
+                  ...(portfolio.some(p => p.category?.toLowerCase() === 'film') ? [{ id: 'film', label: 'General Film' }] : []),
+                  ...(portfolio.some(p => ['weddings', 'portraits', 'events', 'sporting events'].includes(p.category?.toLowerCase())) ? [{ id: 'other', label: 'Other Work' }] : []),
                 ].map(({ id, label }) => (
                   <button
                     key={id}
-                    onClick={() => filterPortfolio(id)}
+                    onClick={() => {
+                      if (id === 'other') {
+                        setActiveFilter('other')
+                        setFilteredPortfolio(portfolio.filter(item => ['weddings', 'portraits', 'events', 'sporting events'].includes(item.category?.toLowerCase())))
+                      } else {
+                        filterPortfolio(id)
+                      }
+                    }}
                     className={`px-6 py-2 rounded-full text-sm tracking-wide transition-colors cursor-pointer ${
                       activeFilter === id
                         ? 'bg-[#CDEDF6] text-slate-900'
@@ -923,7 +947,7 @@ function App() {
               </div>
 
               {filteredPortfolio.length === 0 ? (
-                <p className="text-center text-gray-500 py-20">No images in this category yet.</p>
+                <p className="text-center text-gray-500 py-20">No film photos in this category yet.</p>
               ) : (
                 <div className="columns-1 sm:columns-2 lg:columns-3 gap-6">
                   {filteredPortfolio.map((item, idx) => (
@@ -935,7 +959,7 @@ function App() {
                       {item.image && (
                         <img
                           src={urlFor(item.image).width(1200).auto('format').fit('max').url()}
-                          alt={item.title || 'Portfolio image'}
+                          alt={item.title || 'Film photography'}
                           className="w-full h-auto object-contain block transition-transform duration-700 group-hover:scale-[1.02]"
                           loading="lazy"
                         />

@@ -2,27 +2,30 @@ import { BulkPhotosInput } from '../components/BulkPhotosInput'
 
 export default {
   name: 'portfolioImage',
-  title: 'Portfolio Photos',
+  title: 'Film Photos',
   type: 'document',
   fields: [
     {
       name: 'title',
-      title: 'Title / Shoot Name',
+      title: 'Roll / Shoot Title',
       type: 'string',
-      description: 'A brief title or description (e.g., "35mm Film Shoot", "Sam & Nicole Wedding", "Senior Portrait").',
+      description: 'A brief title or roll name (e.g., "35mm Film Shoot", "The Aaron\'s Wedding", "Medium Format Portraits").',
       validation: (Rule) => Rule.required(),
     },
     {
       name: 'category',
-      title: 'Category',
+      title: 'Film Format / Category',
       type: 'string',
-      description: 'Choose which portfolio tab these photos will appear under.',
+      description: 'Choose the film format or style for this photo set.',
+      initialValue: 'film',
       options: {
         list: [
+          { title: 'Film (General)', value: 'film' },
+          { title: '35mm Film', value: '35mm' },
+          { title: '120 Medium Format', value: '120' },
           { title: 'Weddings', value: 'weddings' },
           { title: 'Portraits', value: 'portraits' },
           { title: 'Sporting Events', value: 'sporting events' },
-          { title: 'Film', value: 'film' },
         ],
         layout: 'radio',
       },
@@ -96,19 +99,21 @@ export default {
     },
     prepare({ title, category, featured, media, photos }) {
       const categoryMap = {
-        'weddings': 'Weddings',
-        'portraits': 'Portraits',
-        'sporting events': 'Sporting Events',
-        'events': 'Sporting Events',
+        '35mm': '35mm Film',
+        '120': '120 Medium Format',
         'film': 'Film',
+        'weddings': 'Weddings (Film)',
+        'portraits': 'Portraits (Film)',
+        'sporting events': 'Sporting Events (Film)',
+        'events': 'Sporting Events (Film)',
       }
-      const categoryLabel = (category && categoryMap[category.toLowerCase()]) || (category ? category.charAt(0).toUpperCase() + category.slice(1) : 'No category')
+      const categoryLabel = (category && categoryMap[category.toLowerCase()]) || (category ? category.charAt(0).toUpperCase() + category.slice(1) : 'Film')
       const featuredLabel = featured ? ' ⭐ Featured' : ''
       const count = photos ? photos.length : 0
       const countLabel = count > 0 ? ` (${count} photo${count === 1 ? '' : 's'})` : ''
       const firstMedia = media || (photos && photos[0])
       return {
-        title: title || 'Untitled Portfolio Photo',
+        title: title || 'Untitled Film Photo',
         subtitle: `${categoryLabel}${countLabel}${featuredLabel}`,
         media: firstMedia,
       }
