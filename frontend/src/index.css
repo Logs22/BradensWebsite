@@ -8,6 +8,28 @@
 
 html, body {
   overflow-x: hidden;
+  max-width: 100vw;
+  width: 100%;
+  -webkit-text-size-adjust: 100%;
+}
+
+/* Universal text wrapping across all mobile device screen sizes */
+a, p, span, h1, h2, h3, h4, h5, h6, label, div {
+  overflow-wrap: break-word;
+}
+
+/* Ensure long email addresses, URLs, and continuous strings break cleanly on narrow screens */
+a {
+  overflow-wrap: anywhere;
+}
+
+/* Prevent iOS Safari automatic page zoom on form field focus */
+input, select, textarea {
+  font-size: 16px !important;
+}
+
+/* Media responsive containment */
+img, svg, video, iframe {
   max-width: 100%;
 }
 

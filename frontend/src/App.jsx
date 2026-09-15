@@ -496,9 +496,9 @@ function App() {
   return (
     <div className="bg-white min-h-screen w-full overflow-x-hidden">
       {/* ── Navigation ───────────────────────────────────────────────── */}
-      <nav className="absolute top-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md shadow-sm py-4">
-        <div className="max-w-7xl mx-auto px-6 flex items-center justify-between">
-          <Link to="/" className="text-2xl font-light tracking-wider cursor-pointer">
+      <nav className="absolute top-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md shadow-sm py-4 w-full">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 flex items-center justify-between min-w-0 w-full">
+          <Link to="/" className="text-xl sm:text-2xl font-light tracking-wider cursor-pointer truncate min-w-0">
             <span className="text-slate-900">BRADEN</span>
             <span className="ml-1 font-normal text-slate-900">BLACKBURN</span>
           </Link>
@@ -520,7 +520,7 @@ function App() {
             ))}
           </div>
 
-          <button onClick={() => setMobileMenuOpen(!mobileMenuOpen)} className="md:hidden text-slate-900">
+          <button onClick={() => setMobileMenuOpen(!mobileMenuOpen)} className="md:hidden text-slate-900 shrink-0 p-1" aria-label="Toggle menu">
             <svg width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2">
               <line x1="3" y1="12" x2="21" y2="12" /><line x1="3" y1="6" x2="21" y2="6" /><line x1="3" y1="18" x2="21" y2="18" />
             </svg>
@@ -529,7 +529,7 @@ function App() {
 
         {mobileMenuOpen && (
           <div className="md:hidden bg-white border-t">
-            <div className="max-w-7xl mx-auto px-6 py-4 space-y-4">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4 space-y-4">
               {navPages.map(page => (
                 <Link
                   key={page}
@@ -560,27 +560,27 @@ function App() {
                 />
               ))}
               <div className="absolute inset-0 bg-black/30" />
-              <div className="relative text-center text-white px-6 z-10">
+              <div className="relative text-center text-white px-4 sm:px-6 z-10 min-w-0 w-full">
                 {hero?.heading && (
-                  <h1 className="text-5xl md:text-7xl lg:text-8xl font-light tracking-wider mb-4">
+                  <h1 className="text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-light tracking-wider mb-4 break-words">
                     {hero.heading}
                   </h1>
                 )}
                 {hero?.subheading && (
-                  <p className="text-lg md:text-xl text-gray-200 mb-8 font-light tracking-wide max-w-2xl mx-auto">
+                  <p className="text-base sm:text-lg md:text-xl text-gray-200 mb-8 font-light tracking-wide max-w-2xl mx-auto break-words">
                     {hero.subheading}
                   </p>
                 )}
-                <div className="flex flex-wrap justify-center gap-4">
+                <div className="flex flex-wrap justify-center gap-3 sm:gap-4 px-2">
                   <Link
                     to="/film"
-                    className="bg-[#CDEDF6] text-slate-900 hover:bg-white rounded-full px-8 py-4 text-base tracking-wide transition-colors cursor-pointer inline-block"
+                    className="bg-[#CDEDF6] text-slate-900 hover:bg-white rounded-full px-6 sm:px-8 py-3.5 sm:py-4 text-sm sm:text-base tracking-wide transition-colors cursor-pointer inline-block"
                   >
                     Explore Film →
                   </Link>
                   <Link
                     to="/clients"
-                    className="bg-white/10 hover:bg-white text-white hover:text-slate-900 backdrop-blur-sm border border-white/40 rounded-full px-8 py-4 text-base tracking-wide transition-colors cursor-pointer inline-block"
+                    className="bg-white/10 hover:bg-white text-white hover:text-slate-900 backdrop-blur-sm border border-white/40 rounded-full px-6 sm:px-8 py-3.5 sm:py-4 text-sm sm:text-base tracking-wide transition-colors cursor-pointer inline-block"
                   >
                     Client Galleries →
                   </Link>
@@ -607,12 +607,12 @@ function App() {
             </section>
 
             {/* Featured Work */}
-            <section className="py-24 px-6 bg-gray-50">
-              <div className="max-w-7xl mx-auto text-center mb-16">
-                <h2 className="text-4xl md:text-5xl font-light mb-4 tracking-wide">
+            <section className="py-20 sm:py-24 px-4 sm:px-6 bg-gray-50 overflow-hidden w-full">
+              <div className="max-w-7xl mx-auto text-center mb-16 min-w-0 w-full">
+                <h2 className="text-3xl sm:text-4xl md:text-5xl font-light mb-4 tracking-wide break-words">
                   {filmPage?.homeHeading || 'Film Photography'}
                 </h2>
-                <p className="text-gray-500 font-light text-base max-w-xl mx-auto whitespace-pre-line">
+                <p className="text-gray-500 font-light text-base max-w-xl mx-auto whitespace-pre-line break-words">
                   {filmPage?.homeSubtitle || 'A curated selection of analog moments captured on 35mm and medium format film.'}
                 </p>
 
@@ -802,15 +802,15 @@ function App() {
 
             {/* Client Galleries Teaser */}
             {clientGalleries.length > 0 && (
-              <section className="py-24 px-6 bg-white">
-                <div className="max-w-7xl mx-auto text-center">
-                  <h2 className="text-4xl md:text-5xl font-light mb-4 tracking-wide">
+              <section className="py-20 sm:py-24 px-4 sm:px-6 bg-white overflow-hidden w-full">
+                <div className="max-w-7xl mx-auto text-center min-w-0 w-full">
+                  <h2 className="text-3xl sm:text-4xl md:text-5xl font-light mb-4 tracking-wide break-words">
                     {clientsPage?.homeHeading || 'Client Stories'}
                   </h2>
-                  <p className="text-gray-500 font-light mb-12 whitespace-pre-line">
+                  <p className="text-gray-500 font-light mb-12 whitespace-pre-line break-words">
                     {clientsPage?.homeSubtitle || 'Discover recent client sessions and featured stories'}
                   </p>
-                  <div className="columns-1 md:columns-3 gap-8 text-center">
+                  <div className="columns-1 md:columns-3 gap-8 text-center min-w-0 w-full">
                     {clientGalleries.slice(0, 3).map(cg => (
                       <div
                         key={cg._id}
@@ -841,7 +841,7 @@ function App() {
                           </div>
                         </div>
                         <div className="space-y-1">
-                          <h3 className="text-lg md:text-xl font-light tracking-[0.12em] uppercase text-slate-900 group-hover:text-gray-600 transition-colors">
+                          <h3 className="text-lg md:text-xl font-light tracking-[0.12em] uppercase text-slate-900 group-hover:text-gray-600 transition-colors break-words">
                             {cg.title}
                           </h3>
                           {cg.date && (
@@ -861,7 +861,7 @@ function App() {
             )}
 
             {/* About Preview */}
-            <section className="py-24 px-6 bg-gray-50 overflow-hidden">
+            <section className="py-20 sm:py-24 px-4 sm:px-6 bg-gray-50 overflow-hidden w-full">
               <div className="max-w-6xl mx-auto grid md:grid-cols-2 gap-12 md:gap-16 items-center min-w-0 w-full">
                 <div className="w-full min-w-0 flex justify-center">
                   <img
@@ -881,15 +881,15 @@ function App() {
             </section>
 
             {/* Services Preview - Using Green BG */}
-            <section className="py-24 px-6 text-white text-center" style={{ backgroundColor: '#042A2B' }}>
-              <h2 className="text-4xl md:text-5xl font-light mb-4 tracking-wide">Services</h2>
-              <div className="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto mt-16">
+            <section className="py-20 sm:py-24 px-4 sm:px-6 text-white text-center overflow-hidden w-full" style={{ backgroundColor: '#042A2B' }}>
+              <h2 className="text-3xl sm:text-4xl md:text-5xl font-light mb-4 tracking-wide break-words">Services</h2>
+              <div className="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto mt-16 min-w-0 w-full">
                 {services.map((s) => (
-                  <div key={s._id} className="border border-white/20 p-8 hover:border-white/50 transition-colors bg-white/5 backdrop-blur-sm text-left flex flex-col justify-between">
+                  <div key={s._id} className="border border-white/20 p-6 sm:p-8 hover:border-white/50 transition-colors bg-white/5 backdrop-blur-sm text-left flex flex-col justify-between min-w-0 w-full">
                     <div>
-                      <h3 className="text-2xl font-light mb-3 tracking-wide">{s.title}</h3>
-                      {s.price && <div className="text-lg text-[#CDEDF6] font-light mb-4">{s.price}</div>}
-                      <p className="text-white/80 mb-6 leading-relaxed">{s.description || s.desc}</p>
+                      <h3 className="text-xl sm:text-2xl font-light mb-3 tracking-wide break-words">{s.title}</h3>
+                      {s.price && <div className="text-base sm:text-lg text-[#CDEDF6] font-light mb-4 break-words">{s.price}</div>}
+                      <p className="text-white/80 mb-6 leading-relaxed break-words text-sm sm:text-base">{s.description || s.desc}</p>
                     </div>
                     <div className="mt-6">
                       <Link to="/services" className="text-white hover:underline cursor-pointer font-light inline-block">View Details →</Link>
@@ -900,9 +900,9 @@ function App() {
             </section>
 
             {/* CTA */}
-            <section className="py-24 px-6 text-center">
-              <h2 className="text-4xl md:text-5xl font-light mb-6 tracking-wide">Let's Create Something Beautiful</h2>
-              <Link to="/contact" className="inline-block rounded-full px-12 py-4 text-slate-900 text-base tracking-wide cursor-pointer bg-[#CDEDF6] hover:bg-white transition-colors">Get In Touch</Link>
+            <section className="py-20 sm:py-24 px-4 sm:px-6 text-center overflow-hidden w-full">
+              <h2 className="text-3xl sm:text-4xl md:text-5xl font-light mb-6 tracking-wide break-words">Let's Create Something Beautiful</h2>
+              <Link to="/contact" className="inline-block rounded-full px-8 sm:px-12 py-3.5 sm:py-4 text-slate-900 text-base tracking-wide cursor-pointer bg-[#CDEDF6] hover:bg-white transition-colors">Get In Touch</Link>
             </section>
           </div>
         } />
@@ -912,18 +912,18 @@ function App() {
 
         {/* ── FILM PAGE ─────────────────────────────────────────────────── */}
         <Route path="/film" element={
-          <div className="pt-24 pb-16 bg-white min-h-screen">
-            <div className="max-w-7xl mx-auto px-6">
-              <div className="text-center mb-16">
-                <h1 className="text-5xl md:text-6xl font-light mb-4 tracking-wide">
+          <div className="pt-24 pb-16 bg-white min-h-screen w-full overflow-x-hidden">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 min-w-0 w-full">
+              <div className="text-center mb-12 sm:mb-16 min-w-0 w-full">
+                <h1 className="text-4xl sm:text-5xl lg:text-6xl font-light mb-4 tracking-wide break-words text-slate-900">
                   {filmPage?.title || 'Film Photography'}
                 </h1>
-                <p className="text-gray-600 text-lg font-light whitespace-pre-line">
+                <p className="text-gray-600 text-base sm:text-lg font-light whitespace-pre-line break-words">
                   {filmPage?.subtitle || 'A curated collection of analog moments captured on 35mm and medium format film.'}
                 </p>
               </div>
 
-              <div className="flex flex-wrap justify-center gap-4 mb-12">
+              <div className="flex flex-wrap justify-center gap-2.5 sm:gap-4 mb-12">
                 {[
                   { id: 'all', label: 'All Film' },
                   { id: '35mm', label: '35mm Film' },
@@ -941,7 +941,7 @@ function App() {
                         filterPortfolio(id)
                       }
                     }}
-                    className={`px-6 py-2 rounded-full text-sm tracking-wide transition-colors cursor-pointer ${
+                    className={`px-4 sm:px-6 py-2 rounded-full text-xs sm:text-sm tracking-wide transition-colors cursor-pointer ${
                       activeFilter === id
                         ? 'bg-[#CDEDF6] text-slate-900'
                         : 'bg-gray-100 text-gray-700 hover:bg-[#CDEDF6] hover:text-slate-900'
@@ -1057,13 +1057,13 @@ function App() {
 
         {/* ── CLIENTS PAGE (PIXIESET STYLE) ────────────────────────────── */}
         <Route path="/clients" element={
-          <div className="pt-24 pb-16 bg-white min-h-screen">
-            <div className="max-w-7xl mx-auto px-6">
-              <div className="text-center mb-16">
-                <h1 className="text-5xl md:text-6xl font-light mb-4 tracking-wide">
+          <div className="pt-24 pb-16 bg-white min-h-screen w-full overflow-x-hidden">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 min-w-0 w-full">
+              <div className="text-center mb-12 sm:mb-16 min-w-0 w-full">
+                <h1 className="text-4xl sm:text-5xl lg:text-6xl font-light mb-4 tracking-wide break-words text-slate-900">
                   {clientsPage?.title || 'Client Galleries'}
                 </h1>
-                <p className="text-gray-600 text-lg font-light whitespace-pre-line">
+                <p className="text-gray-600 text-base sm:text-lg font-light whitespace-pre-line break-words">
                   {clientsPage?.subtitle || 'Client stories, weddings, and featured collections'}
                 </p>
               </div>
@@ -1074,7 +1074,7 @@ function App() {
                   <p className="text-gray-400 text-sm font-light">Add your first client shoot in Sanity Studio under "Client Gallery"!</p>
                 </div>
               ) : (
-                <div className="columns-1 md:columns-2 lg:columns-3 gap-10 text-center">
+                <div className="columns-1 md:columns-2 lg:columns-3 gap-6 sm:gap-10 text-center min-w-0 w-full">
                   {clientGalleries.map((gallery) => (
                     <div
                       key={gallery._id}
@@ -1183,20 +1183,20 @@ function App() {
 
         {/* ── SERVICES PAGE ─────────────────────────────────────────────── */}
         <Route path="/services" element={
-          <div className="pt-24 pb-16 bg-white min-h-screen">
-            <section className="max-w-5xl mx-auto px-6 mb-20 text-center">
-              <h1 className="text-5xl md:text-6xl font-light mb-6 tracking-wide">
+          <div className="pt-24 pb-16 bg-white min-h-screen w-full overflow-x-hidden">
+            <section className="max-w-5xl mx-auto px-4 sm:px-6 mb-16 sm:mb-20 text-center min-w-0 w-full">
+              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-light mb-4 sm:mb-6 tracking-wide break-words text-slate-900">
                 {servicesPage?.title || 'Services & Investment'}
               </h1>
-              <p className="text-gray-600 text-lg font-light max-w-2xl mx-auto leading-relaxed whitespace-pre-line">
+              <p className="text-gray-600 text-base sm:text-lg font-light max-w-2xl mx-auto leading-relaxed whitespace-pre-line break-words">
                 {servicesPage?.subtitle || 'Quality photography is an investment in memories that last a lifetime. I offer flexible packages to suit your needs and budget.'}
               </p>
             </section>
 
-            <section className="max-w-7xl mx-auto px-6 mb-20">
-              <div className="space-y-20">
+            <section className="max-w-7xl mx-auto px-4 sm:px-6 mb-20 min-w-0 w-full">
+              <div className="space-y-16 sm:space-y-20 min-w-0 w-full">
                 {services.map((service, idx) => (
-                  <div key={service._id} className="grid md:grid-cols-2 gap-12 items-center">
+                  <div key={service._id} className="grid md:grid-cols-2 gap-8 md:gap-12 items-center min-w-0 w-full">
                     <div className={idx % 2 !== 0 ? 'md:order-2' : ''}>
                       {(service.image || (service.photos && service.photos[0])) && (
                         <div
@@ -1274,48 +1274,48 @@ function App() {
 
         {/* ── CONTACT PAGE ──────────────────────────────────────────────── */}
         <Route path="/contact" element={
-          <div className="pt-24 pb-16 bg-white min-h-screen">
-            <section className="max-w-5xl mx-auto px-6 mb-20 text-center">
-              <h1 className="text-5xl md:text-6xl font-light mb-6 tracking-wide">Let's Connect</h1>
-              <p className="text-gray-600 text-lg font-light max-w-2xl mx-auto leading-relaxed">
+          <div className="pt-24 pb-16 bg-white min-h-screen w-full overflow-x-hidden">
+            <section className="max-w-5xl mx-auto px-4 sm:px-6 mb-16 sm:mb-20 text-center min-w-0 w-full">
+              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-light mb-4 sm:mb-6 tracking-wide break-words text-slate-900">Let's Connect</h1>
+              <p className="text-gray-600 text-base sm:text-lg font-light max-w-2xl mx-auto leading-relaxed break-words">
                 Ready to capture your story? Fill out the form below or reach out directly.
               </p>
             </section>
 
-            <div className="max-w-7xl mx-auto px-6">
-              <div className="grid lg:grid-cols-5 gap-16">
-                <div className="lg:col-span-3">
-                  <form onSubmit={handleContactSubmit} className="space-y-6">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 min-w-0 w-full">
+              <div className="grid lg:grid-cols-5 gap-10 lg:gap-16 min-w-0 w-full">
+                <div className="lg:col-span-3 min-w-0 w-full">
+                  <form onSubmit={handleContactSubmit} className="space-y-6 min-w-0 w-full">
                     {formStatus.state === 'success' && (
-                      <div className="p-4 bg-emerald-50 border border-emerald-200 text-emerald-800 rounded-md text-sm">
+                      <div className="p-4 bg-emerald-50 border border-emerald-200 text-emerald-800 rounded-md text-sm break-words">
                         {formStatus.message}
                       </div>
                     )}
                     {formStatus.state === 'error' && (
-                      <div className="p-4 bg-rose-50 border border-rose-200 text-rose-800 rounded-md text-sm">
+                      <div className="p-4 bg-rose-50 border border-rose-200 text-rose-800 rounded-md text-sm break-words">
                         {formStatus.message}
                       </div>
                     )}
 
-                    <div className="grid md:grid-cols-2 gap-6">
-                      <div className="space-y-2">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 min-w-0 w-full">
+                      <div className="space-y-2 min-w-0 w-full">
                         <label className="text-gray-700 block text-sm">Full Name *</label>
-                        <input name="name" required className="border border-gray-300 p-3 w-full rounded focus:outline-none focus:border-gray-900" placeholder="Jane Smith" />
+                        <input name="name" required className="border border-gray-300 p-3 w-full rounded text-base focus:outline-none focus:border-gray-900" placeholder="Jane Smith" />
                       </div>
-                      <div className="space-y-2">
+                      <div className="space-y-2 min-w-0 w-full">
                         <label className="text-gray-700 block text-sm">Email Address *</label>
-                        <input name="email" type="email" required className="border border-gray-300 p-3 w-full rounded focus:outline-none focus:border-gray-900" placeholder="jane@example.com" />
+                        <input name="email" type="email" required className="border border-gray-300 p-3 w-full rounded text-base focus:outline-none focus:border-gray-900" placeholder="jane@example.com" />
                       </div>
                     </div>
 
-                    <div className="grid md:grid-cols-2 gap-6">
-                      <div className="space-y-2">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 min-w-0 w-full">
+                      <div className="space-y-2 min-w-0 w-full">
                         <label className="text-gray-700 block text-sm">Phone Number</label>
-                        <input name="phone" type="tel" className="border border-gray-300 p-3 w-full rounded focus:outline-none focus:border-gray-900" placeholder="(555) 123-4567" />
+                        <input name="phone" type="tel" className="border border-gray-300 p-3 w-full rounded text-base focus:outline-none focus:border-gray-900" placeholder="(555) 123-4567" />
                       </div>
-                      <div className="space-y-2">
+                      <div className="space-y-2 min-w-0 w-full">
                         <label className="text-gray-700 block text-sm">Service Type *</label>
-                        <select name="service" required className="border border-gray-300 p-3 w-full rounded focus:outline-none focus:border-gray-900">
+                        <select name="service" required className="border border-gray-300 p-3 w-full rounded text-base bg-white focus:outline-none focus:border-gray-900">
                           <option value="">Select a service</option>
                           <option value="Weddings">Wedding Photography</option>
                           <option value="Portraits">Portrait Session</option>
@@ -1326,43 +1326,51 @@ function App() {
                       </div>
                     </div>
 
-                    <div className="space-y-2">
+                    <div className="space-y-2 min-w-0 w-full">
                       <label className="text-gray-700 block text-sm">Tell Me About Your Vision *</label>
-                      <textarea name="message" required className="border border-gray-300 p-3 w-full rounded min-h-[150px] focus:outline-none focus:border-gray-900" placeholder="Share details about your event, location preferences, style inspiration..." />
+                      <textarea name="message" required className="border border-gray-300 p-3 w-full rounded text-base min-h-[150px] focus:outline-none focus:border-gray-900" placeholder="Share details about your event, location preferences, style inspiration..." />
                     </div>
 
                     <button
                       type="submit"
                       disabled={formStatus.state === 'submitting'}
-                      className="w-full md:w-auto bg-[#CDEDF6] hover:bg-white rounded-full px-12 py-4 text-slate-900 text-base tracking-wide cursor-pointer disabled:opacity-60 transition-colors border border-transparent hover:border-slate-300"
+                      className="w-full sm:w-auto bg-[#CDEDF6] hover:bg-white rounded-full px-8 sm:px-12 py-3.5 sm:py-4 text-slate-900 text-base tracking-wide cursor-pointer disabled:opacity-60 transition-colors border border-transparent hover:border-slate-300"
                     >
                       {formStatus.state === 'submitting' ? 'Sending...' : 'Send Message'}
                     </button>
                   </form>
                 </div>
 
-                <div className="lg:col-span-2 space-y-8">
-                  <div className="bg-gray-50 p-8 rounded-lg">
-                    <h3 className="text-2xl font-light mb-6 tracking-wide">Get In Touch</h3>
-                    <div className="space-y-4 text-gray-700">
-                      <p>📍 {contact?.location || 'Fort Mitchell, Kentucky'}</p>
-                      <p>📞 {contact?.phone || '(555) 123-4567'}</p>
-                      <p>
-                        ✉️{' '}
+                <div className="lg:col-span-2 space-y-6 sm:space-y-8 min-w-0 w-full">
+                  <div className="bg-gray-50 p-6 sm:p-8 rounded-lg min-w-0 w-full">
+                    <h3 className="text-xl sm:text-2xl font-light mb-6 tracking-wide">Get In Touch</h3>
+                    <div className="space-y-4 text-gray-700 text-sm sm:text-base">
+                      <p className="flex items-start gap-2.5 break-words">
+                        <span className="shrink-0 text-base">📍</span>
+                        <span>{contact?.location || 'Fort Mitchell, Kentucky'}</span>
+                      </p>
+                      <p className="flex items-start gap-2.5 break-words">
+                        <span className="shrink-0 text-base">📞</span>
+                        <a href={`tel:${contact?.phone || '(555) 123-4567'}`} className="hover:underline break-words">
+                          {contact?.phone || '(555) 123-4567'}
+                        </a>
+                      </p>
+                      <p className="flex items-start gap-2.5 min-w-0 w-full">
+                        <span className="shrink-0 text-base">✉️</span>
                         <a
                           href={`mailto:${contact?.email || 'contact@bradenblackburnphotography.com'}`}
-                          className="hover:underline"
+                          className="hover:underline break-all text-slate-900"
                         >
                           {contact?.email || 'contact@bradenblackburnphotography.com'}
                         </a>
                       </p>
-                      <p>
-                        📷{' '}
+                      <p className="flex items-start gap-2.5 min-w-0 w-full">
+                        <span className="shrink-0 text-base">📷</span>
                         <a
                           href={contact?.instagramUrl || 'https://www.instagram.com/blackburn_creative/'}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="hover:underline"
+                          className="hover:underline break-all text-slate-900"
                         >
                           {contact?.instagram || '@blackburn_creative'}
                         </a>
@@ -1370,16 +1378,16 @@ function App() {
                     </div>
                   </div>
 
-                  <div className="p-8 rounded-lg text-white" style={{ backgroundColor: '#042A2B' }}>
-                    <h3 className="text-xl font-light mb-4 tracking-wide">Response Time</h3>
-                    <p className="text-white/80 text-sm leading-relaxed">
+                  <div className="p-6 sm:p-8 rounded-lg text-white min-w-0 w-full" style={{ backgroundColor: '#042A2B' }}>
+                    <h3 className="text-lg sm:text-xl font-light mb-3 sm:mb-4 tracking-wide">Response Time</h3>
+                    <p className="text-white/80 text-sm leading-relaxed break-words">
                       {contact?.responseTime || "I typically respond to all inquiries within 24 hours. If you haven't heard back, please check your spam folder or reach out directly via phone."}
                     </p>
                   </div>
 
-                  <div className="border border-gray-200 p-8 rounded-lg">
-                    <h3 className="text-xl font-light mb-4 tracking-wide">Booking Notice</h3>
-                    <p className="text-gray-600 text-sm leading-relaxed">
+                  <div className="border border-gray-200 p-6 sm:p-8 rounded-lg min-w-0 w-full">
+                    <h3 className="text-lg sm:text-xl font-light mb-3 sm:mb-4 tracking-wide">Booking Notice</h3>
+                    <p className="text-gray-600 text-sm leading-relaxed break-words">
                       {contact?.bookingNotice || 'For weddings and large events, I recommend booking 6-12 months in advance. Portrait sessions can typically be scheduled within 2-4 weeks.'}
                     </p>
                   </div>
@@ -1619,11 +1627,11 @@ function App() {
       )}
 
       {/* ── FOOTER ────────────────────────────────────────────────────── */}
-      <footer className="text-white py-16 px-6" style={{ backgroundColor: '#042A2B' }}>
-        <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-12 mb-12 border-b border-white/20 pb-12 text-white">
-          <div>
-            <h3 className="text-2xl font-light tracking-widest mb-4">BRADEN <span className="font-normal">BLACKBURN</span></h3>
-            <p className="text-white/80 text-sm leading-relaxed max-w-xs">Based in {contact?.location || 'Kentucky'}.</p>
+      <footer className="text-white py-16 px-4 sm:px-6 w-full overflow-hidden" style={{ backgroundColor: '#042A2B' }}>
+        <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-10 md:gap-12 mb-12 border-b border-white/20 pb-12 text-white min-w-0 w-full">
+          <div className="min-w-0 w-full">
+            <h3 className="text-2xl font-light tracking-widest mb-4 break-words">BRADEN <span className="font-normal">BLACKBURN</span></h3>
+            <p className="text-white/80 text-sm leading-relaxed max-w-xs break-words">Based in {contact?.location || 'Kentucky'}.</p>
           </div>
           <div>
             <h4 className="text-sm font-semibold tracking-wider mb-6 uppercase">Quick Links</h4>
