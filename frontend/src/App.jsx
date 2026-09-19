@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useEffect, useMemo, useRef } from 'react'
 import { createClient } from '@sanity/client'
 import imageUrlBuilder from '@sanity/image-url'
 import { Routes, Route, Link, useLocation, Navigate } from 'react-router-dom'
@@ -232,6 +232,96 @@ function App() {
     return () => window.removeEventListener('keydown', handleKeyDown)
   }, [generalLightbox])
 
+  // Touch swipe handling for mobile lightboxes
+  const touchStartX = useRef(0)
+  const touchStartY = useRef(0)
+
+  const handleTouchStart = (e) => {
+    if (e.touches && e.touches.length > 0) {
+      touchStartX.current = e.touches[0].clientX
+      touchStartY.current = e.touches[0].clientY
+    }
+  }
+
+  const handleTouchEnd = (onNext, onPrev) => (e) => {
+    if (e.changedTouches && e.changedTouches.length > 0) {
+      const diffX = touchStartX.current - e.changedTouches[0].clientX
+      const diffY = touchStartY.current - e.changedTouches[0].clientY
+      if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > 40) {
+        if (diffX > 0) {
+          onNext()
+        } else {
+          onPrev()
+        }
+      }
+    }
+  }
+
+  // Preload a single Sanity image URL into browser cache
+  const preloadSanityImage = (source) => {
+    if (!source) return
+    try {
+      const img = new Image()
+      img.src = urlFor(source).width(2000).auto('format').fit('max').quality(85).url()
+    } catch (err) {}
+  }
+
+  // Preload first 5 images when client gallery modal opens
+  useEffect(() => {
+    if (!activeModalGallery?.photos?.length) return
+    activeModalGallery.photos.slice(0, 5).forEach(preloadSanityImage)
+  }, [activeModalGallery])
+
+  // Preload adjacent images in client gallery lightbox
+  useEffect(() => {
+    if (lightboxIndex === null || !activeModalGallery?.photos?.length) return
+    const photos = activeModalGallery.photos
+    const len = photos.length
+    if (len <= 1) return
+
+    const indices = [
+      (lightboxIndex + 1) % len,
+      (lightboxIndex + 2) % len,
+      (lightboxIndex + 3) % len,
+      (lightboxIndex - 1 + len) % len,
+      (lightboxIndex - 2 + len) % len,
+    ]
+    indices.forEach((idx) => preloadSanityImage(photos[idx]))
+  }, [lightboxIndex, activeModalGallery])
+
+  // Preload adjacent images in film / portfolio lightbox
+  useEffect(() => {
+    if (portfolioLightboxIndex === null || !filteredPortfolio?.length) return
+    const len = filteredPortfolio.length
+    if (len <= 1) return
+
+    const indices = [
+      (portfolioLightboxIndex + 1) % len,
+      (portfolioLightboxIndex + 2) % len,
+      (portfolioLightboxIndex - 1 + len) % len,
+    ]
+    indices.forEach((idx) => {
+      if (filteredPortfolio[idx]?.image) {
+        preloadSanityImage(filteredPortfolio[idx].image)
+      }
+    })
+  }, [portfolioLightboxIndex, filteredPortfolio])
+
+  // Preload adjacent images in general lightbox (About / Services)
+  useEffect(() => {
+    if (!generalLightbox?.photos?.length || generalLightbox.index === null) return
+    const photos = generalLightbox.photos
+    const len = photos.length
+    if (len <= 1) return
+
+    const indices = [
+      (generalLightbox.index + 1) % len,
+      (generalLightbox.index + 2) % len,
+      (generalLightbox.index - 1 + len) % len,
+    ]
+    indices.forEach((idx) => preloadSanityImage(photos[idx]))
+  }, [generalLightbox])
+
   useEffect(() => {
     const fetchSanityData = async () => {
       try {
@@ -424,6 +514,24 @@ function App() {
 
     window.addEventListener('keydown', handleKeyDown)
     return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [featuredLightboxIndex, displayFeatured])
+
+  // Preload adjacent images in featured work lightbox
+  useEffect(() => {
+    if (featuredLightboxIndex === null || !displayFeatured?.length) return
+    const len = displayFeatured.length
+    if (len <= 1) return
+
+    const indices = [
+      (featuredLightboxIndex + 1) % len,
+      (featuredLightboxIndex + 2) % len,
+      (featuredLightboxIndex - 1 + len) % len,
+    ]
+    indices.forEach((idx) => {
+      if (displayFeatured[idx]?.image) {
+        preloadSanityImage(displayFeatured[idx].image)
+      }
+    })
   }, [featuredLightboxIndex, displayFeatured])
 
   const handleContactSubmit = async (e) => {
@@ -729,6 +837,11 @@ function App() {
                 style={{ zIndex: 9999 }}
                 className="fixed inset-0 bg-black/95 flex items-center justify-center p-2 md:p-4 select-none cursor-pointer"
                 onClick={() => setFeaturedLightboxIndex(null)}
+                onTouchStart={handleTouchStart}
+                onTouchEnd={handleTouchEnd(
+                  () => setFeaturedLightboxIndex((prev) => (prev < displayFeatured.length - 1 ? prev + 1 : 0)),
+                  () => setFeaturedLightboxIndex((prev) => (prev > 0 ? prev - 1 : displayFeatured.length - 1))
+                )}
               >
                 {/* Close Button */}
                 <button
@@ -776,10 +889,11 @@ function App() {
                   onClick={(e) => e.stopPropagation()}
                 >
                   <img
-                    key={featuredLightboxIndex}
-                    src={urlFor(displayFeatured[featuredLightboxIndex].image).width(2400).auto('format').fit('max').url()}
+                    src={urlFor(displayFeatured[featuredLightboxIndex].image).width(2000).auto('format').fit('max').quality(85).url()}
                     alt={displayFeatured[featuredLightboxIndex].title || 'Featured photo'}
-                    className="max-h-[94vh] max-w-[96vw] w-auto h-auto object-contain rounded-sm shadow-2xl transition-opacity duration-200"
+                    className="max-h-[94vh] max-w-[96vw] w-auto h-auto object-contain rounded-sm shadow-2xl transition-opacity duration-150"
+                    decoding="async"
+                    loading="eager"
                   />
                   {displayFeatured[featuredLightboxIndex].title && (
                     <p className="text-white/85 text-sm font-light mt-2 tracking-wide text-center">
@@ -828,7 +942,7 @@ function App() {
                         <div className="relative overflow-hidden rounded bg-gray-100 mb-4 shadow-sm group-hover:shadow-md transition-shadow">
                           {cg.coverImage && (
                             <img
-                              src={urlFor(cg.coverImage).width(1200).auto('format').fit('max').url()}
+                              src={urlFor(cg.coverImage).width(800).auto('format').fit('max').quality(85).url()}
                               alt={cg.title}
                               className="w-full h-auto object-contain transition-transform duration-700 group-hover:scale-105"
                               loading="lazy"
@@ -964,7 +1078,7 @@ function App() {
                     >
                       {item.image && (
                         <img
-                          src={urlFor(item.image).width(1200).auto('format').fit('max').url()}
+                          src={urlFor(item.image).width(800).auto('format').fit('max').quality(85).url()}
                           alt={item.title || 'Film photography'}
                           className="w-full h-auto object-contain block transition-transform duration-700 group-hover:scale-[1.02]"
                           loading="lazy"
@@ -982,6 +1096,11 @@ function App() {
                 style={{ zIndex: 9999 }}
                 className="fixed inset-0 bg-black/95 flex items-center justify-center p-2 md:p-4 select-none cursor-pointer"
                 onClick={() => setPortfolioLightboxIndex(null)}
+                onTouchStart={handleTouchStart}
+                onTouchEnd={handleTouchEnd(
+                  () => setPortfolioLightboxIndex((prev) => (prev < filteredPortfolio.length - 1 ? prev + 1 : 0)),
+                  () => setPortfolioLightboxIndex((prev) => (prev > 0 ? prev - 1 : filteredPortfolio.length - 1))
+                )}
               >
                 <button
                   onClick={() => setPortfolioLightboxIndex(null)}
@@ -1021,10 +1140,11 @@ function App() {
                   onClick={(e) => e.stopPropagation()}
                 >
                   <img
-                    key={portfolioLightboxIndex}
-                    src={urlFor(filteredPortfolio[portfolioLightboxIndex].image).width(2400).auto('format').fit('max').url()}
+                    src={urlFor(filteredPortfolio[portfolioLightboxIndex].image).width(2000).auto('format').fit('max').quality(85).url()}
                     alt=""
-                    className="max-h-[94vh] max-w-[96vw] w-auto h-auto object-contain rounded-sm shadow-2xl"
+                    className="max-h-[94vh] max-w-[96vw] w-auto h-auto object-contain rounded-sm shadow-2xl transition-opacity duration-150"
+                    decoding="async"
+                    loading="eager"
                   />
                   {(filteredPortfolio[portfolioLightboxIndex].title || filteredPortfolio[portfolioLightboxIndex].caption) && (
                     <div className="text-center mt-3 space-y-1">
@@ -1092,7 +1212,7 @@ function App() {
                       <div className="relative overflow-hidden rounded bg-gray-100 mb-4 shadow-sm group-hover:shadow-md transition-shadow">
                         {gallery.coverImage && (
                           <img
-                            src={urlFor(gallery.coverImage).width(1200).auto('format').fit('max').url()}
+                            src={urlFor(gallery.coverImage).width(800).auto('format').fit('max').quality(85).url()}
                             alt={gallery.title}
                             className="w-full h-auto object-contain transition-transform duration-700 group-hover:scale-105"
                             loading="lazy"
@@ -1444,7 +1564,7 @@ function App() {
                     className="cursor-pointer break-inside-avoid overflow-hidden rounded group relative shadow hover:opacity-95 transition-all bg-black/20"
                   >
                     <img
-                      src={urlFor(photo).width(1200).auto('format').fit('max').url()}
+                      src={urlFor(photo).width(800).auto('format').fit('max').quality(85).url()}
                       alt=""
                       className="w-full h-auto object-contain transition-transform duration-500 group-hover:scale-[1.02]"
                       loading="lazy"
@@ -1477,6 +1597,11 @@ function App() {
           style={{ zIndex: 9999 }}
           className="fixed inset-0 bg-black/95 flex items-center justify-center p-2 md:p-4 select-none cursor-pointer"
           onClick={() => setLightboxIndex(null)}
+          onTouchStart={handleTouchStart}
+          onTouchEnd={handleTouchEnd(
+            () => setLightboxIndex((prev) => (prev < activeModalGallery.photos.length - 1 ? prev + 1 : 0)),
+            () => setLightboxIndex((prev) => (prev > 0 ? prev - 1 : activeModalGallery.photos.length - 1))
+          )}
         >
           {/* Close Button */}
           <button
@@ -1524,10 +1649,11 @@ function App() {
             onClick={(e) => e.stopPropagation()}
           >
             <img
-              key={lightboxIndex}
-              src={urlFor(activeModalGallery.photos[lightboxIndex]).width(2400).auto('format').fit('max').url()}
+              src={urlFor(activeModalGallery.photos[lightboxIndex]).width(2000).auto('format').fit('max').quality(85).url()}
               alt=""
-              className="max-h-[96vh] max-w-[96vw] w-auto h-auto object-contain rounded-sm shadow-2xl transition-opacity duration-200"
+              className="max-h-[96vh] max-w-[96vw] w-auto h-auto object-contain rounded-sm shadow-2xl transition-opacity duration-150"
+              decoding="async"
+              loading="eager"
             />
           </div>
 
@@ -1549,6 +1675,11 @@ function App() {
           style={{ zIndex: 9999 }}
           className="fixed inset-0 bg-black/95 flex items-center justify-center p-2 md:p-4 select-none cursor-pointer"
           onClick={() => setGeneralLightbox(null)}
+          onTouchStart={handleTouchStart}
+          onTouchEnd={handleTouchEnd(
+            () => setGeneralLightbox((prev) => ({ ...prev, index: prev.index < prev.photos.length - 1 ? prev.index + 1 : 0 })),
+            () => setGeneralLightbox((prev) => ({ ...prev, index: prev.index > 0 ? prev.index - 1 : prev.photos.length - 1 }))
+          )}
         >
           {/* Close Button */}
           <button
@@ -1602,10 +1733,11 @@ function App() {
             onClick={(e) => e.stopPropagation()}
           >
             <img
-              key={generalLightbox.index}
-              src={urlFor(generalLightbox.photos[generalLightbox.index]).width(2400).auto('format').fit('max').url()}
+              src={urlFor(generalLightbox.photos[generalLightbox.index]).width(2000).auto('format').fit('max').quality(85).url()}
               alt=""
-              className="max-h-[94vh] max-w-[96vw] w-auto h-auto object-contain rounded-sm shadow-2xl transition-opacity duration-200"
+              className="max-h-[94vh] max-w-[96vw] w-auto h-auto object-contain rounded-sm shadow-2xl transition-opacity duration-150"
+              decoding="async"
+              loading="eager"
             />
             {generalLightbox.title && (
               <p className="text-white/80 text-sm font-light mt-2 tracking-wide text-center">
